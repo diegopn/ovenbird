@@ -1,0 +1,7 @@
+/build-dir/
+/build/
+/.ovenbird-build/
+/.flatpak-builder/
+/.flatpak/
+*.swp
+*~

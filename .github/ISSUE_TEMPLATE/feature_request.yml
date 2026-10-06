@@ -1,0 +1,25 @@
+name: Sugerir uma melhoria
+description: Proponha uma mudança para escrita LaTeX, biblioteca local ou Zotero.
+title: "[Ideia]: "
+body:
+  - type: markdown
+    attributes:
+      value: Descreva o problema de uso que a ideia resolveria. Não inclua documentos ou referências privadas.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema você quer resolver?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Como gostaria que funcionasse?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+    validations:
+      required: false

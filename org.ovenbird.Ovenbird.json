@@ -1,0 +1,49 @@
+{
+  "app-id": "org.ovenbird.Ovenbird",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "51",
+  "sdk": "org.gnome.Sdk",
+  "command": "ovenbird",
+  "finish-args": [
+    "--share=ipc",
+    "--share=network",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--talk-name=org.freedesktop.secrets"
+  ],
+  "modules": [
+    {
+      "name": "tectonic",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -Dm755 tectonic /app/bin/tectonic"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%400.17.0/tectonic-0.17.0-x86_64-unknown-linux-musl.tar.gz",
+          "sha256": "8533d07f9ccbd7a65824b9e0459041bca34af1eb33daba48f59215593753a3b7",
+          "strip-components": 0,
+          "only-arches": ["x86_64"]
+        },
+        {
+          "type": "archive",
+          "url": "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%400.17.0/tectonic-0.17.0-aarch64-unknown-linux-musl.tar.gz",
+          "sha256": "b10954a95404f3ab2328d2fa59a5ebab8e657f893fab096f98be8db7c0c979b8",
+          "strip-components": 0,
+          "only-arches": ["aarch64"]
+        }
+      ]
+    },
+    {
+      "name": "ovenbird",
+      "buildsystem": "meson",
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1100 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ovenbird\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 16:28-0300\n"
+"PO-Revision-Date: 2026-10-06 00:00-0300\n"
+"Last-Translator: Ovenbird contributors\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/window.js:57 src/window.js:842 src/window.js:920
+msgid "Not built yet"
+msgstr "Aún no compilado"
+
+#: src/window.js:58
+msgid "Compile the document to create the PDF."
+msgstr "Compila el documento para generar el PDF."
+
+#: src/window.js:69
+msgid "Navigation"
+msgstr "Navegación"
+
+#: src/window.js:70 src/window.js:119 src/window.js:161 src/window.js:401
+#: src/window.js:694
+msgid "Writing"
+msgstr "Escritura"
+
+#: src/window.js:98 src/window.js:193 src/window.js:408
+msgid "Find in document"
+msgstr "Buscar en el documento"
+
+#: src/window.js:104 src/window.js:157 src/window.js:189 src/window.js:721
+#: src/core/editor.js:122
+msgid "New document"
+msgstr "Nuevo documento"
+
+#: src/window.js:110
+msgid "WORKSPACE"
+msgstr "ESPACIO DE TRABAJO"
+
+#: src/window.js:121 src/window.js:162 src/window.js:196 src/window.js:593
+#: src/window.js:694
+msgid "Local library"
+msgstr "Biblioteca local"
+
+#: src/window.js:132
+msgid "Connect to Zotero"
+msgstr "Conectar con Zotero"
+
+#: src/window.js:137
+msgid "LaTeX · local references"
+msgstr "LaTeX · referencias locales"
+
+#: src/window.js:168
+msgid "Set up Zotero"
+msgstr "Configurar Zotero"
+
+#: src/window.js:178
+msgid "Application menu"
+msgstr "Menú de la aplicación"
+
+#: src/window.js:190
+msgid "Open document"
+msgstr "Abrir documento"
+
+#: src/window.js:191 src/window.js:415
+msgid "Open project folder"
+msgstr "Abrir carpeta del proyecto"
+
+#: src/window.js:192 src/window.js:416
+msgid "Save document"
+msgstr "Guardar documento"
+
+#: src/window.js:194 src/window.js:417 src/window.js:707
+msgid "Compile and create PDF"
+msgstr "Compilar y generar PDF"
+
+#: src/window.js:195
+msgid "Insert citation"
+msgstr "Insertar cita"
+
+#: src/window.js:198 src/window.js:730
+msgid "Keyboard shortcuts"
+msgstr "Atajos de teclado"
+
+#: src/window.js:199
+msgid "Collapse/expand sidebar"
+msgstr "Contraer/expandir panel lateral"
+
+#: src/window.js:225
+msgid "Document and build details"
+msgstr "Detalles del documento y la compilación"
+
+#: src/window.js:244
+msgid "Current document"
+msgstr "Documento actual"
+
+#: src/window.js:255
+msgid "Compiler"
+msgstr "Compilador"
+
+#: src/window.js:256
+msgid "Status"
+msgstr "Estado"
+
+#: src/window.js:257
+msgid "Last build"
+msgstr "Última compilación"
+
+#: src/window.js:287
+msgid "Find in document…"
+msgstr "Buscar en el documento…"
+
+#: src/window.js:291
+msgid "Previous result"
+msgstr "Resultado anterior"
+
+#: src/window.js:293
+msgid "Next result"
+msgstr "Resultado siguiente"
+
+#: src/window.js:295
+msgid "Close search"
+msgstr "Cerrar búsqueda"
+
+#: src/window.js:316
+msgid "Error"
+msgstr "Error"
+
+#: src/window.js:317
+msgid "Modified"
+msgstr "Modificado"
+
+#: src/window.js:322
+msgid "New document not saved yet"
+msgstr "Documento nuevo aún sin guardar"
+
+#: src/window.js:323
+msgid "No project folder selected"
+msgstr "No se seleccionó una carpeta de proyecto"
+
+#: src/window.js:324
+msgid "Save the document to set the project file."
+msgstr "Guarda el documento para definir el archivo del proyecto."
+
+#: src/window.js:325
+#, javascript-format
+msgid ""
+"File: %s\n"
+"Project: %s"
+msgstr ""
+"Archivo: %s\n"
+"Proyecto: %s"
+
+#: src/window.js:326
+msgid "Not found"
+msgstr "No encontrado"
+
+#: src/window.js:328
+#, javascript-format
+msgid "%s · local changes pending"
+msgstr "%s · cambios locales pendientes"
+
+#: src/window.js:363
+msgid "No results"
+msgstr "Sin resultados"
+
+#: src/window.js:372
+msgid "Match found"
+msgstr "Coincidencia encontrada"
+
+#: src/window.js:393
+msgid "Expand sidebar"
+msgstr "Expandir panel lateral"
+
+#: src/window.js:393 src/window.js:406
+msgid "Collapse sidebar"
+msgstr "Contraer panel lateral"
+
+#: src/window.js:414 src/window.js:757
+msgid "Open LaTeX document"
+msgstr "Abrir documento LaTeX"
+
+#: src/window.js:420 src/window.js:1346
+msgid "Add reference"
+msgstr "Añadir referencia"
+
+#: src/window.js:425
+msgid "Sync Zotero"
+msgstr "Sincronizar Zotero"
+
+#: src/window.js:433
+msgid "Code"
+msgstr "Código"
+
+#: src/window.js:434
+msgid "Visual"
+msgstr "Visual"
+
+#: src/window.js:462
+msgid "The compiled PDF will appear here"
+msgstr "El PDF compilado aparecerá aquí"
+
+#: src/window.js:475
+msgid ""
+"Switch modes at any time without creating another version of the document"
+msgstr "Cambia de modo cuando quieras sin crear otra versión del documento"
+
+#: src/window.js:483
+msgid "Undo"
+msgstr "Deshacer"
+
+#: src/window.js:484
+msgid "Redo"
+msgstr "Rehacer"
+
+#: src/window.js:491 src/window.js:492
+msgid "Normal text"
+msgstr "Texto normal"
+
+#: src/window.js:493
+msgid "Section"
+msgstr "Sección"
+
+#: src/window.js:494
+msgid "Subsection"
+msgstr "Subsección"
+
+#: src/window.js:495
+msgid "Subsubsection"
+msgstr "Subsubsección"
+
+#: src/window.js:496
+msgid "Paragraph"
+msgstr "Párrafo"
+
+#: src/window.js:497
+msgid "Subparagraph"
+msgstr "Subpárrafo"
+
+#: src/window.js:503
+msgid "Bold"
+msgstr "Negrita"
+
+#: src/window.js:504
+msgid "Italic"
+msgstr "Cursiva"
+
+#: src/window.js:505
+msgid "Underline"
+msgstr "Subrayado"
+
+#: src/window.js:506
+msgid "Monospace"
+msgstr "Monoespaciado"
+
+#: src/window.js:510
+msgid "Math"
+msgstr "Matemáticas"
+
+#: src/window.js:511
+msgid "Inline equation"
+msgstr "Ecuación en línea"
+
+#: src/window.js:512
+msgid "Display equation"
+msgstr "Ecuación destacada"
+
+#: src/window.js:516
+msgid "α  Alpha"
+msgstr "α  Alfa"
+
+#: src/window.js:517
+msgid "β  Beta"
+msgstr "β  Beta"
+
+#: src/window.js:518
+msgid "γ  Gamma"
+msgstr "γ  Gamma"
+
+#: src/window.js:519
+msgid "π  Pi"
+msgstr "π  Pi"
+
+#: src/window.js:520
+msgid "≤  Less than or equal to"
+msgstr "≤  Menor o igual que"
+
+#: src/window.js:521
+msgid "≥  Greater than or equal to"
+msgstr "≥  Mayor o igual que"
+
+#: src/window.js:522
+msgid "≠  Not equal to"
+msgstr "≠  Distinto de"
+
+#: src/window.js:523
+msgid "×  Multiplication"
+msgstr "×  Multiplicación"
+
+#: src/window.js:524
+msgid "±  Plus or minus"
+msgstr "±  Más o menos"
+
+#: src/window.js:525
+msgid "∞  Infinity"
+msgstr "∞  Infinito"
+
+#: src/window.js:526
+msgid "∑  Summation"
+msgstr "∑  Sumatoria"
+
+#: src/window.js:527
+msgid "∫  Integral"
+msgstr "∫  Integral"
+
+#: src/window.js:528
+msgid "√  Square root"
+msgstr "√  Raíz cuadrada"
+
+#: src/window.js:530 src/window.js:1232 src/window.js:1234
+msgid "Insert link"
+msgstr "Insertar enlace"
+
+#: src/window.js:531
+msgid "Cite"
+msgstr "Citar"
+
+#: src/window.js:532
+msgid "Find and insert a bibliography reference"
+msgstr "Buscar e insertar una referencia bibliográfica"
+
+#: src/window.js:537
+msgid "List"
+msgstr "Lista"
+
+#: src/window.js:538
+msgid "Bulleted list"
+msgstr "Lista con viñetas"
+
+#: src/window.js:539
+msgid "Numbered list"
+msgstr "Lista numerada"
+
+#: src/window.js:540
+msgid "Quotation block"
+msgstr "Bloque de cita"
+
+#: src/window.js:541
+msgid "Increase indent"
+msgstr "Aumentar sangría"
+
+#: src/window.js:542
+msgid "Decrease indent"
+msgstr "Reducir sangría"
+
+#: src/window.js:544
+msgid "More"
+msgstr "Más"
+
+#: src/window.js:545 src/window.js:1300
+msgid "Insert image"
+msgstr "Insertar imagen"
+
+#: src/window.js:546 src/window.js:1269 src/window.js:1271
+msgid "Insert table"
+msgstr "Insertar tabla"
+
+#: src/window.js:547
+msgid "LaTeX comment"
+msgstr "Comentario LaTeX"
+
+#: src/window.js:548
+msgid "Footnote"
+msgstr "Nota al pie"
+
+#: src/window.js:549
+msgid "Review note"
+msgstr "Nota de revisión"
+
+#: src/window.js:550
+msgid "Add label"
+msgstr "Añadir etiqueta"
+
+#: src/window.js:551
+msgid "Cross-reference"
+msgstr "Referencia cruzada"
+
+#: src/window.js:570
+msgid "New document · unsaved changes"
+msgstr "Documento nuevo · cambios sin guardar"
+
+#: src/window.js:595
+msgid "Your references stay on this computer and remain available offline."
+msgstr ""
+"Tus referencias permanecen en este equipo y están disponibles sin conexión."
+
+#: src/window.js:602
+msgid "Search references…"
+msgstr "Buscar referencias…"
+
+#: src/window.js:607
+msgid "Import .bib"
+msgstr "Importar .bib"
+
+#: src/window.js:609
+msgid "Export .bib"
+msgstr "Exportar .bib"
+
+#: src/window.js:707
+msgid "Add a reference to the local library"
+msgstr "Añadir una referencia a la biblioteca local"
+
+#: src/window.js:722
+#, javascript-format
+msgid "%s · unsaved changes"
+msgstr "%s · cambios sin guardar"
+
+#: src/window.js:722
+#, javascript-format
+msgid "%s · saved"
+msgstr "%s · guardado"
+
+#: src/window.js:731
+msgid ""
+"Ctrl+O  Open document\n"
+"Ctrl+S  Save\n"
+"Ctrl+F  Find in document\n"
+"Ctrl+Shift+R  Compile and create PDF\n"
+"Ctrl+Shift+C  Insert citation\n"
+"Ctrl+Z / Ctrl+Shift+Z  Undo / Redo"
+msgstr ""
+"Ctrl+O  Abrir documento\n"
+"Ctrl+S  Guardar\n"
+"Ctrl+F  Buscar en el documento\n"
+"Ctrl+Shift+R  Compilar y generar PDF\n"
+"Ctrl+Shift+C  Insertar cita\n"
+"Ctrl+Z / Ctrl+Shift+Z  Deshacer / Rehacer"
+
+#: src/window.js:741 src/window.js:804
+msgid "Open"
+msgstr "Abrir"
+
+#: src/window.js:741 src/window.js:885 src/window.js:1137
+msgid "Save"
+msgstr "Guardar"
+
+#: src/window.js:742 src/window.js:765 src/window.js:803 src/window.js:884
+#: src/window.js:1135 src/window.js:1233 src/window.js:1270 src/window.js:1301
+#: src/window.js:1413 src/window.js:1449 src/window.js:1488
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/window.js:746
+msgid "LaTeX (*.tex)"
+msgstr "LaTeX (*.tex)"
+
+#: src/window.js:764
+msgid "Select folder"
+msgstr "Seleccionar carpeta"
+
+#: src/window.js:775
+msgid "Open LaTeX project folder"
+msgstr "Abrir carpeta del proyecto LaTeX"
+
+#: src/window.js:788
+msgid "No .tex files were found in this folder"
+msgstr "No se encontraron archivos .tex en esta carpeta"
+
+#: src/window.js:795
+#, javascript-format
+msgid "Could not list the folder: %s"
+msgstr "No se pudo enumerar la carpeta: %s"
+
+#: src/window.js:801
+msgid "Choose main document"
+msgstr "Elegir documento principal"
+
+#: src/window.js:836 src/core/build.js:99
+msgid "The document must be available as a local file."
+msgstr "El documento debe estar disponible como archivo local."
+
+#: src/window.js:838 src/window.js:1422
+msgid "Could not read the file."
+msgstr "No se pudo leer el archivo."
+
+#: src/window.js:843 src/window.js:921
+msgid "This document has not been compiled yet."
+msgstr "Este documento aún no se ha compilado."
+
+#: src/window.js:844 src/window.js:922
+msgid "Compile the document to see the PDF"
+msgstr "Compila el documento para ver el PDF"
+
+#: src/window.js:847
+#, javascript-format
+msgid "Could not open: %s"
+msgstr "No se pudo abrir: %s"
+
+#: src/window.js:863
+msgid "Discard unsaved changes?"
+msgstr "¿Descartar los cambios sin guardar?"
+
+#: src/window.js:864
+msgid "The current document has changes that have not been saved."
+msgstr "El documento actual tiene cambios sin guardar."
+
+#: src/window.js:866
+msgid "Keep editing"
+msgstr "Seguir editando"
+
+#: src/window.js:867
+msgid "Discard"
+msgstr "Descartar"
+
+#: src/window.js:876
+msgid "Choose a folder for the new project"
+msgstr "Elegir una carpeta para el proyecto nuevo"
+
+#: src/window.js:882
+msgid "New LaTeX document"
+msgstr "Documento nuevo de LaTeX"
+
+#: src/window.js:882
+msgid "Save LaTeX document"
+msgstr "Guardar documento LaTeX"
+
+#: src/window.js:885
+msgid "Create"
+msgstr "Crear"
+
+#: src/window.js:893
+msgid "File name in the selected folder"
+msgstr "Nombre del archivo en la carpeta seleccionada"
+
+#: src/window.js:903
+msgid "Enter a valid file name"
+msgstr "Introduce un nombre de archivo válido"
+
+#: src/window.js:909
+msgid "A file with that name already exists in this folder"
+msgstr "Ya existe un archivo con ese nombre en esta carpeta"
+
+#: src/window.js:914
+msgid "The folder is not available as a local directory."
+msgstr "La carpeta no está disponible como directorio local."
+
+#: src/window.js:926
+#, javascript-format
+msgid "Could not create the file: %s"
+msgstr "No se pudo crear el archivo: %s"
+
+#: src/window.js:934
+msgid "Document saved"
+msgstr "Documento guardado"
+
+#: src/window.js:937
+msgid "Choose a folder for the document"
+msgstr "Elegir una carpeta para el documento"
+
+#: src/window.js:955
+msgid "Choose a project folder before updating the BibTeX file."
+msgstr "Selecciona una carpeta de proyecto para actualizar el archivo BibTeX."
+
+#: src/window.js:973
+#, javascript-format
+msgid "Could not create a folder for %s."
+msgstr "No se pudo crear una carpeta para %s."
+
+#: src/window.js:978
+#, javascript-format
+msgid "Could not read %s."
+msgstr "No se pudo leer %s."
+
+#: src/window.js:1030
+msgid "Save the document before compiling"
+msgstr "Guarda el documento antes de compilar"
+
+#: src/window.js:1031
+msgid "Save the document before compiling."
+msgstr "Guarda el documento antes de compilar."
+
+#: src/window.js:1036
+msgid "No LaTeX compiler was found in the Ovenbird environment."
+msgstr "No se encontró un compilador de LaTeX en el entorno de Ovenbird."
+
+#: src/window.js:1037
+msgid ""
+"No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live in the "
+"Ovenbird environment."
+msgstr ""
+"No se encontró un compilador de LaTeX. Instala latexmk, Tectonic o TeX Live "
+"en el entorno de Ovenbird."
+
+#: src/window.js:1042
+#, javascript-format
+msgid "%d local reference added to the project BibTeX"
+msgid_plural "%d local references added to the project BibTeX"
+msgstr[0] "%d referencia local añadida al BibTeX del proyecto"
+msgstr[1] "%d referencias locales añadidas al BibTeX del proyecto"
+
+#: src/window.js:1044
+#, javascript-format
+msgid "%d duplicate key; the project file was left unchanged"
+msgid_plural "%d duplicate keys; the project file was left unchanged"
+msgstr[0] "%d clave duplicada; se conservó el archivo del proyecto"
+msgstr[1] "%d claves duplicadas; se conservó el archivo del proyecto"
+
+#: src/window.js:1048
+#, javascript-format
+msgid "Could not update the project bibliography: %s"
+msgstr "No se pudo actualizar la bibliografía del proyecto: %s"
+
+#: src/window.js:1053
+msgid "Compilation is in progress."
+msgstr "La compilación está en curso."
+
+#: src/window.js:1054
+msgid "Compiling LaTeX…"
+msgstr "Compilando LaTeX…"
+
+#: src/window.js:1059
+msgid "Compilation found errors"
+msgstr "La compilación encontró errores"
+
+#: src/window.js:1067
+msgid "PDF updated"
+msgstr "PDF actualizado"
+
+#: src/window.js:1069
+msgid "PDF compiled, but the preview could not be opened"
+msgstr "PDF compilado, pero no se pudo abrir la vista previa"
+
+#: src/window.js:1070
+#, javascript-format
+msgid "PDF created, but the preview could not be opened: %s"
+msgstr "PDF generado, pero no se pudo abrir la vista previa: %s"
+
+#: src/window.js:1071
+msgid "Could not open the PDF preview"
+msgstr "No se pudo abrir la vista previa del PDF"
+
+#: src/window.js:1079
+msgid "Could not compile the document"
+msgstr "No se pudo compilar el documento"
+
+#: src/window.js:1080
+msgid "Check the build output"
+msgstr "Revisa la salida de compilación"
+
+#: src/window.js:1107 src/window.js:1367
+msgid "No references found"
+msgstr "No se encontraron referencias"
+
+#: src/window.js:1107
+msgid "Your library starts here"
+msgstr "Tu biblioteca empieza aquí"
+
+#: src/window.js:1108
+msgid "Try another search term."
+msgstr "Prueba con otro término de búsqueda."
+
+#: src/window.js:1108
+msgid "Add a reference, import a BibTeX file, or connect your Zotero account."
+msgstr ""
+"Añade una referencia, importa un archivo BibTeX o conecta tu cuenta de "
+"Zotero."
+
+#: src/window.js:1113 src/window.js:1383
+msgid "Unknown author"
+msgstr "Autor desconocido"
+
+#: src/window.js:1120 src/window.js:1133
+msgid "Edit reference"
+msgstr "Editar referencia"
+
+#: src/window.js:1127
+#, javascript-format
+msgid "%d local reference"
+msgid_plural "%d local references"
+msgstr[0] "%d referencia local"
+msgstr[1] "%d referencias locales"
+
+#: src/window.js:1133
+msgid "New reference"
+msgstr "Referencia nueva"
+
+#: src/window.js:1136
+msgid "Delete"
+msgstr "Eliminar"
+
+#: src/window.js:1137
+msgid "Add"
+msgstr "Añadir"
+
+#: src/window.js:1155
+msgid "Reference type"
+msgstr "Tipo de referencia"
+
+#: src/window.js:1161
+msgid "Citation key"
+msgstr "Clave de cita"
+
+#: src/window.js:1162
+msgid "Title"
+msgstr "Título"
+
+#: src/window.js:1163
+msgid "Author(s)"
+msgstr "Autor(es)"
+
+#: src/window.js:1164
+msgid "Editor(s)"
+msgstr "Editor(es)"
+
+#: src/window.js:1165
+msgid "Year / date"
+msgstr "Año / fecha"
+
+#: src/window.js:1166
+msgid "Journal / event / book"
+msgstr "Revista / evento / libro"
+
+#: src/window.js:1167
+msgid "Publisher"
+msgstr "Editorial"
+
+#: src/window.js:1168
+msgid "Volume"
+msgstr "Volumen"
+
+#: src/window.js:1169
+msgid "Number / issue"
+msgstr "Número / edición"
+
+#: src/window.js:1170
+msgid "Edition"
+msgstr "Edición"
+
+#: src/window.js:1171
+msgid "Pages"
+msgstr "Páginas"
+
+#: src/window.js:1172
+msgid "DOI"
+msgstr "DOI"
+
+#: src/window.js:1173
+msgid "URL"
+msgstr "URL"
+
+#: src/window.js:1174
+msgid "Keywords"
+msgstr "Palabras clave"
+
+#: src/window.js:1182
+msgid "Full title of the work"
+msgstr "Título completo de la obra"
+
+#: src/window.js:1192
+msgid "Reference removed from the local library"
+msgstr "Referencia eliminada de la biblioteca local"
+
+#: src/window.js:1196
+msgid "Enter the reference title"
+msgstr "Introduce el título de la referencia"
+
+#: src/window.js:1220
+msgid "Reference updated"
+msgstr "Referencia actualizada"
+
+#: src/window.js:1220
+msgid "Reference added"
+msgstr "Referencia añadida"
+
+#: src/window.js:1244
+msgid "Text shown in the document"
+msgstr "Texto que aparece en el documento"
+
+#: src/window.js:1245
+msgid "Link address"
+msgstr "Dirección del enlace"
+
+#: src/window.js:1247
+msgid "Link text"
+msgstr "Texto del enlace"
+
+#: src/window.js:1256
+msgid "Enter a link address"
+msgstr "Introduce la dirección del enlace"
+
+#: src/window.js:1284
+msgid "Rows"
+msgstr "Filas"
+
+#: src/window.js:1286
+msgid "Columns"
+msgstr "Columnas"
+
+#: src/window.js:1301
+msgid "Insert"
+msgstr "Insertar"
+
+#: src/window.js:1303
+msgid "Images and PDF"
+msgstr "Imágenes y PDF"
+
+#: src/window.js:1337
+msgid "Search by title, author, or year…"
+msgstr "Buscar por título, autor o año…"
+
+#: src/window.js:1341
+msgid ""
+"Your local library is empty. Add a reference or import a BibTeX file to cite "
+"it."
+msgstr ""
+"Tu biblioteca local está vacía. Añade una referencia o importa un archivo "
+"BibTeX para citarlo."
+
+#: src/window.js:1347 src/window.js:1412
+msgid "Import BibTeX"
+msgstr "Importar BibTeX"
+
+#: src/window.js:1384
+msgid "Year unknown"
+msgstr "Año desconocido"
+
+#: src/window.js:1386
+msgid "Untitled reference"
+msgstr "Referencia sin título"
+
+#: src/window.js:1413
+msgid "Import"
+msgstr "Importar"
+
+#: src/window.js:1415
+msgid "BibTeX (*.bib)"
+msgstr "BibTeX (*.bib)"
+
+#: src/window.js:1437
+#, javascript-format
+msgid "%d reference imported"
+msgid_plural "%d references imported"
+msgstr[0] "%d referencia importada"
+msgstr[1] "%d referencias importadas"
+
+#: src/window.js:1439
+#, javascript-format
+msgid "Import failed: %s"
+msgstr "Error al importar: %s"
+
+#: src/window.js:1448
+msgid "Export BibTeX library"
+msgstr "Exportar biblioteca BibTeX"
+
+#: src/window.js:1449
+msgid "Export"
+msgstr "Exportar"
+
+#: src/window.js:1456
+msgid "Library exported"
+msgstr "Biblioteca exportada"
+
+#: src/window.js:1458
+#, javascript-format
+msgid "Export failed: %s"
+msgstr "Error al exportar: %s"
+
+#: src/window.js:1486
+msgid "Sync with Zotero"
+msgstr "Sincronizar con Zotero"
+
+#: src/window.js:1489
+msgid "Save and sync"
+msgstr "Guardar y sincronizar"
+
+#: src/window.js:1497
+msgid ""
+"The local library works without an account. To sync, enter your library ID "
+"and a Zotero key with read and write access."
+msgstr ""
+"La biblioteca local funciona sin una cuenta. Para sincronizar, introduce el "
+"ID de la biblioteca y una clave de Zotero con permisos de lectura y "
+"escritura."
+
+#: src/window.js:1501
+msgid "User ID"
+msgstr "ID de usuario"
+
+#: src/window.js:1502
+msgid "Found at zotero.org/settings/keys"
+msgstr "Disponible en zotero.org/settings/keys"
+
+#: src/window.js:1503
+msgid "API key"
+msgstr "Clave de API"
+
+#: src/window.js:1504
+msgid "Zotero key with write access"
+msgstr "Clave de Zotero con permiso de escritura"
+
+#: src/window.js:1515
+msgid "Enter the ID and API key"
+msgstr "Introduce el ID y la clave de API"
+
+#: src/window.js:1525
+#, javascript-format
+msgid "Could not save the key: %s"
+msgstr "No se pudo guardar la clave: %s"
+
+#: src/window.js:1536
+#, javascript-format
+msgid "The password service is unavailable: %s"
+msgstr "El servicio de contraseñas no está disponible: %s"
+
+#: src/window.js:1542
+msgid "Syncing references…"
+msgstr "Sincronizando referencias…"
+
+#: src/window.js:1549
+#, javascript-format
+msgid "%d reference downloaded"
+msgid_plural "%d references downloaded"
+msgstr[0] "%d referencia descargada"
+msgstr[1] "%d referencias descargadas"
+
+#: src/window.js:1550
+#, javascript-format
+msgid "%d reference uploaded"
+msgid_plural "%d references uploaded"
+msgstr[0] "%d referencia subida"
+msgstr[1] "%d referencias subidas"
+
+#: src/window.js:1551
+#, javascript-format
+msgid "%d reference updated locally"
+msgid_plural "%d references updated locally"
+msgstr[0] "%d referencia actualizada localmente"
+msgstr[1] "%d referencias actualizadas localmente"
+
+#: src/window.js:1552
+#, javascript-format
+msgid "%d conflict kept locally"
+msgid_plural "%d conflicts kept locally"
+msgstr[0] "%d conflicto conservado localmente"
+msgstr[1] "%d conflictos conservados localmente"
+
+#: src/window.js:1553
+#, javascript-format
+msgid "%d upload failed"
+msgid_plural "%d uploads failed"
+msgstr[0] "%d error al subir"
+msgstr[1] "%d errores al subir"
+
+#: src/window.js:1557
+#, javascript-format
+msgid "Sync failed: %s"
+msgstr "Error al sincronizar: %s"
+
+#: src/core/editor.js:122
+msgid "Introduction"
+msgstr "Introducción"
+
+#: src/core/editor.js:122
+msgid "Start writing here."
+msgstr "Empieza a escribir aquí."
+
+#: src/core/editor.js:170
+msgid ""
+"Visual mode needs a document with \\begin{document} and \\end{document}.\n"
+"\n"
+"Switch to Code mode to review the document structure."
+msgstr ""
+"El modo Visual necesita un documento con \\begin{document} y "
+"\\end{document}.\n"
+"\n"
+"Cambia al modo Código para revisar la estructura del documento."
+
+#: src/core/build.js:52 src/core/build.js:64
+#, javascript-format
+msgid "Compilation stopped after %d minute."
+msgid_plural "Compilation stopped after %d minutes."
+msgstr[0] "La compilación se detuvo después de %d minuto."
+msgstr[1] "La compilación se detuvo después de %d minutos."
+
+#: src/core/build.js:57
+msgid "The document failed to compile."
+msgstr "No se pudo compilar el documento."
+
+#: src/core/build.js:93
+msgid "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live."
+msgstr ""
+"No se encontró un compilador de LaTeX. Instala latexmk, Tectonic o TeX Live."
+
+#: src/core/build.js:95
+msgid "Compiling with Tectonic · the first build may download support files."
+msgstr ""
+"Compilando con Tectonic · la primera compilación puede descargar archivos de "
+"soporte."
+
+#: src/core/build.js:96
+#, javascript-format
+msgid "Compiling with %s…"
+msgstr "Compilando con %s…"
+
+#: src/core/build.js:108
+#, javascript-format
+msgid "Could not prepare the build folder: %s"
+msgstr "No se pudo preparar la carpeta de compilación: %s"
+
+#: src/core/build.js:135
+msgid ""
+"This document uses biblatex and needs Biber. Install Biber, latexmk, or "
+"Tectonic."
+msgstr ""
+"Este documento usa biblatex y necesita Biber. Instala Biber, latexmk o "
+"Tectonic."
+
+#: src/core/build.js:143
+msgid "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic."
+msgstr "Este documento necesita BibTeX. Instala BibTeX, latexmk o Tectonic."
+
+#: src/core/build.js:151
+#, javascript-format
+msgid ""
+"%s finished without creating the expected PDF. Check that the document has a "
+"complete LaTeX structure."
+msgstr ""
+"%s terminó sin generar el PDF esperado. Comprueba que el documento tenga una "
+"estructura LaTeX completa."
+
+#: src/core/build.js:154
+#, javascript-format
+msgid "%s: compilation complete."
+msgstr "%s: compilación finalizada."
+
+#: src/core/build.js:169
+msgid "Previous page"
+msgstr "Página anterior"
+
+#: src/core/build.js:170
+msgid "Next page"
+msgstr "Página siguiente"
+
+#: src/core/build.js:207
+msgid "PDF opened in the default viewer"
+msgstr "PDF abierto en el visor predeterminado"
+
+#: src/core/build.js:218
+msgid "Could not open the PDF"
+msgstr "No se pudo abrir el PDF"
+
+#: src/core/latex-commands.js:31
+#, javascript-format
+msgid "Unknown LaTeX formatting: %s"
+msgstr "Formato LaTeX desconocido: %s"
+
+#: src/core/latex-commands.js:47
+#, javascript-format
+msgid "Unknown paragraph style: %s"
+msgstr "Estilo de párrafo desconocido: %s"
+
+#: src/core/latex-commands.js:53
+#, javascript-format
+msgid "Unknown list environment: %s"
+msgstr "Entorno de lista desconocido: %s"
+
+#: src/core/library.js:36 src/core/library.js:43
+#, javascript-format
+msgid "Citation key “%s” already exists."
+msgstr "La clave de cita “%s” ya existe."
+
+#: src/core/library.js:45
+msgid "The reference no longer exists."
+msgstr "La referencia ya no existe."
+
+#: src/core/zotero.js:42
+msgid "Ovenbird Zotero API key"
+msgstr "Clave de API de Zotero de Ovenbird"
+
+#: src/core/zotero.js:43
+msgid "The password service did not accept the key."
+msgstr "El servicio de contraseñas no aceptó la clave."
+
+#: src/core/zotero.js:92
+#, javascript-format
+msgid "Zotero returned %s: %s"
+msgstr "Zotero respondió %s: %s"
+
+#: src/core/zotero.js:231
+msgid ""
+"Zotero did not report the current library version; no references were "
+"uploaded."
+msgstr ""
+"Zotero no indicó la versión actual de la biblioteca; no se subió ninguna "
+"referencia."

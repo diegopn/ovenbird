@@ -1,0 +1,41 @@
+name: Relatar um erro
+description: Informe algo que não está funcionando como esperado.
+title: "[Erro]: "
+body:
+  - type: markdown
+    attributes:
+      value: Obrigado por ajudar a melhorar o Ovenbird. Não anexe documentos ou bibliografias privadas.
+  - type: input
+    id: version
+    attributes:
+      label: Versão do Ovenbird
+      placeholder: "0.1.0 ou commit usado"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir
+      description: Liste os passos que levam ao problema.
+      placeholder: "1. Abra… 2. Escolha… 3. Observe…"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: O que esperava acontecer?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: O que aconteceu?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Inclua sua distribuição Linux, versão do GNOME/Flatpak e compilador LaTeX, se aplicável.
+    validations:
+      required: false

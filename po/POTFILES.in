@@ -1,0 +1,7 @@
+src/application.js
+src/window.js
+src/core/editor.js
+src/core/build.js
+src/core/latex-commands.js
+src/core/library.js
+src/core/zotero.js
