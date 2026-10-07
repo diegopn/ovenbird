@@ -1,105 +1,109 @@
 # Ovenbird
 
-Editor LaTeX nativo para GNOME, com uma biblioteca bibliográfica local e sincronização opcional com Zotero.
+Editor LaTeX para GNOME, escrito em Rust com GTK 4, Libadwaita e GtkSourceView. Os documentos continuam em arquivos `.tex`; o projeto não converte o conteúdo para Markdown nem para um formato proprietário.
 
-Os documentos de trabalho continuam sendo arquivos `.tex`: não há conversão para Markdown nem formato proprietário. O editor oferece modos **Código** e **Visual** para o mesmo conteúdo; a biblioteca local funciona sem conta Zotero e sem conexão com a internet. O Markdown deste repositório é apenas documentação para o GitHub.
+## Recursos
 
-> **Estado:** protótipo inicial em desenvolvimento. Ainda não é uma versão pronta para publicação no Flathub.
+- Modos Código e Visual para o mesmo documento, com histórico compartilhado de desfazer e refazer.
+- Edição de `.tex`, `.bib` e `.sty`; os demais arquivos do projeto aparecem como recursos.
+- Navegador recursivo de arquivos do projeto, criação de arquivos e pastas, arrastar para mover, renomear e enviar à lixeira.
+- Busca no documento, inserção de links, imagens, tabelas, equações, listas, notas e citações.
+- Biblioteca BibTeX local independente dos projetos, com formulários por tipo de referência e importação e exportação `.bib`.
+- Sincronização bidirecional manual com Zotero Web API v3. Credenciais ficam no Secret Service do sistema.
+- Projetos em branco, ABNT, IEEE, ACM, Elsevier e Springer Nature criados a partir dos modelos incluídos, sem baixar modelos da internet.
+- Compilação por `latexmk`, `pdflatex` ou Tectonic, com referências locais combinadas em um `.bib` temporário.
+- Prévia de PDF dentro do editor quando Poppler-GLib está disponível no build; sem ele, o PDF abre no leitor padrão.
+- Interface traduzida para português do Brasil e espanhol, respeitando o idioma do sistema e usando inglês como fallback.
 
-## O que já está nesta base
+O modo Visual cobre um subconjunto conservador de LaTeX. Comandos e ambientes desconhecidos permanecem como texto-fonte para evitar perda de conteúdo.
 
-- Interface no idioma do sistema: português do Brasil e espanhol, com inglês como idioma padrão.
-- Aplicativo GJS com GTK 4, Libadwaita e GtkSourceView.
-- Janela adaptável inspirada nos padrões de navegação do GNOME, com áreas de Escrita e Biblioteca local.
-- Abrir um `.tex` isolado ou uma pasta de projeto, criar documentos dentro de uma pasta autorizada e salvar `.tex`.
-- Alternância entre Código e Visual no mesmo documento.
-- Uma faixa horizontal de edição presente em Código e Visual, com estilos de parágrafo, formatação, equações, símbolos, links, listas, recuo, notas, imagens e tabelas. Ações sem representação visual no subconjunto atual inserem LaTeX no documento.
-- Desfazer e refazer compartilhados entre Código e Visual.
-- Pré-visualização embutida quando Poppler está disponível; caso contrário, o PDF abre no leitor padrão.
-- Cadastro, busca, edição e exclusão de referências localmente.
-- Importação e exportação de BibTeX; diretivas `@string`, `@preamble` e `@comment` são mantidas.
-- Busca rápida de citações por título, autor ou ano; selecionar um resultado ou pressionar Enter insere `\cite{chave}` no cursor. Com a biblioteca vazia, o mesmo fluxo oferece adicionar ou importar referências.
-- Ao compilar, mescla referências locais no `.bib` declarado por `\addbibresource` ou `\bibliography`. Chaves já existentes no projeto são preservadas e conflitos são informados.
-- Sincronização manual bidirecional básica com a biblioteca pessoal do Zotero por meio da API Web v3.
-- Chaves Zotero armazenadas pelo Secret Service do sistema; arquivos de projetos acessados pelo seletor de arquivos do desktop.
+## Requisitos no Fedora
 
-## Limites conhecidos
-
-- O modo Visual cobre um subconjunto de LaTeX. Classes, macros, ambientes e comandos personalizados podem aparecer como código para preservar o texto original.
-- A edição do preâmbulo é feita no modo Código.
-- A sincronização ainda não transfere PDFs/anexos nem propaga exclusões. Conflitos entre alterações locais e remotas são preservados localmente e informados, sem sobrescrita automática. A sincronização é completa, não incremental.
-- No Flatpak, o Tectonic 0.17.0 é incluído para compilar documentos LaTeX e processar bibliografias BibTeX. A primeira compilação pode baixar arquivos de suporte do Tectonic; depois eles ficam no cache local. Projetos `biblatex` que exigem Biber precisam de um ambiente TeX que inclua Biber, como TeX Live com `latexmk`.
-- PDFs e arquivos intermediários da compilação ficam no cache privado do Ovenbird, fora da pasta do projeto. A interface informa quando a primeira execução do Tectonic pode estar baixando seus arquivos de suporte; cada processo de compilação tem limite de cinco minutos.
-- A validação do editor visual e da sincronização ainda precisa crescer; a licença e a URL do repositório também precisam ser escolhidas antes da publicação.
-
-## Requisitos para executar a versão de desenvolvimento
-
-- GJS com introspecção de GTK 4 e Libadwaita.
-- GtkSourceView 5 disponível para GObject Introspection.
-- Ferramentas GNU gettext (`msgfmt` e `xgettext`) para compilar os catálogos durante o desenvolvimento; o GNOME SDK do Flatpak já as fornece.
-- Poppler-GLib para a pré-visualização embutida (opcional; sem ela, o PDF abre no leitor padrão).
-- Para executar fora do Flatpak, instale `latexmk`, `pdflatex` com BibTeX, ou Tectonic. Projetos `biblatex` precisam também do Biber; `latexmk` automatiza as passagens quando os processadores correspondentes estão instalados.
-- Para usar Zotero: conexão de rede, uma chave da API com leitura e escrita, e um serviço Secret Service (por exemplo, GNOME Keyring).
-
-O Flatpak usa GNOME Platform/SDK 51 e solicita rede para a integração Zotero e para baixar arquivos de suporte do Tectonic na primeira compilação. A biblioteca bibliográfica local e os arquivos `.bib` do projeto continuam armazenados localmente. O aplicativo não pede acesso irrestrito ao diretório pessoal: escolha a pasta do projeto pelo seletor para permitir acesso aos arquivos relacionados, como imagens e `.bib`.
-
-## Executar localmente
+Para compilar e executar fora do Flatpak:
 
 ```sh
-meson setup build-dir
-meson compile -C build-dir
-OVENBIRD_LOCALEDIR="$PWD/build-dir/po" gjs -m src/main.js
+sudo dnf install gcc rust cargo pkgconf-pkg-config meson ninja-build gettext-devel gtk4-devel libadwaita-devel gtksourceview5-devel libsecret-devel unzip
 ```
 
-## Validar o núcleo
+O `rust` e o `cargo` são necessários para o build nativo pelo Meson. A extensão Rust do Flatpak é usada pelo GNOME Builder e não instala o Cargo no Fedora fora do SDK.
+
+O Poppler é opcional e habilita a prévia embutida:
 
 ```sh
-meson setup build-dir
-meson test -C build-dir --print-errorlogs
+sudo dnf install poppler-glib-devel
 ```
 
-## Construir o Flatpak
-
-Com `flatpak-builder`, o GNOME SDK 51 e o runtime correspondentes instalados:
+Para compilar LaTeX fora do Flatpak no Fedora:
 
 ```sh
-flatpak-builder --user --force-clean build-dir org.ovenbird.Ovenbird.json
+sudo dnf install latexmk texlive
 ```
 
-Para instalar localmente depois da construção:
+Isso fornece `latexmk`, `pdflatex` e BibTeX. Projetos que usam `biblatex` podem precisar do Biber:
 
 ```sh
-flatpak-builder --user --install --force-clean build-dir org.ovenbird.Ovenbird.json
+sudo dnf install biber
 ```
 
-## Dados locais e sincronização
+Para sincronizar com Zotero, é necessária uma sessão Secret Service, como GNOME Keyring, e uma chave Zotero com acesso de leitura e escrita.
 
-- Biblioteca BibTeX: `$XDG_DATA_HOME/ovenbird/library.bib`.
+## GNOME Builder e Flatpak
+
+O manifesto usa GNOME Platform/SDK 51 e a extensão `org.freedesktop.Sdk.Extension.rust-stable`. Com Builder, compile pelo perfil Flatpak do projeto. No Fedora, o runtime Flatpak e a extensão Rust devem estar instalados na mesma instalação do Flatpak usada pelo Builder. A extensão que acompanha este ambiente é a branch 26.08; o manifesto inclui a extensão para que o Builder a monte no SDK.
+
+Para construir pelo terminal com `flatpak-builder` (instalado no Fedora como `flatpak-builder`):
+
+```sh
+flatpak-builder --user --force-clean .flatpak-build org.ovenbird.Ovenbird.json
+```
+
+O módulo do aplicativo limpa o diretório Meson interno antes de configurar o build. Assim o Flatpak Builder não reutiliza `coredata.dat` criado por outra versão do Meson. Para recuperar um checkout Flatpak antigo, use o comando acima da raiz do repositório; mantenha `.flatpak-build` dentro da pasta do projeto.
+
+Para instalar localmente depois do build:
+
+```sh
+flatpak-builder --user --install --force-clean .flatpak-build org.ovenbird.Ovenbird.json
+flatpak run org.ovenbird.Ovenbird
+```
+
+No Flatpak, Tectonic é incluído. A criação de projetos pelos modelos funciona offline; a primeira compilação com Tectonic pode baixar os arquivos de suporte do LaTeX. A prévia embutida de PDF depende de Poppler-GLib no ambiente de build; caso contrário, o aplicativo usa o visualizador padrão do sistema.
+
+## Build com Meson e Cargo
+
+Execute a partir da raiz do repositório e mantenha o diretório de build dentro dele. Para o build nativo:
+
+```sh
+rm -rf rust-build-fedora
+meson setup rust-build-fedora
+meson compile -C rust-build-fedora
+meson test -C rust-build-fedora --print-errorlogs
+```
+
+Meson é a entrada do build GNOME. Ele chama Cargo usando `Cargo.lock`, sem rede, e mantém o `CARGO_HOME` e os artefatos Cargo dentro do diretório de build Meson. Se aparecer a incompatibilidade entre Meson 1.11.2 e 1.12.0, apague apenas o diretório de build nativo e configure novamente. O comando de build Flatpak acima limpa seu próprio diretório interno automaticamente.
+
+## Dados locais
+
+- Biblioteca: `$XDG_DATA_HOME/ovenbird/library.bib`.
 - Estado de sincronização Zotero: `$XDG_DATA_HOME/ovenbird/zotero-sync.json`.
 - ID da biblioteca Zotero: `$XDG_CONFIG_HOME/ovenbird/settings.json`.
-- A chave Zotero fica no Secret Service, separada dos arquivos acima.
-- Projetos LaTeX permanecem em suas pastas originais; o Ovenbird não os converte para um formato proprietário.
+- Chave Zotero: Secret Service, schema `org.ovenbird.Ovenbird` e atributo `application=ovenbird`.
+- PDFs e arquivos intermediários: cache privado do Ovenbird, fora da pasta do projeto.
+- Arquivos do projeto: permanecem nas pastas escolhidas pela pessoa usuária.
 
-A sincronização é acionada pela pessoa usuária. Para conectar, informe o ID da biblioteca pessoal e uma chave Zotero com permissão de escrita. A chave pode ser criada nas [configurações de API do Zotero](https://www.zotero.org/settings/keys). O projeto também mantém uma cópia BibTeX padrão por documento; referências da biblioteca local entram nela quando o documento é compilado.
+Os `.bib` importados são incorporados à biblioteca local. Durante a compilação, o Ovenbird cria um BibTeX temporário com a biblioteca e as referências declaradas no projeto; exporte a biblioteca quando quiser compartilhar um `.bib` permanente.
 
 ## Estrutura
 
 ```text
 .
 ├── data/                  # Ícone, desktop entry e metadados AppStream
-├── .github/               # Formulários de issues e modelo de pull request
-├── tests/                 # Verificações do parser, BibTeX, comandos e histórico do editor
-├── src/
-│   ├── core/              # Biblioteca BibTeX, comandos e histórico do editor, compilação e Zotero
-│   ├── application.js
-│   ├── main.js
-│   ├── ovenbird           # Launcher instalado no Flatpak
-│   └── window.js
+├── docs/                  # Inventário e plano da migração Rust
+├── po/                    # Catálogos gettext pt_BR e es
+├── rust/src/              # Aplicação, editor, projetos, referências e serviços
+├── src/templates/         # Modelos LaTeX incluídos
+├── cargo-cache/           # Cache local de crates para builds offline
+├── Cargo.toml
+├── Cargo.lock
 ├── meson.build
-├── org.ovenbird.Ovenbird.json
-└── README.md
+└── org.ovenbird.Ovenbird.json
 ```
-
-## Contribuições
-
-Issues e pull requests no GitHub são bem-vindos. Antes de uma primeira publicação no Flathub, ainda é necessário incluir a URL do repositório nos metadados AppStream e escolher uma licença.

@@ -1,2 +1,0 @@
-#!/bin/sh
-exec gjs -m /app/share/org.ovenbird.Ovenbird/src/main.js "$@"

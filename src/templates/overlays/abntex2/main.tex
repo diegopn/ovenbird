@@ -1,0 +1,29 @@
+\documentclass[article,12pt,oneside,a4paper]{abntex2}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[alf]{abntex2cite}
+
+\titulo{Título do artigo}
+\tituloestrangeiro{Article title}
+\autor{Nome do autor}
+\instituicao{Instituição}
+\local{Cidade}
+\data{\today}
+
+\begin{document}
+\maketitle
+
+\begin{resumo}
+Escreva o resumo aqui.
+\end{resumo}
+
+\textual
+\section{Introdução}
+Comece a escrever aqui.
+Uma citação de exemplo: \cite{lamport1994}.
+
+\postextual
+\bibliographystyle{abntex2-alf}
+\bibliography{references}
+\end{document}

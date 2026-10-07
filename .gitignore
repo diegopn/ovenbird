@@ -3,5 +3,7 @@
 /.ovenbird-build/
 /.flatpak-builder/
 /.flatpak/
+/.tooling/
+/target/
 *.swp
 *~

@@ -4,7 +4,9 @@ Ovenbird está em desenvolvimento inicial. Mudanças pequenas e focadas são mai
 
 ## Ambiente
 
-Use o GNOME SDK/Platform 51 com GTK 4, Libadwaita, GJS, GtkSourceView 5 e Poppler-GLib. Para compilar LaTeX, instale `latexmk`, `tectonic` ou `pdflatex`; com `pdflatex`, instale BibTeX para documentos BibTeX e Biber para documentos `biblatex`.
+Use o GNOME SDK/Platform 51 com GTK 4, Libadwaita, GtkSourceView 5, Secret Service e a extensão Rust stable. Para builds nativos, instale `rust`, `cargo`, Meson, Ninja e os pacotes `-devel` descritos no README. Mantenha o build nativo separado do build Flatpak/Builder.
+
+Para criar projetos pelos modelos incluídos, o utilitário `unzip` precisa estar disponível no ambiente de execução. Para compilar LaTeX, instale `latexmk`, `tectonic` ou `pdflatex`; com `pdflatex`, instale BibTeX para documentos BibTeX e Biber para documentos `biblatex`.
 
 ## Antes de abrir um pull request
 

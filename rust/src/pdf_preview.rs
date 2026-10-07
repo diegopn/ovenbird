@@ -1,0 +1,285 @@
+use gtk::prelude::*;
+use std::cell::Cell;
+#[cfg(feature = "poppler-preview")]
+use std::cell::RefCell;
+use std::path::Path;
+use std::rc::Rc;
+
+#[cfg(feature = "poppler-preview")]
+mod poppler {
+    use gtk::gio::prelude::FileExt;
+    use gtk::glib::{self, translate::*};
+    use std::ffi::{c_char, CString};
+    use std::path::Path;
+
+    #[repr(C)]
+    pub struct Document {
+        _private: [u8; 0],
+    }
+    #[repr(C)]
+    pub struct Page {
+        _private: [u8; 0],
+    }
+
+    #[link(name = "poppler-glib")]
+    unsafe extern "C" {
+        fn poppler_document_get_type() -> glib::ffi::GType;
+        fn poppler_page_get_type() -> glib::ffi::GType;
+        fn poppler_document_new_from_file(
+            uri: *const c_char,
+            password: *const c_char,
+            error: *mut *mut glib::ffi::GError,
+        ) -> *mut Document;
+        fn poppler_document_get_n_pages(document: *mut Document) -> i32;
+        fn poppler_document_get_page(document: *mut Document, index: i32) -> *mut Page;
+        fn poppler_page_get_size(page: *mut Page, width: *mut f64, height: *mut f64);
+        fn poppler_page_render(page: *mut Page, cairo: *mut gtk::cairo::ffi::cairo_t);
+    }
+
+    glib::wrapper! {
+        pub struct PdfDocument(Object<Document>);
+        match fn {
+            type_ => || poppler_document_get_type(),
+        }
+    }
+
+    glib::wrapper! {
+        pub struct PdfPage(Object<Page>);
+        match fn {
+            type_ => || poppler_page_get_type(),
+        }
+    }
+
+    impl PdfDocument {
+        pub fn open(path: &Path) -> Result<Self, String> {
+            let uri = gtk::gio::File::for_path(path).uri();
+            let uri = CString::new(uri.as_str()).map_err(|error| error.to_string())?;
+            let mut error = std::ptr::null_mut();
+            let document = unsafe {
+                poppler_document_new_from_file(uri.as_ptr(), std::ptr::null(), &mut error)
+            };
+            if document.is_null() {
+                if error.is_null() {
+                    return Err("Poppler could not open the PDF.".to_owned());
+                }
+                let error: glib::Error = unsafe { from_glib_full(error) };
+                return Err(error.to_string());
+            }
+            Ok(unsafe { from_glib_full(document) })
+        }
+
+        pub fn page_count(&self) -> i32 {
+            unsafe { poppler_document_get_n_pages(self.to_glib_none().0) }
+        }
+
+        pub fn page(&self, index: i32) -> Option<PdfPage> {
+            let page = unsafe { poppler_document_get_page(self.to_glib_none().0, index) };
+            (!page.is_null()).then(|| unsafe { from_glib_none(page) })
+        }
+    }
+
+    impl PdfPage {
+        pub fn size(&self) -> (f64, f64) {
+            let (mut width, mut height) = (0.0, 0.0);
+            unsafe { poppler_page_get_size(self.to_glib_none().0, &mut width, &mut height) };
+            (width, height)
+        }
+
+        pub fn render(&self, context: &gtk::cairo::Context) {
+            unsafe { poppler_page_render(self.to_glib_none().0, context.to_raw_none()) };
+        }
+    }
+}
+
+pub struct PdfPreview {
+    root: gtk::Box,
+    message: gtk::Label,
+    page_label: gtk::Label,
+    stack: gtk::Stack,
+    #[cfg(feature = "poppler-preview")]
+    drawing: gtk::DrawingArea,
+    previous: gtk::Button,
+    next: gtk::Button,
+    #[cfg(feature = "poppler-preview")]
+    document: Rc<RefCell<Option<poppler::PdfDocument>>>,
+    page_index: Rc<Cell<i32>>,
+    page_count: Rc<Cell<i32>>,
+}
+
+impl PdfPreview {
+    pub fn new() -> Self {
+        let root = gtk::Box::new(gtk::Orientation::Vertical, 0);
+        let toolbar = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+        toolbar.set_margin_start(8);
+        toolbar.set_margin_end(8);
+        toolbar.set_margin_top(6);
+        toolbar.set_margin_bottom(6);
+        let previous = gtk::Button::from_icon_name("go-up-symbolic");
+        previous.set_tooltip_text(Some(&tr("Previous page")));
+        let page_label = gtk::Label::new(Some("PDF"));
+        page_label.set_hexpand(true);
+        let next = gtk::Button::from_icon_name("go-down-symbolic");
+        next.set_tooltip_text(Some(&tr("Next page")));
+        toolbar.append(&previous);
+        toolbar.append(&page_label);
+        toolbar.append(&next);
+        root.append(&toolbar);
+
+        let stack = gtk::Stack::builder().hexpand(true).vexpand(true).build();
+        let message = gtk::Label::new(Some(&tr("The compiled PDF will appear here")));
+        message.set_wrap(true);
+        message.add_css_class("dim-label");
+        stack.add_named(&message, Some("empty"));
+        let drawing = gtk::DrawingArea::builder()
+            .content_width(420)
+            .content_height(600)
+            .hexpand(true)
+            .halign(gtk::Align::Center)
+            .build();
+        let scroll = gtk::ScrolledWindow::builder()
+            .hscrollbar_policy(gtk::PolicyType::Automatic)
+            .vscrollbar_policy(gtk::PolicyType::Automatic)
+            .vexpand(true)
+            .child(&drawing)
+            .build();
+        stack.add_named(&scroll, Some("pdf"));
+        stack.set_visible_child_name("empty");
+        root.append(&stack);
+
+        let page_index = Rc::new(Cell::new(0));
+        let page_count = Rc::new(Cell::new(0));
+        #[cfg(feature = "poppler-preview")]
+        let document: Rc<RefCell<Option<poppler::PdfDocument>>> = Rc::new(RefCell::new(None));
+
+        #[cfg(feature = "poppler-preview")]
+        {
+            let document = document.clone();
+            let page_index = page_index.clone();
+            drawing.set_draw_func(move |area, context, width, _height| {
+                context.set_source_rgb(0.92, 0.93, 0.95);
+                let _ = context.paint();
+                let Some(page) = document
+                    .borrow()
+                    .as_ref()
+                    .and_then(|document| document.page(page_index.get()))
+                else {
+                    return;
+                };
+                let (page_width, page_height) = page.size();
+                if page_width <= 0.0 || page_height <= 0.0 {
+                    return;
+                }
+                let scale = ((width as f64 - 32.0) / page_width).min(1.0).max(0.1);
+                let display_width = page_width * scale;
+                let display_height = page_height * scale;
+                area.set_content_height((display_height + 24.0).ceil() as i32);
+                context.set_source_rgb(1.0, 1.0, 1.0);
+                context.rectangle(
+                    (width as f64 - display_width) / 2.0,
+                    12.0,
+                    display_width,
+                    display_height,
+                );
+                let _ = context.fill();
+                let _ = context.save();
+                context.translate((width as f64 - display_width) / 2.0, 12.0);
+                context.scale(scale, scale);
+                page.render(context);
+                let _ = context.restore();
+            });
+        }
+
+        let page_label_prev = page_label.clone();
+        let page_index_prev = page_index.clone();
+        let page_count_prev = page_count.clone();
+        let drawing_prev = drawing.clone();
+        let next_prev = next.clone();
+        previous.connect_clicked(move |button| {
+            let index = (page_index_prev.get() - 1).max(0);
+            page_index_prev.set(index);
+            page_label_prev.set_label(&format!("{} / {}", index + 1, page_count_prev.get()));
+            button.set_sensitive(index > 0);
+            next_prev.set_sensitive(index + 1 < page_count_prev.get());
+            drawing_prev.queue_draw();
+        });
+        let page_label_next = page_label.clone();
+        let page_index_next = page_index.clone();
+        let page_count_next = page_count.clone();
+        let drawing_next = drawing.clone();
+        let previous_next = previous.clone();
+        next.connect_clicked(move |button| {
+            let index = (page_index_next.get() + 1).min(page_count_next.get() - 1);
+            page_index_next.set(index);
+            page_label_next.set_label(&format!("{} / {}", index + 1, page_count_next.get()));
+            previous_next.set_sensitive(index > 0);
+            button.set_sensitive(index + 1 < page_count_next.get());
+            drawing_next.queue_draw();
+        });
+        previous.set_sensitive(false);
+        next.set_sensitive(false);
+
+        Self {
+            root,
+            message,
+            page_label,
+            stack,
+            #[cfg(feature = "poppler-preview")]
+            drawing,
+            previous,
+            next,
+            #[cfg(feature = "poppler-preview")]
+            document,
+            page_index,
+            page_count,
+        }
+    }
+
+    pub fn widget(&self) -> &gtk::Box {
+        &self.root
+    }
+
+    pub fn set_message(&self, message: &str) {
+        #[cfg(feature = "poppler-preview")]
+        self.document.borrow_mut().take();
+        self.page_index.set(0);
+        self.page_count.set(0);
+        self.message.set_label(message);
+        self.page_label.set_label("PDF");
+        self.previous.set_sensitive(false);
+        self.next.set_sensitive(false);
+        self.stack.set_visible_child_name("empty");
+    }
+
+    pub fn open(&self, path: &Path) -> Result<(), String> {
+        #[cfg(feature = "poppler-preview")]
+        {
+            let document = poppler::PdfDocument::open(path)?;
+            let count = document.page_count();
+            if count <= 0 {
+                return Err(tr("The PDF has no pages."));
+            }
+            *self.document.borrow_mut() = Some(document);
+            self.page_index.set(0);
+            self.page_count.set(count);
+            self.page_label.set_label(&format!("1 / {count}"));
+            self.previous.set_sensitive(false);
+            self.next.set_sensitive(count > 1);
+            self.stack.set_visible_child_name("pdf");
+            self.drawing.queue_draw();
+            return Ok(());
+        }
+
+        #[cfg(not(feature = "poppler-preview"))]
+        {
+            let uri = gtk::gio::File::for_path(path).uri();
+            gtk::gio::AppInfo::launch_default_for_uri(&uri, None::<&gtk::gio::AppLaunchContext>)
+                .map_err(|error| error.to_string())?;
+            self.set_message(&tr("PDF opened in the default viewer"));
+            Ok(())
+        }
+    }
+}
+
+fn tr(message: &str) -> String {
+    crate::i18n::gettext(message)
+}

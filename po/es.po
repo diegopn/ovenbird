@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ovenbird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 16:28-0300\n"
+"POT-Creation-Date: 2026-10-06 23:28-0300\n"
 "PO-Revision-Date: 2026-10-06 00:00-0300\n"
 "Last-Translator: Ovenbird contributors\n"
 "Language-Team: Spanish\n"
@@ -12,143 +12,398 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/window.js:57 src/window.js:842 src/window.js:920
-msgid "Not built yet"
-msgstr "Aún no compilado"
+#: rust/src/bibtex.rs:50
+msgid "Journal article"
+msgstr "Artículo de revista"
 
-#: src/window.js:58
-msgid "Compile the document to create the PDF."
-msgstr "Compila el documento para generar el PDF."
+#: rust/src/bibtex.rs:51
+msgid "Book"
+msgstr "Libro"
 
-#: src/window.js:69
-msgid "Navigation"
-msgstr "Navegación"
+#: rust/src/bibtex.rs:52
+msgid "Book chapter"
+msgstr "Capítulo de libro"
 
-#: src/window.js:70 src/window.js:119 src/window.js:161 src/window.js:401
-#: src/window.js:694
-msgid "Writing"
-msgstr "Escritura"
+#: rust/src/bibtex.rs:53
+msgid "Conference paper"
+msgstr "Artículo de congreso"
 
-#: src/window.js:98 src/window.js:193 src/window.js:408
-msgid "Find in document"
-msgstr "Buscar en el documento"
+#: rust/src/bibtex.rs:54
+msgid "Doctoral thesis"
+msgstr "Tesis doctoral"
 
-#: src/window.js:104 src/window.js:157 src/window.js:189 src/window.js:721
-#: src/core/editor.js:122
+#: rust/src/bibtex.rs:55
+msgid "Master's thesis"
+msgstr "Tesis de maestría"
+
+#: rust/src/bibtex.rs:56
+msgid "Technical report"
+msgstr "Informe técnico"
+
+#: rust/src/bibtex.rs:57
+msgid "Online resource"
+msgstr "Recurso en línea"
+
+#: rust/src/bibtex.rs:58
+msgid "Miscellaneous"
+msgstr "Otros"
+
+#: rust/src/bibtex.rs:64
+msgid "Title"
+msgstr "Título"
+
+#: rust/src/bibtex.rs:65
+msgid "Author(s)"
+msgstr "Autor(es)"
+
+#: rust/src/bibtex.rs:66
+msgid "Editor(s)"
+msgstr "Editor(es)"
+
+#: rust/src/bibtex.rs:67
+msgid "Year / date"
+msgstr "Año / fecha"
+
+#: rust/src/bibtex.rs:68
+msgid "Journal"
+msgstr "Revista"
+
+#: rust/src/bibtex.rs:69
+msgid "Publisher"
+msgstr "Editorial"
+
+#: rust/src/bibtex.rs:70
+msgid "Volume"
+msgstr "Volumen"
+
+#: rust/src/bibtex.rs:71
+msgid "Number / issue"
+msgstr "Número / edición"
+
+#: rust/src/bibtex.rs:72
+msgid "Edition"
+msgstr "Edición"
+
+#: rust/src/bibtex.rs:73
+msgid "Pages"
+msgstr "Páginas"
+
+#: rust/src/bibtex.rs:74
+msgid "DOI"
+msgstr "DOI"
+
+#: rust/src/bibtex.rs:75 rust/src/window.rs:1959
+msgid "URL"
+msgstr "URL"
+
+#: rust/src/bibtex.rs:76
+msgid "Keywords"
+msgstr "Palabras clave"
+
+#: rust/src/bibtex.rs:77
+msgid "Series"
+msgstr "Serie"
+
+#: rust/src/bibtex.rs:78
+msgid "Publication location"
+msgstr "Lugar de publicación"
+
+#: rust/src/bibtex.rs:79
+msgid "ISBN"
+msgstr "ISBN"
+
+#: rust/src/bibtex.rs:80
+msgid "Chapter"
+msgstr "Capítulo"
+
+#: rust/src/bibtex.rs:81
+msgid "Website or organization"
+msgstr "Sitio web u organización"
+
+#: rust/src/bibtex.rs:82
+msgid "Organization"
+msgstr "Organización"
+
+#: rust/src/bibtex.rs:83
+msgid "University or academic institution"
+msgstr "Universidad o institución académica"
+
+#: rust/src/bibtex.rs:84
+msgid "Institution"
+msgstr "Institución"
+
+#: rust/src/bibtex.rs:85
+msgid "Report type"
+msgstr "Tipo de informe"
+
+#: rust/src/bibtex.rs:86
+msgid "Month"
+msgstr "Mes"
+
+#: rust/src/bibtex.rs:87
+msgid "Note"
+msgstr "Nota"
+
+#: rust/src/bibtex.rs:88
+msgid "Publication method"
+msgstr "Método de publicación"
+
+#: rust/src/bibtex.rs:89
+msgid "Access date"
+msgstr "Fecha de acceso"
+
+#: rust/src/bibtex.rs:90
+msgid "Proceedings title"
+msgstr "Título de las actas"
+
+#: rust/src/bibtex.rs:91
+msgid "Book title"
+msgstr "Título del libro"
+
+#: rust/src/editor.rs:416
 msgid "New document"
 msgstr "Nuevo documento"
 
-#: src/window.js:110
+#: rust/src/editor.rs:417
+msgid "Introduction"
+msgstr "Introducción"
+
+#: rust/src/editor.rs:418
+msgid "Start writing here."
+msgstr "Empieza a escribir aquí."
+
+#: rust/src/pdf_preview.rs:114
+msgid "Previous page"
+msgstr "Página anterior"
+
+#: rust/src/pdf_preview.rs:118
+msgid "Next page"
+msgstr "Página siguiente"
+
+#: rust/src/pdf_preview.rs:128
+msgid "The compiled PDF will appear here"
+msgstr "El PDF compilado aparecerá aquí"
+
+#: rust/src/pdf_preview.rs:240
+msgid "The PDF has no pages."
+msgstr "El PDF no contiene páginas."
+
+#: rust/src/pdf_preview.rs:258
+msgid "PDF opened in the default viewer"
+msgstr "PDF abierto en el visor predeterminado"
+
+#: rust/src/window.rs:164
+msgid "Compile the document to create the PDF."
+msgstr "Compila el documento para generar el PDF."
+
+#: rust/src/window.rs:165 rust/src/window.rs:1160
+msgid "Not built yet"
+msgstr "Aún no compilado"
+
+#: rust/src/window.rs:218
+msgid "Find in document"
+msgstr "Buscar en el documento"
+
+#: rust/src/window.rs:227
+msgid "Main menu"
+msgstr "Menú de la aplicación"
+
+#: rust/src/window.rs:234
 msgid "WORKSPACE"
 msgstr "ESPACIO DE TRABAJO"
 
-#: src/window.js:121 src/window.js:162 src/window.js:196 src/window.js:593
-#: src/window.js:694
-msgid "Local library"
-msgstr "Biblioteca local"
+#: rust/src/window.rs:241
+msgid "Editor"
+msgstr "Editor"
 
-#: src/window.js:132
-msgid "Connect to Zotero"
-msgstr "Conectar con Zotero"
+#: rust/src/window.rs:360
+msgid "LaTeX editor"
+msgstr "Editor de LaTeX"
 
-#: src/window.js:137
+#: rust/src/window.rs:247
+msgid "Project files"
+msgstr "Archivos del proyecto"
+
+#: rust/src/window.rs:255
+msgid "Create files and folders"
+msgstr "Crear archivos y carpetas"
+
+#: rust/src/window.rs:271
+msgid "References"
+msgstr "Referencias"
+
+#: rust/src/window.rs:279 rust/src/window.rs:588 rust/src/window.rs:2467
+msgid "Sync with Zotero"
+msgstr "Sincronizar con Zotero"
+
+#: rust/src/window.rs:284
 msgid "LaTeX · local references"
 msgstr "LaTeX · referencias locales"
 
-#: src/window.js:168
-msgid "Set up Zotero"
-msgstr "Configurar Zotero"
+#: rust/src/window.rs:345 rust/src/window.rs:1657
+msgid "New folder"
+msgstr "Nueva carpeta"
 
-#: src/window.js:178
-msgid "Application menu"
-msgstr "Menú de la aplicación"
+#: rust/src/window.rs:363
+msgid "Code"
+msgstr "Código"
 
-#: src/window.js:190
-msgid "Open document"
-msgstr "Abrir documento"
+#: rust/src/window.rs:366
+msgid "Visual"
+msgstr "Visual"
 
-#: src/window.js:191 src/window.js:415
-msgid "Open project folder"
-msgstr "Abrir carpeta del proyecto"
+#: rust/src/window.rs:371
+msgid ""
+"Switch modes at any time without creating another version of the document"
+msgstr "Cambia de modo cuando quieras sin crear otra versión del documento"
 
-#: src/window.js:192 src/window.js:416
-msgid "Save document"
-msgstr "Guardar documento"
-
-#: src/window.js:194 src/window.js:417 src/window.js:707
-msgid "Compile and create PDF"
-msgstr "Compilar y generar PDF"
-
-#: src/window.js:195
-msgid "Insert citation"
-msgstr "Insertar cita"
-
-#: src/window.js:198 src/window.js:730
-msgid "Keyboard shortcuts"
-msgstr "Atajos de teclado"
-
-#: src/window.js:199
-msgid "Collapse/expand sidebar"
-msgstr "Contraer/expandir panel lateral"
-
-#: src/window.js:225
-msgid "Document and build details"
-msgstr "Detalles del documento y la compilación"
-
-#: src/window.js:244
-msgid "Current document"
-msgstr "Documento actual"
-
-#: src/window.js:255
-msgid "Compiler"
-msgstr "Compilador"
-
-#: src/window.js:256
-msgid "Status"
-msgstr "Estado"
-
-#: src/window.js:257
-msgid "Last build"
-msgstr "Última compilación"
-
-#: src/window.js:287
+#: rust/src/window.rs:384
 msgid "Find in document…"
 msgstr "Buscar en el documento…"
 
-#: src/window.js:291
-msgid "Previous result"
-msgstr "Resultado anterior"
-
-#: src/window.js:293
-msgid "Next result"
-msgstr "Resultado siguiente"
-
-#: src/window.js:295
+#: rust/src/window.rs:398
 msgid "Close search"
 msgstr "Cerrar búsqueda"
 
-#: src/window.js:316
-msgid "Error"
-msgstr "Error"
+#: rust/src/window.rs:416
+msgid "Normal text"
+msgstr "Texto normal"
 
-#: src/window.js:317
-msgid "Modified"
-msgstr "Modificado"
+#: rust/src/window.rs:433
+msgid "Math"
+msgstr "Matemáticas"
 
-#: src/window.js:322
+#: rust/src/window.rs:438
+msgid "Math symbols"
+msgstr "Símbolos matemáticos"
+
+#: rust/src/window.rs:441 rust/src/window.rs:2098
+msgid "Insert citation"
+msgstr "Insertar cita"
+
+#: rust/src/window.rs:442
+msgid "Find and insert a bibliography reference"
+msgstr "Buscar e insertar una referencia bibliográfica"
+
+#: rust/src/window.rs:448
+msgid "Lists and indentation"
+msgstr "Listas y sangría"
+
+#: rust/src/window.rs:453
+msgid "More"
+msgstr "Más"
+
+#: rust/src/window.rs:553
+msgid "Local library"
+msgstr "Biblioteca local"
+
+#: rust/src/window.rs:557
+msgid "Your references stay on this computer and remain available offline."
+msgstr ""
+"Tus referencias permanecen en este equipo y están disponibles sin conexión."
+
+#: rust/src/window.rs:563 rust/src/window.rs:2103
+msgid "Search references…"
+msgstr "Buscar referencias…"
+
+msgid "All authors"
+msgstr "Todos los autores"
+
+msgid "All years"
+msgstr "Todos los años"
+
+msgid "All tags"
+msgstr "Todas las etiquetas"
+
+#: rust/src/window.rs:566
+msgid "Add reference"
+msgstr "Añadir referencia"
+
+msgid "Add"
+msgstr "Añadir"
+
+msgid "Add a reference to the local library"
+msgstr "Añadir una referencia a la biblioteca local"
+
+#: rust/src/window.rs:569
+msgid "Import BibTeX"
+msgstr "Importar BibTeX"
+
+#: rust/src/window.rs:572
+msgid "Export BibTeX"
+msgstr "Exportar BibTeX"
+
+msgid "No references match the current search and filters."
+msgstr "Ninguna referencia coincide con la búsqueda y los filtros actuales."
+
+#: rust/src/window.rs:601
+msgid "Show or hide the sidebar"
+msgstr "Mostrar u ocultar la barra lateral"
+
+#: rust/src/window.rs:604
+msgid "Save document"
+msgstr "Guardar documento"
+
+#: rust/src/window.rs:617
+msgid "Compile document"
+msgstr "Compilar documento"
+
+#: rust/src/window.rs:621
+msgid "Compile and create PDF"
+msgstr "Compilar y generar PDF"
+
+#: rust/src/window.rs:636 rust/src/window.rs:2651
+msgid "Export PDF"
+msgstr "Exportar PDF"
+
+#: rust/src/window.rs:646
+msgid "Document and build details"
+msgstr "Detalles del documento y la compilación"
+
+#: rust/src/window.rs:652 rust/src/window.rs:1159 rust/src/window.rs:1168
+#: rust/src/window.rs:1218 rust/src/window.rs:1315 rust/src/window.rs:1899
+#: rust/src/window.rs:2195 rust/src/window.rs:2528 rust/src/window.rs:2529
+#: rust/src/window.rs:2623
+msgid "Ready"
+msgstr "Listo"
+
+#: rust/src/window.rs:663
+msgid "Current document"
+msgstr "Documento actual"
+
+#: rust/src/window.rs:667 rust/src/window.rs:751
 msgid "New document not saved yet"
 msgstr "Documento nuevo aún sin guardar"
 
-#: src/window.js:323
+#: rust/src/window.rs:683
+msgid "Compiler"
+msgstr "Compilador"
+
+#: rust/src/window.rs:683
+msgid "Status"
+msgstr "Estado"
+
+#: rust/src/window.rs:683
+msgid "Last build"
+msgstr "Última compilación"
+
+#: rust/src/window.rs:743 rust/src/window.rs:767
+msgid "Error"
+msgstr "Error"
+
+#: rust/src/window.rs:744 rust/src/window.rs:768
+msgid "Modified"
+msgstr "Modificado"
+
+#: rust/src/window.rs:753
 msgid "No project folder selected"
 msgstr "No se seleccionó una carpeta de proyecto"
 
-#: src/window.js:324
+#: rust/src/window.rs:754
 msgid "Save the document to set the project file."
 msgstr "Guarda el documento para definir el archivo del proyecto."
 
-#: src/window.js:325
-#, javascript-format
+#: rust/src/window.rs:755
 msgid ""
 "File: %s\n"
 "Project: %s"
@@ -156,729 +411,453 @@ msgstr ""
 "Archivo: %s\n"
 "Proyecto: %s"
 
-#: src/window.js:326
+#: rust/src/window.rs:760
 msgid "Not found"
 msgstr "No encontrado"
 
-#: src/window.js:328
-#, javascript-format
+#: rust/src/window.rs:762
 msgid "%s · local changes pending"
 msgstr "%s · cambios locales pendientes"
 
-#: src/window.js:363
-msgid "No results"
-msgstr "Sin resultados"
+#: rust/src/window.rs:783
+msgid "Just now"
+msgstr "Ahora"
 
-#: src/window.js:372
+#: rust/src/window.rs:1000
 msgid "Match found"
 msgstr "Coincidencia encontrada"
 
-#: src/window.js:393
-msgid "Expand sidebar"
-msgstr "Expandir panel lateral"
-
-#: src/window.js:393 src/window.js:406
-msgid "Collapse sidebar"
-msgstr "Contraer panel lateral"
-
-#: src/window.js:414 src/window.js:757
-msgid "Open LaTeX document"
-msgstr "Abrir documento LaTeX"
-
-#: src/window.js:420 src/window.js:1346
-msgid "Add reference"
-msgstr "Añadir referencia"
-
-#: src/window.js:425
-msgid "Sync Zotero"
-msgstr "Sincronizar Zotero"
-
-#: src/window.js:433
-msgid "Code"
-msgstr "Código"
-
-#: src/window.js:434
-msgid "Visual"
-msgstr "Visual"
-
-#: src/window.js:462
-msgid "The compiled PDF will appear here"
-msgstr "El PDF compilado aparecerá aquí"
-
-#: src/window.js:475
-msgid ""
-"Switch modes at any time without creating another version of the document"
-msgstr "Cambia de modo cuando quieras sin crear otra versión del documento"
-
-#: src/window.js:483
-msgid "Undo"
-msgstr "Deshacer"
-
-#: src/window.js:484
-msgid "Redo"
-msgstr "Rehacer"
-
-#: src/window.js:491 src/window.js:492
-msgid "Normal text"
-msgstr "Texto normal"
-
-#: src/window.js:493
-msgid "Section"
-msgstr "Sección"
-
-#: src/window.js:494
-msgid "Subsection"
-msgstr "Subsección"
-
-#: src/window.js:495
-msgid "Subsubsection"
-msgstr "Subsubsección"
-
-#: src/window.js:496
-msgid "Paragraph"
-msgstr "Párrafo"
-
-#: src/window.js:497
-msgid "Subparagraph"
-msgstr "Subpárrafo"
-
-#: src/window.js:503
-msgid "Bold"
-msgstr "Negrita"
-
-#: src/window.js:504
-msgid "Italic"
-msgstr "Cursiva"
-
-#: src/window.js:505
-msgid "Underline"
-msgstr "Subrayado"
-
-#: src/window.js:506
-msgid "Monospace"
-msgstr "Monoespaciado"
-
-#: src/window.js:510
-msgid "Math"
-msgstr "Matemáticas"
-
-#: src/window.js:511
-msgid "Inline equation"
-msgstr "Ecuación en línea"
-
-#: src/window.js:512
-msgid "Display equation"
-msgstr "Ecuación destacada"
-
-#: src/window.js:516
-msgid "α  Alpha"
-msgstr "α  Alfa"
-
-#: src/window.js:517
-msgid "β  Beta"
-msgstr "β  Beta"
-
-#: src/window.js:518
-msgid "γ  Gamma"
-msgstr "γ  Gamma"
-
-#: src/window.js:519
-msgid "π  Pi"
-msgstr "π  Pi"
-
-#: src/window.js:520
-msgid "≤  Less than or equal to"
-msgstr "≤  Menor o igual que"
-
-#: src/window.js:521
-msgid "≥  Greater than or equal to"
-msgstr "≥  Mayor o igual que"
-
-#: src/window.js:522
-msgid "≠  Not equal to"
-msgstr "≠  Distinto de"
-
-#: src/window.js:523
-msgid "×  Multiplication"
-msgstr "×  Multiplicación"
-
-#: src/window.js:524
-msgid "±  Plus or minus"
-msgstr "±  Más o menos"
-
-#: src/window.js:525
-msgid "∞  Infinity"
-msgstr "∞  Infinito"
-
-#: src/window.js:526
-msgid "∑  Summation"
-msgstr "∑  Sumatoria"
-
-#: src/window.js:527
-msgid "∫  Integral"
-msgstr "∫  Integral"
-
-#: src/window.js:528
-msgid "√  Square root"
-msgstr "√  Raíz cuadrada"
-
-#: src/window.js:530 src/window.js:1232 src/window.js:1234
-msgid "Insert link"
-msgstr "Insertar enlace"
-
-#: src/window.js:531
-msgid "Cite"
-msgstr "Citar"
-
-#: src/window.js:532
-msgid "Find and insert a bibliography reference"
-msgstr "Buscar e insertar una referencia bibliográfica"
-
-#: src/window.js:537
-msgid "List"
-msgstr "Lista"
-
-#: src/window.js:538
-msgid "Bulleted list"
-msgstr "Lista con viñetas"
-
-#: src/window.js:539
-msgid "Numbered list"
-msgstr "Lista numerada"
-
-#: src/window.js:540
-msgid "Quotation block"
-msgstr "Bloque de cita"
-
-#: src/window.js:541
-msgid "Increase indent"
-msgstr "Aumentar sangría"
-
-#: src/window.js:542
-msgid "Decrease indent"
-msgstr "Reducir sangría"
-
-#: src/window.js:544
-msgid "More"
-msgstr "Más"
-
-#: src/window.js:545 src/window.js:1300
-msgid "Insert image"
-msgstr "Insertar imagen"
-
-#: src/window.js:546 src/window.js:1269 src/window.js:1271
-msgid "Insert table"
-msgstr "Insertar tabla"
-
-#: src/window.js:547
-msgid "LaTeX comment"
-msgstr "Comentario LaTeX"
-
-#: src/window.js:548
-msgid "Footnote"
-msgstr "Nota al pie"
-
-#: src/window.js:549
-msgid "Review note"
-msgstr "Nota de revisión"
-
-#: src/window.js:550
-msgid "Add label"
-msgstr "Añadir etiqueta"
-
-#: src/window.js:551
-msgid "Cross-reference"
-msgstr "Referencia cruzada"
-
-#: src/window.js:570
-msgid "New document · unsaved changes"
-msgstr "Documento nuevo · cambios sin guardar"
-
-#: src/window.js:595
-msgid "Your references stay on this computer and remain available offline."
-msgstr ""
-"Tus referencias permanecen en este equipo y están disponibles sin conexión."
-
-#: src/window.js:602
-msgid "Search references…"
-msgstr "Buscar referencias…"
-
-#: src/window.js:607
-msgid "Import .bib"
-msgstr "Importar .bib"
-
-#: src/window.js:609
-msgid "Export .bib"
-msgstr "Exportar .bib"
-
-#: src/window.js:707
-msgid "Add a reference to the local library"
-msgstr "Añadir una referencia a la biblioteca local"
-
-#: src/window.js:722
-#, javascript-format
-msgid "%s · unsaved changes"
-msgstr "%s · cambios sin guardar"
-
-#: src/window.js:722
-#, javascript-format
-msgid "%s · saved"
-msgstr "%s · guardado"
-
-#: src/window.js:731
-msgid ""
-"Ctrl+O  Open document\n"
-"Ctrl+S  Save\n"
-"Ctrl+F  Find in document\n"
-"Ctrl+Shift+R  Compile and create PDF\n"
-"Ctrl+Shift+C  Insert citation\n"
-"Ctrl+Z / Ctrl+Shift+Z  Undo / Redo"
-msgstr ""
-"Ctrl+O  Abrir documento\n"
-"Ctrl+S  Guardar\n"
-"Ctrl+F  Buscar en el documento\n"
-"Ctrl+Shift+R  Compilar y generar PDF\n"
-"Ctrl+Shift+C  Insertar cita\n"
-"Ctrl+Z / Ctrl+Shift+Z  Deshacer / Rehacer"
-
-#: src/window.js:741 src/window.js:804
-msgid "Open"
-msgstr "Abrir"
-
-#: src/window.js:741 src/window.js:885 src/window.js:1137
-msgid "Save"
-msgstr "Guardar"
-
-#: src/window.js:742 src/window.js:765 src/window.js:803 src/window.js:884
-#: src/window.js:1135 src/window.js:1233 src/window.js:1270 src/window.js:1301
-#: src/window.js:1413 src/window.js:1449 src/window.js:1488
+#: rust/src/window.rs:1000
+msgid "No results"
+msgstr "Sin resultados"
+
+#: rust/src/window.rs:1018
+msgid "Keyboard shortcuts"
+msgstr "Atajos de teclado"
+
+#: rust/src/window.rs:1019 rust/src/window.rs:2099
+msgid "Close"
+msgstr "Cerrar"
+
+#: rust/src/window.rs:1046 rust/src/window.rs:1085 rust/src/window.rs:1243
+#: rust/src/window.rs:1590 rust/src/window.rs:1658 rust/src/window.rs:1707
+#: rust/src/window.rs:1770 rust/src/window.rs:1851 rust/src/window.rs:1947
+#: rust/src/window.rs:2032 rust/src/window.rs:2073 rust/src/window.rs:2314
+#: rust/src/window.rs:2469 rust/src/window.rs:2652
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/window.js:746
-msgid "LaTeX (*.tex)"
-msgstr "LaTeX (*.tex)"
+#: rust/src/window.rs:1048
+msgid "LaTeX, BibTeX, and style files"
+msgstr "Archivos LaTeX, BibTeX y de estilo"
 
-#: src/window.js:764
-msgid "Select folder"
-msgstr "Seleccionar carpeta"
+#: rust/src/window.rs:1077 rust/src/window.rs:1302
+msgid "A document save is still in progress."
+msgstr "El guardado del documento sigue en curso."
 
-#: src/window.js:775
-msgid "Open LaTeX project folder"
-msgstr "Abrir carpeta del proyecto LaTeX"
+#: rust/src/window.rs:1084
+msgid "Unsaved changes"
+msgstr "Cambios sin guardar"
 
-#: src/window.js:788
-msgid "No .tex files were found in this folder"
-msgstr "No se encontraron archivos .tex en esta carpeta"
-
-#: src/window.js:795
-#, javascript-format
-msgid "Could not list the folder: %s"
-msgstr "No se pudo enumerar la carpeta: %s"
-
-#: src/window.js:801
-msgid "Choose main document"
-msgstr "Elegir documento principal"
-
-#: src/window.js:836 src/core/build.js:99
-msgid "The document must be available as a local file."
-msgstr "El documento debe estar disponible como archivo local."
-
-#: src/window.js:838 src/window.js:1422
-msgid "Could not read the file."
-msgstr "No se pudo leer el archivo."
-
-#: src/window.js:843 src/window.js:921
-msgid "This document has not been compiled yet."
-msgstr "Este documento aún no se ha compilado."
-
-#: src/window.js:844 src/window.js:922
-msgid "Compile the document to see the PDF"
-msgstr "Compila el documento para ver el PDF"
-
-#: src/window.js:847
-#, javascript-format
-msgid "Could not open: %s"
-msgstr "No se pudo abrir: %s"
-
-#: src/window.js:863
-msgid "Discard unsaved changes?"
-msgstr "¿Descartar los cambios sin guardar?"
-
-#: src/window.js:864
-msgid "The current document has changes that have not been saved."
-msgstr "El documento actual tiene cambios sin guardar."
-
-#: src/window.js:866
-msgid "Keep editing"
-msgstr "Seguir editando"
-
-#: src/window.js:867
+#: rust/src/window.rs:1086
 msgid "Discard"
 msgstr "Descartar"
 
-#: src/window.js:876
-msgid "Choose a folder for the new project"
-msgstr "Elegir una carpeta para el proyecto nuevo"
+#: rust/src/window.rs:1087
+msgid "Save"
+msgstr "Guardar"
 
-#: src/window.js:882
-msgid "New LaTeX document"
-msgstr "Documento nuevo de LaTeX"
+#: rust/src/window.rs:1088
+msgid "Save changes before continuing?"
+msgstr "¿Guardar los cambios antes de continuar?"
 
-#: src/window.js:882
-msgid "Save LaTeX document"
-msgstr "Guardar documento LaTeX"
+#: rust/src/window.rs:1127
+msgid "Opening document…"
+msgstr "Abriendo documento…"
 
-#: src/window.js:885
-msgid "Create"
-msgstr "Crear"
+#: rust/src/window.rs:1161
+msgid "This document has not been compiled yet."
+msgstr "Este documento aún no se ha compilado."
 
-#: src/window.js:893
-msgid "File name in the selected folder"
-msgstr "Nombre del archivo en la carpeta seleccionada"
+#: rust/src/window.rs:1169
+msgid "Could not open the document"
+msgstr "No se pudo abrir el documento"
 
-#: src/window.js:903
-msgid "Enter a valid file name"
-msgstr "Introduce un nombre de archivo válido"
+#: rust/src/window.rs:1205
+msgid "Loading project…"
+msgstr "Cargando proyecto…"
 
-#: src/window.js:909
-msgid "A file with that name already exists in this folder"
-msgstr "Ya existe un archivo con ese nombre en esta carpeta"
+#: rust/src/window.rs:1222 rust/src/window.rs:1386 rust/src/window.rs:2698
+msgid "Could not list the project folder"
+msgstr "No se pudo listar la carpeta del proyecto"
 
-#: src/window.js:914
-msgid "The folder is not available as a local directory."
-msgstr "La carpeta no está disponible como directorio local."
+#: rust/src/window.rs:1235
+msgid "This project has no .tex document yet."
+msgstr "Este proyecto todavía no tiene ningún documento .tex."
 
-#: src/window.js:926
-#, javascript-format
-msgid "Could not create the file: %s"
-msgstr "No se pudo crear el archivo: %s"
+#: rust/src/window.rs:1241
+msgid "Choose main document"
+msgstr "Elegir documento principal"
 
-#: src/window.js:934
+#: rust/src/window.rs:1244
+msgid "Open"
+msgstr "Abrir"
+
+#: rust/src/window.rs
+msgid "Open document"
+msgstr "Abrir documento"
+
+#: rust/src/window.rs
+msgid "Open project folder"
+msgstr "Abrir carpeta del proyecto"
+
+#: rust/src/window.rs:1306
+msgid "Saving…"
+msgstr "Guardando…"
+
+#: rust/src/window.rs:1325
+msgid "The document changed while it was being saved. Save again."
+msgstr "El documento cambió mientras se guardaba. Vuelve a guardarlo."
+
+#: rust/src/window.rs:1333
 msgid "Document saved"
 msgstr "Documento guardado"
 
-#: src/window.js:937
-msgid "Choose a folder for the document"
-msgstr "Elegir una carpeta para el documento"
+#: rust/src/window.rs:1346
+msgid "Open a project folder to browse its files."
+msgstr "Abre una carpeta del proyecto para navegar por sus archivos."
 
-#: src/window.js:955
-msgid "Choose a project folder before updating the BibTeX file."
-msgstr "Selecciona una carpeta de proyecto para actualizar el archivo BibTeX."
+#: rust/src/window.rs:1353
+msgid "Loading project files…"
+msgstr "Cargando los archivos del proyecto…"
 
-#: src/window.js:973
-#, javascript-format
-msgid "Could not create a folder for %s."
-msgstr "No se pudo crear una carpeta para %s."
+#: rust/src/window.rs:1379
+msgid "This project has no files yet. Use + to create one."
+msgstr "Este proyecto aún no tiene archivos. Usa + para crear uno."
 
-#: src/window.js:978
-#, javascript-format
-msgid "Could not read %s."
-msgstr "No se pudo leer %s."
-
-#: src/window.js:1030
-msgid "Save the document before compiling"
-msgstr "Guarda el documento antes de compilar"
-
-#: src/window.js:1031
-msgid "Save the document before compiling."
-msgstr "Guarda el documento antes de compilar."
-
-#: src/window.js:1036
-msgid "No LaTeX compiler was found in the Ovenbird environment."
-msgstr "No se encontró un compilador de LaTeX en el entorno de Ovenbird."
-
-#: src/window.js:1037
+#: rust/src/window.rs:1426
 msgid ""
-"No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live in the "
-"Ovenbird environment."
+"This file is listed as a project resource and cannot be edited in Ovenbird "
+"yet."
 msgstr ""
-"No se encontró un compilador de LaTeX. Instala latexmk, Tectonic o TeX Live "
-"en el entorno de Ovenbird."
+"Este archivo aparece como recurso del proyecto y todavía no se puede editar "
+"en Ovenbird."
 
-#: src/window.js:1042
-#, javascript-format
-msgid "%d local reference added to the project BibTeX"
-msgid_plural "%d local references added to the project BibTeX"
-msgstr[0] "%d referencia local añadida al BibTeX del proyecto"
-msgstr[1] "%d referencias locales añadidas al BibTeX del proyecto"
+#: rust/src/window.rs:1463 rust/src/window.rs:1706 rust/src/window.rs:1708
+msgid "Rename"
+msgstr "Cambiar nombre"
 
-#: src/window.js:1044
-#, javascript-format
-msgid "%d duplicate key; the project file was left unchanged"
-msgid_plural "%d duplicate keys; the project file was left unchanged"
-msgstr[0] "%d clave duplicada; se conservó el archivo del proyecto"
-msgstr[1] "%d claves duplicadas; se conservó el archivo del proyecto"
+#: rust/src/window.rs:1463
+msgid "Move to Trash"
+msgstr "Mover a la papelera"
 
-#: src/window.js:1048
-#, javascript-format
-msgid "Could not update the project bibliography: %s"
-msgstr "No se pudo actualizar la bibliografía del proyecto: %s"
+#: rust/src/window.rs:1591 rust/src/window.rs:1659 rust/src/window.rs:1852
+msgid "Create"
+msgstr "Crear"
 
-#: src/window.js:1053
-msgid "Compilation is in progress."
-msgstr "La compilación está en curso."
+#: rust/src/window.rs:1599
+msgid "File name in the selected folder"
+msgstr "Nombre del archivo en la carpeta seleccionada"
 
-#: src/window.js:1054
-msgid "Compiling LaTeX…"
-msgstr "Compilando LaTeX…"
+#: rust/src/window.rs:1612
+msgid "Enter a valid file name"
+msgstr "Introduce un nombre de archivo válido"
 
-#: src/window.js:1059
-msgid "Compilation found errors"
-msgstr "La compilación encontró errores"
+#: rust/src/window.rs:1634
+msgid "File created"
+msgstr "Archivo creado"
 
-#: src/window.js:1067
-msgid "PDF updated"
-msgstr "PDF actualizado"
+#: rust/src/window.rs:1637
+msgid "Could not create the file"
+msgstr "No se pudo crear el archivo"
 
-#: src/window.js:1069
-msgid "PDF compiled, but the preview could not be opened"
-msgstr "PDF compilado, pero no se pudo abrir la vista previa"
+#: rust/src/window.rs:1662
+msgid "Folder name"
+msgstr "Nombre de la carpeta"
 
-#: src/window.js:1070
-#, javascript-format
-msgid "PDF created, but the preview could not be opened: %s"
-msgstr "PDF generado, pero no se pudo abrir la vista previa: %s"
+#: rust/src/window.rs:1675
+msgid "Enter a valid folder name"
+msgstr "Introduce un nombre de carpeta válido"
 
-#: src/window.js:1071
-msgid "Could not open the PDF preview"
-msgstr "No se pudo abrir la vista previa del PDF"
+#: rust/src/window.rs:1690
+msgid "Folder created"
+msgstr "Carpeta creada"
 
-#: src/window.js:1079
-msgid "Could not compile the document"
-msgstr "No se pudo compilar el documento"
+#: rust/src/window.rs:1693
+msgid "Could not create the folder"
+msgstr "No se pudo crear la carpeta"
 
-#: src/window.js:1080
-msgid "Check the build output"
-msgstr "Revisa la salida de compilación"
+#: rust/src/window.rs:1761
+msgid "Moved to Trash"
+msgstr "Movido a la papelera"
 
-#: src/window.js:1107 src/window.js:1367
-msgid "No references found"
-msgstr "No se encontraron referencias"
+#: rust/src/window.rs:1763
+msgid "Could not move to Trash"
+msgstr "No se pudo mover a la papelera"
 
-#: src/window.js:1107
-msgid "Your library starts here"
-msgstr "Tu biblioteca empieza aquí"
+#: rust/src/window.rs:1768 rust/src/window.rs:1850
+msgid "New project"
+msgstr "Nuevo proyecto"
 
-#: src/window.js:1108
-msgid "Try another search term."
-msgstr "Prueba con otro término de búsqueda."
+#: rust/src/window.rs:1771
+msgid "Continue"
+msgstr "Continuar"
 
-#: src/window.js:1108
-msgid "Add a reference, import a BibTeX file, or connect your Zotero account."
+#: rust/src/window.rs:1779
+msgid ""
+"Choose a starting point. Template files are copied into a local project "
+"folder."
 msgstr ""
-"Añade una referencia, importa un archivo BibTeX o conecta tu cuenta de "
-"Zotero."
+"Elige un punto de partida. Los archivos de la plantilla se copiarán en una "
+"carpeta de proyecto local."
 
-#: src/window.js:1113 src/window.js:1383
-msgid "Unknown author"
-msgstr "Autor desconocido"
+#: rust/src/window.rs:1785
+msgid "Blank LaTeX document"
+msgstr "Documento LaTeX en blanco"
 
-#: src/window.js:1120 src/window.js:1133
-msgid "Edit reference"
-msgstr "Editar referencia"
+#: rust/src/window.rs:1785
+msgid "Start a new document with a simple article structure."
+msgstr "Empieza un documento con una estructura sencilla de artículo."
 
-#: src/window.js:1127
-#, javascript-format
-msgid "%d local reference"
-msgid_plural "%d local references"
-msgstr[0] "%d referencia local"
-msgstr[1] "%d referencias locales"
+#: rust/src/window.rs:1786
+msgid "ABNT · abnTeX2"
+msgstr "ABNT · abnTeX2"
 
-#: src/window.js:1133
-msgid "New reference"
-msgstr "Referencia nueva"
+#: rust/src/window.rs:1786
+msgid ""
+"Academic work, articles, reports, and research projects based on ABNT rules."
+msgstr ""
+"Trabajos académicos, artículos, informes y proyectos de investigación según "
+"las normas ABNT."
 
-#: src/window.js:1136
-msgid "Delete"
-msgstr "Eliminar"
+#: rust/src/window.rs:1787
+msgid "IEEE · IEEEtran"
+msgstr "IEEE · IEEEtran"
 
-#: src/window.js:1137
-msgid "Add"
-msgstr "Añadir"
+#: rust/src/window.rs:1787
+msgid "IEEE conference and journal papers using the IEEEtran class."
+msgstr "Artículos para congresos y revistas IEEE con la clase IEEEtran."
 
-#: src/window.js:1155
-msgid "Reference type"
-msgstr "Tipo de referencia"
+#: rust/src/window.rs:1788
+msgid "ACM · acmart"
+msgstr "ACM · acmart"
 
-#: src/window.js:1161
-msgid "Citation key"
-msgstr "Clave de cita"
+#: rust/src/window.rs:1788
+msgid "ACM journal and conference papers using the acmart class."
+msgstr "Artículos de revistas y congresos ACM con la clase acmart."
 
-#: src/window.js:1162
-msgid "Title"
-msgstr "Título"
+#: rust/src/window.rs:1789
+msgid "Elsevier · elsarticle"
+msgstr "Elsevier · elsarticle"
 
-#: src/window.js:1163
-msgid "Author(s)"
-msgstr "Autor(es)"
+#: rust/src/window.rs:1789
+msgid "Elsevier manuscripts using the elsarticle package."
+msgstr "Manuscritos de Elsevier con el paquete elsarticle."
 
-#: src/window.js:1164
-msgid "Editor(s)"
-msgstr "Editor(es)"
+#: rust/src/window.rs:1790
+msgid "Springer Nature"
+msgstr "Springer Nature"
 
-#: src/window.js:1165
-msgid "Year / date"
-msgstr "Año / fecha"
+#: rust/src/window.rs:1790
+msgid "Springer Nature journal article templates and sample files."
+msgstr ""
+"Plantillas para artículos de revistas y archivos de ejemplo de Springer "
+"Nature."
 
-#: src/window.js:1166
-msgid "Journal / event / book"
-msgstr "Revista / evento / libro"
+#: rust/src/window.rs:1816
+msgid "Source"
+msgstr "Fuente"
 
-#: src/window.js:1167
-msgid "Publisher"
-msgstr "Editorial"
+#: rust/src/window.rs:1828
+msgid ""
+"Journal and conference requirements can differ. Check the current author "
+"instructions before submission."
+msgstr ""
+"Los requisitos de las revistas y congresos pueden variar. Revisa las "
+"instrucciones actuales para autores antes de enviar el trabajo."
 
-#: src/window.js:1168
-msgid "Volume"
-msgstr "Volumen"
+#: rust/src/window.rs:1869
+msgid "Enter a valid project name"
+msgstr "Escribe un nombre válido para el proyecto"
 
-#: src/window.js:1169
-msgid "Number / issue"
-msgstr "Número / edición"
+#: rust/src/window.rs:1879
+msgid "Creating project"
+msgstr "Creando proyecto"
 
-#: src/window.js:1170
-msgid "Edition"
-msgstr "Edición"
+#: rust/src/window.rs:1891
+msgid "Preparing template project…"
+msgstr "Preparando el proyecto a partir de la plantilla…"
 
-#: src/window.js:1171
-msgid "Pages"
-msgstr "Páginas"
+#: rust/src/window.rs:1895
+msgid "Creating project…"
+msgstr "Creando proyecto…"
 
-#: src/window.js:1172
-msgid "DOI"
-msgstr "DOI"
+#: rust/src/window.rs:1905 rust/src/window.rs:1932
+msgid "Could not create the project"
+msgstr "No se pudo crear el proyecto"
 
-#: src/window.js:1173
-msgid "URL"
-msgstr "URL"
+#: rust/src/window.rs:1946 rust/src/window.rs:1948
+msgid "Insert link"
+msgstr "Insertar enlace"
 
-#: src/window.js:1174
-msgid "Keywords"
-msgstr "Palabras clave"
-
-#: src/window.js:1182
-msgid "Full title of the work"
-msgstr "Título completo de la obra"
-
-#: src/window.js:1192
-msgid "Reference removed from the local library"
-msgstr "Referencia eliminada de la biblioteca local"
-
-#: src/window.js:1196
-msgid "Enter the reference title"
-msgstr "Introduce el título de la referencia"
-
-#: src/window.js:1220
-msgid "Reference updated"
-msgstr "Referencia actualizada"
-
-#: src/window.js:1220
-msgid "Reference added"
-msgstr "Referencia añadida"
-
-#: src/window.js:1244
-msgid "Text shown in the document"
-msgstr "Texto que aparece en el documento"
-
-#: src/window.js:1245
-msgid "Link address"
-msgstr "Dirección del enlace"
-
-#: src/window.js:1247
+#: rust/src/window.rs:1954
 msgid "Link text"
 msgstr "Texto del enlace"
 
-#: src/window.js:1256
-msgid "Enter a link address"
-msgstr "Introduce la dirección del enlace"
+#: rust/src/window.rs:1957
+msgid "Text"
+msgstr "Texto"
 
-#: src/window.js:1284
-msgid "Rows"
-msgstr "Filas"
+#: rust/src/window.rs:1969
+msgid "Enter a URL"
+msgstr "Introduce una URL"
 
-#: src/window.js:1286
-msgid "Columns"
-msgstr "Columnas"
+#: rust/src/window.rs:1983
+msgid "Open a project folder before inserting an image."
+msgstr "Abre una carpeta del proyecto antes de insertar una imagen."
 
-#: src/window.js:1301
+#: rust/src/window.rs:1987
+msgid "The image name is invalid."
+msgstr "El nombre de la imagen no es válido."
+
+#: rust/src/window.rs:2016
+msgid "Image copied to the project. Reopen the document to insert it."
+msgstr ""
+"La imagen se copió al proyecto. Vuelve a abrir el documento para insertarla."
+
+#: rust/src/window.rs:2025
+msgid "Could not add the image to the project"
+msgstr "No se pudo añadir la imagen al proyecto"
+
+#: rust/src/window.rs:2031
+msgid "Insert table"
+msgstr "Insertar tabla"
+
+#: rust/src/window.rs:2033
 msgid "Insert"
 msgstr "Insertar"
 
-#: src/window.js:1303
-msgid "Images and PDF"
-msgstr "Imágenes y PDF"
+#: rust/src/window.rs:2040
+msgid "Rows"
+msgstr "Filas"
 
-#: src/window.js:1337
-msgid "Search by title, author, or year…"
-msgstr "Buscar por título, autor o año…"
+#: rust/src/window.rs:2042
+msgid "Columns"
+msgstr "Columnas"
 
-#: src/window.js:1341
+#: rust/src/window.rs:2074
+msgid "OK"
+msgstr "Aceptar"
+
+#: rust/src/window.rs:2143
+msgid "No matching references"
+msgstr "No hay referencias coincidentes"
+
+#: rust/src/window.rs:2176 rust/src/window.rs:2223
+msgid "Could not load the local library"
+msgstr "No se pudo cargar la biblioteca local"
+
+#: rust/src/window.rs:2184 rust/src/window.rs:2213
+msgid "The local library is busy. Try again in a moment."
+msgstr "La biblioteca local está ocupada. Inténtalo de nuevo en un momento."
+
+#: rust/src/window.rs:2187
+msgid "Saving references…"
+msgstr "Guardando referencias…"
+
+#: rust/src/window.rs:2202
+msgid "Could not save the local library"
+msgstr "No se pudo guardar la biblioteca local"
+
+#: rust/src/window.rs:2209
+msgid "The local library is still loading."
+msgstr "La biblioteca local todavía se está cargando."
+
+#: rust/src/window.rs:2229 rust/src/window.rs:2552
+msgid "Retry"
+msgstr "Reintentar"
+
+#: rust/src/window.rs:2235
+msgid "Loading local library…"
+msgstr "Cargando la biblioteca local…"
+
+#: rust/src/window.rs:2252
 msgid ""
-"Your local library is empty. Add a reference or import a BibTeX file to cite "
-"it."
+"Your library starts here: add a reference, import BibTeX, or connect Zotero."
 msgstr ""
-"Tu biblioteca local está vacía. Añade una referencia o importa un archivo "
-"BibTeX para citarlo."
+"Tu biblioteca empieza aquí: añade una referencia, importa BibTeX o conecta "
+"Zotero."
 
-#: src/window.js:1347 src/window.js:1412
-msgid "Import BibTeX"
-msgstr "Importar BibTeX"
+#: rust/src/window.rs:2253
+msgid "No references match this search."
+msgstr "No hay referencias que coincidan con la búsqueda."
 
-#: src/window.js:1384
-msgid "Year unknown"
-msgstr "Año desconocido"
+#: rust/src/window.rs:2283
+msgid "Edit reference"
+msgstr "Editar referencia"
 
-#: src/window.js:1386
-msgid "Untitled reference"
-msgstr "Referencia sin título"
+msgid "New reference"
+msgstr "Nueva referencia"
 
-#: src/window.js:1413
-msgid "Import"
-msgstr "Importar"
+#: rust/src/window.rs:2288
+msgid "Delete reference"
+msgstr "Eliminar referencia"
 
-#: src/window.js:1415
-msgid "BibTeX (*.bib)"
-msgstr "BibTeX (*.bib)"
+#: rust/src/window.rs:2295 rust/src/window.rs:2388
+msgid "Reference deleted"
+msgstr "Referencia eliminada"
 
-#: src/window.js:1437
-#, javascript-format
-msgid "%d reference imported"
-msgid_plural "%d references imported"
-msgstr[0] "%d referencia importada"
-msgstr[1] "%d referencias importadas"
+#: rust/src/window.rs
+msgid "%d local reference · %s"
+msgid_plural "%d local references · %s"
+msgstr[0] "%d referencia local · %s"
+msgstr[1] "%d referencias locales · %s"
 
-#: src/window.js:1439
-#, javascript-format
-msgid "Import failed: %s"
-msgstr "Error al importar: %s"
+#: rust/src/window.rs:2315
+msgid "Delete"
+msgstr "Eliminar"
 
-#: src/window.js:1448
-msgid "Export BibTeX library"
-msgstr "Exportar biblioteca BibTeX"
+#: rust/src/window.rs:2328
+msgid "Reference type"
+msgstr "Tipo de referencia"
 
-#: src/window.js:1449
-msgid "Export"
-msgstr "Exportar"
+#: rust/src/window.rs:2343
+msgid "Full title of the work"
+msgstr "Título completo de la obra"
 
-#: src/window.js:1456
-msgid "Library exported"
-msgstr "Biblioteca exportada"
+#: rust/src/window.rs:2351
+msgid "Citation key"
+msgstr "Clave de cita"
 
-#: src/window.js:1458
-#, javascript-format
-msgid "Export failed: %s"
-msgstr "Error al exportar: %s"
+#: rust/src/window.rs:2401
+msgid "Enter the reference title"
+msgstr "Introduce el título de la referencia"
 
-#: src/window.js:1486
-msgid "Sync with Zotero"
-msgstr "Sincronizar con Zotero"
+#: rust/src/window.rs:2416
+msgid "Reference saved"
+msgstr "Referencia guardada"
 
-#: src/window.js:1489
+#: rust/src/window.rs:2443
+msgid "Imported %d references"
+msgstr "%d referencias importadas"
+
+#: rust/src/window.rs:2445
+msgid "Could not import BibTeX"
+msgstr "No se pudo importar BibTeX"
+
+#: rust/src/window.rs:2460
+msgid "BibTeX exported"
+msgstr "BibTeX exportado"
+
+#: rust/src/window.rs:2461
+msgid "Could not export BibTeX"
+msgstr "No se pudo exportar BibTeX"
+
+#: rust/src/window.rs:2470
 msgid "Save and sync"
 msgstr "Guardar y sincronizar"
 
-#: src/window.js:1497
+#: rust/src/window.rs:2479
 msgid ""
 "The local library works without an account. To sync, enter your library ID "
 "and a Zotero key with read and write access."
@@ -887,214 +866,397 @@ msgstr ""
 "ID de la biblioteca y una clave de Zotero con permisos de lectura y "
 "escritura."
 
-#: src/window.js:1501
-msgid "User ID"
-msgstr "ID de usuario"
+#: rust/src/window.rs:2484
+msgid "Don’t have a Zotero account?"
+msgstr "¿No tienes una cuenta de Zotero?"
 
-#: src/window.js:1502
+#: rust/src/window.rs:2487
+msgid "Create a Zotero account"
+msgstr "Crear una cuenta de Zotero"
+
+#: rust/src/window.rs:2492
 msgid "Found at zotero.org/settings/keys"
 msgstr "Disponible en zotero.org/settings/keys"
 
-#: src/window.js:1503
-msgid "API key"
-msgstr "Clave de API"
-
-#: src/window.js:1504
+#: rust/src/window.rs:2495
 msgid "Zotero key with write access"
 msgstr "Clave de Zotero con permiso de escritura"
 
-#: src/window.js:1515
+#: rust/src/window.rs:2498
+msgid "User ID"
+msgstr "ID de usuario"
+
+#: rust/src/window.rs:2500
+msgid "API key"
+msgstr "Clave de API"
+
+#: rust/src/window.rs:2510
+msgid "Zotero settings are still loading."
+msgstr "La configuración de Zotero todavía se está cargando."
+
+#: rust/src/window.rs:2515
 msgid "Enter the ID and API key"
 msgstr "Introduce el ID y la clave de API"
 
-#: src/window.js:1525
-#, javascript-format
-msgid "Could not save the key: %s"
-msgstr "No se pudo guardar la clave: %s"
+#: rust/src/window.rs:2524
+msgid "Saving Zotero settings…"
+msgstr "Guardando la configuración de Zotero…"
 
-#: src/window.js:1536
-#, javascript-format
-msgid "The password service is unavailable: %s"
-msgstr "El servicio de contraseñas no está disponible: %s"
+#: rust/src/window.rs:2529
+msgid "Could not save the Zotero key"
+msgstr "No se pudo guardar la clave de Zotero"
 
-#: src/window.js:1542
+#: rust/src/window.rs:2551 rust/src/window.rs:2583
+msgid "Could not load Zotero settings"
+msgstr "No se pudo cargar la configuración de Zotero"
+
+#: rust/src/window.rs:2607
+msgid "Syncing…"
+msgstr "Sincronizando…"
+
+#: rust/src/window.rs:2608
 msgid "Syncing references…"
 msgstr "Sincronizando referencias…"
 
-#: src/window.js:1549
-#, javascript-format
-msgid "%d reference downloaded"
-msgid_plural "%d references downloaded"
-msgstr[0] "%d referencia descargada"
-msgstr[1] "%d referencias descargadas"
+#: rust/src/window.rs:2613
+msgid "No Zotero API key is saved."
+msgstr "No hay guardada ninguna clave de API de Zotero."
 
-#: src/window.js:1550
-#, javascript-format
-msgid "%d reference uploaded"
-msgid_plural "%d references uploaded"
-msgstr[0] "%d referencia subida"
-msgstr[1] "%d referencias subidas"
+#: rust/src/window.rs:2645
+msgid "Zotero sync failed"
+msgstr "Falló la sincronización con Zotero"
 
-#: src/window.js:1551
-#, javascript-format
-msgid "%d reference updated locally"
-msgid_plural "%d references updated locally"
-msgstr[0] "%d referencia actualizada localmente"
-msgstr[1] "%d referencias actualizadas localmente"
+#: rust/src/window.rs:2652
+msgid "Export"
+msgstr "Exportar"
 
-#: src/window.js:1552
-#, javascript-format
-msgid "%d conflict kept locally"
-msgid_plural "%d conflicts kept locally"
-msgstr[0] "%d conflicto conservado localmente"
-msgstr[1] "%d conflictos conservados localmente"
+#: rust/src/window.rs:2671
+msgid "Save the document before compiling."
+msgstr "Guarda el documento antes de compilar."
 
-#: src/window.js:1553
-#, javascript-format
-msgid "%d upload failed"
-msgid_plural "%d uploads failed"
-msgstr[0] "%d error al subir"
-msgstr[1] "%d errores al subir"
+#: rust/src/window.rs:2707
+msgid "Compilation is in progress."
+msgstr "La compilación está en curso."
 
-#: src/window.js:1557
-#, javascript-format
-msgid "Sync failed: %s"
-msgstr "Error al sincronizar: %s"
+#: rust/src/window.rs:2728
+msgid "%d local reference added to the temporary bibliography for this build"
+msgid_plural ""
+"%d local references added to the temporary bibliography for this build"
+msgstr[0] "Se añadió %d referencia local a la bibliografía temporal de esta compilación"
+msgstr[1] "Se añadieron %d referencias locales a la bibliografía temporal de esta compilación"
 
-#: src/core/editor.js:122
-msgid "Introduction"
-msgstr "Introducción"
+#: rust/src/window.rs:2736
+msgid "%d duplicate citation key was left unchanged"
+msgid_plural "%d duplicate citation keys were left unchanged"
+msgstr[0] "Se dejó sin cambios %d clave de cita duplicada"
+msgstr[1] "Se dejaron sin cambios %d claves de cita duplicadas"
 
-#: src/core/editor.js:122
-msgid "Start writing here."
-msgstr "Empieza a escribir aquí."
+#: rust/src/window.rs:2742 rust/src/window.rs:2762
+msgid "Compilation finished"
+msgstr "Compilación terminada"
 
-#: src/core/editor.js:170
-msgid ""
-"Visual mode needs a document with \\begin{document} and \\end{document}.\n"
-"\n"
-"Switch to Code mode to review the document structure."
-msgstr ""
-"El modo Visual necesita un documento con \\begin{document} y "
-"\\end{document}.\n"
-"\n"
-"Cambia al modo Código para revisar la estructura del documento."
+#: rust/src/window.rs:2748 rust/src/window.rs:2755
+msgid "Could not export PDF"
+msgstr "No se pudo exportar el PDF"
 
-#: src/core/build.js:52 src/core/build.js:64
-#, javascript-format
-msgid "Compilation stopped after %d minute."
-msgid_plural "Compilation stopped after %d minutes."
-msgstr[0] "La compilación se detuvo después de %d minuto."
-msgstr[1] "La compilación se detuvo después de %d minutos."
+#: rust/src/window.rs:2751
+msgid "PDF exported"
+msgstr "PDF exportado"
 
-#: src/core/build.js:57
-msgid "The document failed to compile."
-msgstr "No se pudo compilar el documento."
-
-#: src/core/build.js:93
-msgid "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live."
-msgstr ""
-"No se encontró un compilador de LaTeX. Instala latexmk, Tectonic o TeX Live."
-
-#: src/core/build.js:95
-msgid "Compiling with Tectonic · the first build may download support files."
-msgstr ""
-"Compilando con Tectonic · la primera compilación puede descargar archivos de "
-"soporte."
-
-#: src/core/build.js:96
-#, javascript-format
-msgid "Compiling with %s…"
-msgstr "Compilando con %s…"
-
-#: src/core/build.js:108
-#, javascript-format
-msgid "Could not prepare the build folder: %s"
-msgstr "No se pudo preparar la carpeta de compilación: %s"
-
-#: src/core/build.js:135
-msgid ""
-"This document uses biblatex and needs Biber. Install Biber, latexmk, or "
-"Tectonic."
-msgstr ""
-"Este documento usa biblatex y necesita Biber. Instala Biber, latexmk o "
-"Tectonic."
-
-#: src/core/build.js:143
-msgid "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic."
-msgstr "Este documento necesita BibTeX. Instala BibTeX, latexmk o Tectonic."
-
-#: src/core/build.js:151
-#, javascript-format
-msgid ""
-"%s finished without creating the expected PDF. Check that the document has a "
-"complete LaTeX structure."
-msgstr ""
-"%s terminó sin generar el PDF esperado. Comprueba que el documento tenga una "
-"estructura LaTeX completa."
-
-#: src/core/build.js:154
-#, javascript-format
-msgid "%s: compilation complete."
-msgstr "%s: compilación finalizada."
-
-#: src/core/build.js:169
-msgid "Previous page"
-msgstr "Página anterior"
-
-#: src/core/build.js:170
-msgid "Next page"
-msgstr "Página siguiente"
-
-#: src/core/build.js:207
-msgid "PDF opened in the default viewer"
-msgstr "PDF abierto en el visor predeterminado"
-
-#: src/core/build.js:218
+#: rust/src/window.rs:2766
 msgid "Could not open the PDF"
 msgstr "No se pudo abrir el PDF"
 
-#: src/core/latex-commands.js:31
-#, javascript-format
-msgid "Unknown LaTeX formatting: %s"
-msgstr "Formato LaTeX desconocido: %s"
+#: rust/src/window.rs:2767
+msgid "Could not open the compiled PDF"
+msgstr "No se pudo abrir el PDF compilado"
 
-#: src/core/latex-commands.js:47
-#, javascript-format
-msgid "Unknown paragraph style: %s"
-msgstr "Estilo de párrafo desconocido: %s"
+#: rust/src/window.rs:2768
+msgid "Could not open the PDF preview"
+msgstr "No se pudo abrir la vista previa del PDF"
 
-#: src/core/latex-commands.js:53
-#, javascript-format
-msgid "Unknown list environment: %s"
-msgstr "Entorno de lista desconocido: %s"
+#: rust/src/window.rs:2775 rust/src/window.rs:2776
+msgid "Could not compile the document"
+msgstr "No se pudo compilar el documento"
 
-#: src/core/library.js:36 src/core/library.js:43
-#, javascript-format
-msgid "Citation key “%s” already exists."
-msgstr "La clave de cita “%s” ya existe."
+#: rust/src/window.rs:2783
+msgid "Open or create a LaTeX project before compiling."
+msgstr "Abre o crea un proyecto LaTeX antes de compilar."
 
-#: src/core/library.js:45
-msgid "The reference no longer exists."
-msgstr "La referencia ya no existe."
+#: rust/src/window.rs:2789
+msgid "Check the build output"
+msgstr "Revisa la salida de compilación"
 
-#: src/core/zotero.js:42
-msgid "Ovenbird Zotero API key"
-msgstr "Clave de API de Zotero de Ovenbird"
+#: rust/src/window.rs
+msgid "Visual mode is available only for LaTeX documents."
+msgstr "El modo visual solo está disponible para documentos LaTeX."
 
-#: src/core/zotero.js:43
-msgid "The password service did not accept the key."
-msgstr "El servicio de contraseñas no aceptó la clave."
+#: rust/src/window.rs
+msgid "Open a LaTeX document before inserting an image."
+msgstr "Abre un documento LaTeX antes de insertar una imagen."
 
-#: src/core/zotero.js:92
-#, javascript-format
-msgid "Zotero returned %s: %s"
-msgstr "Zotero respondió %s: %s"
+#: rust/src/window.rs
+msgid "Image and PDF files"
+msgstr "Imágenes y archivos PDF"
 
-#: src/core/zotero.js:231
-msgid ""
-"Zotero did not report the current library version; no references were "
-"uploaded."
-msgstr ""
-"Zotero no indicó la versión actual de la biblioteca; no se subió ninguna "
-"referencia."
+#: rust/src/window.rs
+msgid "Choose a main LaTeX document before inserting an image."
+msgstr "Elige el documento LaTeX principal antes de insertar una imagen."
+
+#: rust/src/window.rs
+msgid "The image path cannot be represented relative to the main document."
+msgstr "No se pudo representar la ruta de la imagen relativa al documento principal."
+
+#: rust/src/window.rs
+msgid "Open a LaTeX document before inserting a citation."
+msgstr "Abre un documento LaTeX antes de insertar una cita."
+
+#: rust/src/window.rs
+msgid "Could not check Zotero settings"
+msgstr "No se pudo comprobar la configuración de Zotero"
+
+#: rust/src/window.rs
+msgid "New LaTeX document"
+msgstr "Nuevo documento LaTeX"
+
+#: rust/src/window.rs
+msgid "New bibliography (.bib)"
+msgstr "Nueva bibliografía (.bib)"
+
+#: rust/src/window.rs
+msgid "New style file (.sty)"
+msgstr "Nuevo archivo de estilo (.sty)"
+
+#: rust/src/window.rs
+msgid "Previous match"
+msgstr "Coincidencia anterior"
+
+#: rust/src/window.rs
+msgid "Next match"
+msgstr "Coincidencia siguiente"
+
+#: rust/src/window.rs
+msgid "Bold"
+msgstr "Negrita"
+
+#: rust/src/window.rs
+msgid "Italic"
+msgstr "Cursiva"
+
+#: rust/src/window.rs
+msgid "Underline"
+msgstr "Subrayado"
+
+#: rust/src/window.rs
+msgid "Monospace"
+msgstr "Monoespaciado"
+
+#: rust/src/window.rs
+msgid "Section"
+msgstr "Sección"
+
+#: rust/src/window.rs
+msgid "Subsection"
+msgstr "Subsección"
+
+#: rust/src/window.rs
+msgid "Subsubsection"
+msgstr "Subsubsección"
+
+#: rust/src/window.rs
+msgid "Paragraph"
+msgstr "Párrafo"
+
+#: rust/src/window.rs
+msgid "Subparagraph"
+msgstr "Subpárrafo"
+
+#: rust/src/window.rs
+msgid "Inline math"
+msgstr "Matemáticas en línea"
+
+#: rust/src/window.rs
+msgid "Display math"
+msgstr "Matemáticas en bloque"
+
+#: rust/src/window.rs
+msgid "α  Alpha"
+msgstr "α  Alfa"
+
+#: rust/src/window.rs
+msgid "β  Beta"
+msgstr "β  Beta"
+
+#: rust/src/window.rs
+msgid "γ  Gamma"
+msgstr "γ  Gamma"
+
+#: rust/src/window.rs
+msgid "π  Pi"
+msgstr "π  Pi"
+
+#: rust/src/window.rs
+msgid "≤  Less than or equal to"
+msgstr "≤  Menor o igual que"
+
+#: rust/src/window.rs
+msgid "≥  Greater than or equal to"
+msgstr "≥  Mayor o igual que"
+
+#: rust/src/window.rs
+msgid "≠  Not equal to"
+msgstr "≠  Distinto de"
+
+#: rust/src/window.rs
+msgid "×  Multiplication"
+msgstr "×  Multiplicación"
+
+#: rust/src/window.rs
+msgid "±  Plus or minus"
+msgstr "±  Más o menos"
+
+#: rust/src/window.rs
+msgid "∞  Infinity"
+msgstr "∞  Infinito"
+
+#: rust/src/window.rs
+msgid "∑  Summation"
+msgstr "∑  Sumatoria"
+
+#: rust/src/window.rs
+msgid "∫  Integral"
+msgstr "∫  Integral"
+
+#: rust/src/window.rs
+msgid "√  Square root"
+msgstr "√  Raíz cuadrada"
+
+#: rust/src/window.rs
+msgid "Bulleted list"
+msgstr "Lista con viñetas"
+
+#: rust/src/window.rs
+msgid "Numbered list"
+msgstr "Lista numerada"
+
+#: rust/src/window.rs
+msgid "Quotation block"
+msgstr "Bloque de cita"
+
+#: rust/src/window.rs
+msgid "Increase indent"
+msgstr "Aumentar sangría"
+
+#: rust/src/window.rs
+msgid "Decrease indent"
+msgstr "Disminuir sangría"
+
+#: rust/src/window.rs
+msgid "Insert image"
+msgstr "Insertar imagen"
+
+#: rust/src/window.rs
+msgid "LaTeX comment"
+msgstr "Comentario LaTeX"
+
+#: rust/src/window.rs
+msgid "Footnote"
+msgstr "Nota al pie"
+
+#: rust/src/window.rs
+msgid "Review note"
+msgstr "Nota de revisión"
+
+#: rust/src/window.rs
+msgid "Add label"
+msgstr "Añadir etiqueta"
+
+#: rust/src/window.rs
+msgid "Cross-reference"
+msgstr "Referencia cruzada"
+
+#: rust/src/window.rs
+msgid "Compile"
+msgstr "Compilar"
+
+#: rust/src/window.rs
+msgid "Toggle sidebar"
+msgstr "Alternar barra lateral"
+
+#: rust/src/window.rs
+msgid "Undo"
+msgstr "Deshacer"
+
+#: rust/src/window.rs
+msgid "Redo"
+msgstr "Rehacer"
+
+#: rust/src/window.rs
+msgid "Choose a project folder"
+msgstr "Elegir una carpeta del proyecto"
+
+#: rust/src/window.rs
+msgid "Choose where to create the project"
+msgstr "Elegir dónde crear el proyecto"
+
+#: rust/src/window.rs
+msgid "Import"
+msgstr "Importar"
+
+#: rust/src/window.rs
+msgid "Label identifier"
+msgstr "Identificador de etiqueta"
+
+#: rust/src/window.rs
+msgid "Open project"
+msgstr "Abrir proyecto"
+
+#: rust/src/window.rs
+msgid "Close project"
+msgstr "Cerrar proyecto"
+
+#: rust/src/window.rs
+msgid "Automatic"
+msgstr "Automático"
+
+#: rust/src/window.rs
+msgid "Light"
+msgstr "Claro"
+
+#: rust/src/window.rs
+msgid "Dark"
+msgstr "Oscuro"
+
+#: rust/src/window.rs
+msgid "Quit"
+msgstr "Salir"
+
+#: rust/src/window.rs
+msgid "Project closed"
+msgstr "Proyecto cerrado"
+
+#: rust/src/window.rs
+msgid "%d reference"
+msgid_plural "%d references"
+msgstr[0] "%d referencia"
+msgstr[1] "%d referencias"
+
+#: rust/src/window.rs
+msgid "Open with default application"
+msgstr "Abrir con la aplicación predeterminada"
+
+#: rust/src/window.rs
+msgid "Copy path"
+msgstr "Copiar ruta"
+
+#: rust/src/window.rs
+msgid "Show in Files"
+msgstr "Mostrar en el gestor de archivos"
+
+#: rust/src/window.rs
+msgid "Could not access the clipboard."
+msgstr "No se pudo acceder al portapapeles."
+
+#: rust/src/window.rs
+msgid "Could not find the containing folder."
+msgstr "No se pudo encontrar la carpeta contenedora."

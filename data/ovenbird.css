@@ -1,0 +1,173 @@
+.ovenbird-sidebar {
+  background: @sidebar_bg_color;
+  color: @sidebar_fg_color;
+  min-width: 300px;
+}
+
+.ovenbird-sidebar > * {
+  background-color: @sidebar_bg_color;
+}
+
+.ovenbird-sidebar-tabs button {
+  min-width: 0;
+  min-height: 36px;
+  border-radius: 9px;
+}
+
+.ovenbird-sidebar-tabs button label {
+  font-size: 0.9em;
+  font-weight: normal;
+}
+
+.ovenbird-sidebar-tabs button:checked {
+  background-color: alpha(@view_fg_color, 0.12);
+}
+
+.ovenbird-brand {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ovenbird-editor-toolbar,
+.ovenbird-mode-toolbar {
+  padding: 6px 12px;
+  border-bottom: 1px solid alpha(@borders, 0.65);
+}
+
+.ovenbird-main-toolbar {
+  min-height: 48px;
+  padding: 0 6px 0 0;
+}
+
+.ovenbird-main-toolbar box.start {
+  margin: 0;
+  padding: 0;
+}
+
+.ovenbird-main-toolbar .omnibar > splitbutton {
+  background: color-mix(in srgb, currentColor 7.5%, transparent);
+  border-radius: 10px;
+}
+
+.ovenbird-header-title {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+.ovenbird-header-status {
+  font-size: 12px;
+}
+
+.ovenbird-theme-choice {
+  min-width: 42px;
+  min-height: 42px;
+  padding: 3px;
+  border-radius: 999px;
+  background: transparent;
+  border: 2px solid transparent;
+}
+
+.ovenbird-theme-choice:checked {
+  border-color: @accent_color;
+}
+
+.ovenbird-theme-swatch {
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px solid alpha(@borders, 0.85);
+}
+
+.ovenbird-theme-swatch.theme-auto {
+  background-image: linear-gradient(135deg, #ffffff 0%, #ffffff 49%, #242424 51%, #242424 100%);
+}
+
+.ovenbird-theme-swatch.theme-light {
+  background-color: #ffffff;
+}
+
+.ovenbird-theme-swatch.theme-dark {
+  background-color: #242424;
+}
+
+.ovenbird-theme-check {
+  min-width: 14px;
+  min-height: 14px;
+  padding: 2px;
+  color: white;
+  background-color: @accent_color;
+  border-radius: 999px;
+}
+
+.ovenbird-app-menu-item,
+.ovenbird-app-menu-item label {
+  font-weight: normal;
+}
+
+.ovenbird-sidebar button label,
+.ovenbird-mode-toolbar button label,
+.ovenbird-editor-toolbar button label {
+  font-weight: normal;
+}
+
+.ovenbird-project-file-name {
+  font-size: 0.82em;
+  font-weight: normal;
+}
+
+.navigation-sidebar row {
+  border-radius: 6px;
+  min-height: 30px;
+}
+
+.ovenbird-project-drop-target:drop(active) {
+  background-color: alpha(@accent_bg_color, 0.18);
+  border-radius: 6px;
+}
+
+.ovenbird-editor-page {
+  background: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.ovenbird-code-panel {
+  min-width: 0;
+  border-top: 1px solid alpha(@borders, 0.65);
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.ovenbird-code-panel sourceview,
+.ovenbird-code-panel textview {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.visual-document {
+  background: @view_bg_color;
+  color: @view_fg_color;
+  font-size: 12pt;
+  line-height: 1.5;
+}
+
+.source-view {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.source-view text {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+  font-family: monospace;
+  font-size: 12pt;
+}
+
+.preview-placeholder {
+  color: @dim_label;
+}
+
+.sidebar-section {
+  font-size: 0.85em;
+  font-weight: 600;
+}
