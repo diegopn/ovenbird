@@ -18,12 +18,11 @@
     <binary>ovenbird</binary>
   </provides>
   <developer id="io.github.diegopn">
-    <name>Ovenbird contributors</name>
+    <name>Diego Pereira do Nascimento</name>
   </developer>
   <content_rating type="oars-1.1" />
   <releases>
     <release version="0.1.0" date="2026-10-06">
-      <description><p>Initial development release.</p></description>
     </release>
   </releases>
 </component>
