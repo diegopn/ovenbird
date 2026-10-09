@@ -27,8 +27,10 @@ For a local Flatpak build, use the GNOME SDK and Rust extension described in the
 
 ## Security checks
 
-The Security workflow runs on pushes to `main`, pull requests targeting `main`,
-weekly, and manually from the Actions tab. It uses three independent checks:
+The `Ovenbird checks` workflow runs build, test, and security checks on every
+push and pull request. Dependabot checks Cargo dependencies and GitHub Actions
+every two months and proposes updates as pull requests; security updates remain
+separate from this version update schedule. Updates are not merged automatically.
 
 - `cargo-audit` checks `Cargo.lock` against the RustSec advisory database.
 - Gitleaks scans Git history for exposed credentials, with secret values redacted.
@@ -36,13 +38,11 @@ weekly, and manually from the Actions tab. It uses three independent checks:
   vectors and documentation in previously tracked Cargo sources. Each exception
   identifies a specific commit, file, rule, and line; new findings remain visible.
 - CodeQL analyzes Rust with the `security-extended` query suite and publishes
-  findings to the repository's Security tab. Its build mode is `none`; the Rust
-  quality workflow remains responsible for compiling and testing the application.
+  findings to the repository's Security tab. Its build mode is `none`; the build
+  and test job remains responsible for compiling and testing the application.
 
 These checks require no paid account or additional API secrets for this public,
-personally owned repository. Actions are pinned to commit hashes. Dependabot
-checks Cargo dependencies and GitHub Actions weekly and proposes updates as pull
-requests; updates are not merged automatically.
+personally owned repository. Actions are pinned to commit hashes.
 
 When a dependency update changes `Cargo.lock`, refresh the checked-in
 `cargo-cache/registry/index` and `cargo-cache/registry/cache` for the new locked

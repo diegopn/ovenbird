@@ -3,7 +3,9 @@ updates:
   - package-ecosystem: cargo
     directory: /
     schedule:
-      interval: weekly
+      interval: cron
+      cronjob: '0 9 1 */2 *'
+      timezone: America/Sao_Paulo
     open-pull-requests-limit: 3
     groups:
       rust-dependencies:
@@ -13,7 +15,9 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: cron
+      cronjob: '0 9 1 */2 *'
+      timezone: America/Sao_Paulo
     open-pull-requests-limit: 3
     groups:
       github-actions:
