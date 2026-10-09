@@ -1629,3 +1629,7 @@ msgstr "Falló la generación del PDF: Hay un error en la línea %d que impide l
 #: rust/src/window.rs
 msgid "Your library starts here: add a reference or import BibTeX."
 msgstr "Tu biblioteca empieza aquí: añade una referencia o importa BibTeX."
+
+#: rust/src/storage.rs
+msgid "The BibTeX marker “others” cannot be used as an author name."
+msgstr "El marcador BibTeX “others” no puede usarse como nombre de autor."

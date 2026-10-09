@@ -227,6 +227,9 @@ impl LocalLibrary {
         if profile.full_name.is_empty() || profile.citation_name.is_empty() {
             return Err("An author name is required.".to_owned());
         }
+        if profile.citation_name.eq_ignore_ascii_case("others") {
+            return Err("The BibTeX marker “others” cannot be used as an author name.".to_owned());
+        }
         let identity = author_identity(&profile.citation_name);
         if self
             .authors
@@ -261,6 +264,9 @@ impl LocalLibrary {
         let updated = normalize_author_profile(updated);
         if updated.full_name.is_empty() || updated.citation_name.is_empty() {
             return Err("An author name is required.".to_owned());
+        }
+        if updated.citation_name.eq_ignore_ascii_case("others") {
+            return Err("The BibTeX marker “others” cannot be used as an author name.".to_owned());
         }
         let previous_identity = author_identity(previous);
         let Some(index) = self
@@ -576,6 +582,7 @@ fn unique_authors(authors: Vec<String>) -> Vec<String> {
     for author in authors.into_iter().map(|author| author.trim().to_owned()) {
         let identity = author_identity(&author);
         if !identity.is_empty()
+            && !author.eq_ignore_ascii_case("others")
             && !unique
                 .iter()
                 .any(|existing: &String| author_identity(existing) == identity)
@@ -605,6 +612,7 @@ fn unique_author_profiles(authors: Vec<AuthorProfile>) -> Vec<AuthorProfile> {
     for author in authors.into_iter().map(normalize_author_profile) {
         let identity = author_identity(&author.citation_name);
         if !identity.is_empty()
+            && !author.citation_name.eq_ignore_ascii_case("others")
             && !unique.iter().any(|existing: &AuthorProfile| {
                 author_identity(&existing.citation_name) == identity
             })
@@ -622,6 +630,7 @@ fn merge_author_profiles(
     bibliography: &Bibliography,
 ) -> Vec<AuthorProfile> {
     let mut names = names;
+    let profiles = unique_author_profiles(profiles);
     for entry in &bibliography.entries {
         names.extend(crate::bibtex::split_bibtex_names(entry.get("author")));
     }

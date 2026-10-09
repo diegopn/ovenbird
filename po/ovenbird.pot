@@ -1620,3 +1620,7 @@ msgstr ""
 #: rust/src/window.rs
 msgid "Your library starts here: add a reference or import BibTeX."
 msgstr ""
+
+#: rust/src/storage.rs
+msgid "The BibTeX marker “others” cannot be used as an author name."
+msgstr ""

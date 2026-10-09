@@ -3216,6 +3216,8 @@ fn refresh_project_files(state: &Rc<State>) {
         let empty = gtk::Label::new(Some(&tr("Open a project folder to browse its files.")));
         empty.set_xalign(0.0);
         empty.set_wrap(true);
+        empty.set_margin_start(12);
+        empty.set_margin_end(8);
         empty.add_css_class("dim-label");
         state.file_list.append(&empty);
         state.project_files_scroll.set_value(0.0);
@@ -5371,12 +5373,25 @@ fn refresh_authors(state: &Rc<State>) {
         full_name.set_xalign(0.0);
         full_name.set_ellipsize(gtk::pango::EllipsizeMode::End);
         labels.append(&full_name);
-        let citation_name =
-            gtk::Label::new(Some(&bibtex::display_bibtex_text(&author.citation_name)));
-        citation_name.set_xalign(0.0);
-        citation_name.set_ellipsize(gtk::pango::EllipsizeMode::End);
-        citation_name.add_css_class("dim-label");
-        labels.append(&citation_name);
+        let reference_count = state
+            .library
+            .borrow()
+            .references_for_author(&author.citation_name)
+            .len();
+        let mut details = vec![ngettext("%d reference", "%d references", reference_count)
+            .replace("%d", &reference_count.to_string())];
+        if !author.email.trim().is_empty() {
+            details.push(author.email.trim().to_owned());
+        }
+        if !author.orcid.trim().is_empty() {
+            details.push(format!("{}: {}", tr("ORCID"), author.orcid.trim()));
+        }
+        let details = gtk::Label::new(Some(&details.join(" · ")));
+        details.set_xalign(0.0);
+        details.set_wrap(true);
+        details.set_wrap_mode(gtk::pango::WrapMode::WordChar);
+        details.add_css_class("dim-label");
+        labels.append(&details);
         let open_details = gtk::Button::new();
         open_details.set_has_frame(false);
         open_details.add_css_class("flat");

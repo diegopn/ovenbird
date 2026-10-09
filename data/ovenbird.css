@@ -1,3 +1,8 @@
+:root {
+  --accent-bg-color: #557a69;
+  --accent-fg-color: #ffffff;
+}
+
 .dialog headerbar,
 dialog headerbar {
   background-color: @window_bg_color;
@@ -19,13 +24,20 @@ dialog headerbar {
 }
 
 .ovenbird-sidebar {
-  background: @sidebar_bg_color;
   color: @sidebar_fg_color;
   min-width: 300px;
 }
 
+.ovenbird-sidebar,
 .ovenbird-sidebar > * {
-  background-color: @sidebar_bg_color;
+  background-color: color-mix(in srgb, @sidebar_bg_color 90%, #a8bdb0 10%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .ovenbird-sidebar,
+  .ovenbird-sidebar > * {
+    background-color: color-mix(in srgb, @sidebar_bg_color 88%, #557a69 12%);
+  }
 }
 
 .ovenbird-sidebar-tabs button {
@@ -40,7 +52,7 @@ dialog headerbar {
 }
 
 .ovenbird-sidebar-tabs button:checked {
-  background-color: alpha(@view_fg_color, 0.12);
+  background-color: alpha(@accent_bg_color, 0.14);
 }
 
 .ovenbird-brand {
@@ -221,10 +233,11 @@ dialog headerbar {
 
 .reference-tag-chip {
   padding: 6px 14px;
+  background-color: color-mix(in srgb, @accent_bg_color 10%, transparent);
 }
 
 .reference-detail-tag-chip {
   padding: 6px 14px;
   border-radius: 999px;
-  background-color: color-mix(in srgb, currentColor 7.5%, transparent);
+  background-color: color-mix(in srgb, @accent_bg_color 10%, transparent);
 }

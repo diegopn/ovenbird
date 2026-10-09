@@ -25,6 +25,7 @@ struct Runtime {
     synchronizing: bool,
     visual_edited: bool,
     source_cursor_before_visual: Option<i32>,
+    visual_cursor_before_visual: Option<(i32, i32)>,
     mode: EditorMode,
     history: EditorHistory,
 }
@@ -663,6 +664,7 @@ impl LatexEditor {
             synchronizing: false,
             visual_edited: false,
             source_cursor_before_visual: None,
+            visual_cursor_before_visual: None,
             mode: EditorMode::Code,
             history: EditorHistory::new(empty),
         }));
@@ -876,6 +878,7 @@ impl LatexEditor {
             runtime.dirty = false;
             runtime.visual_edited = false;
             runtime.source_cursor_before_visual = None;
+            runtime.visual_cursor_before_visual = None;
             runtime.mode = EditorMode::Code;
         }
         self.stack.set_visible_child_name("code");
@@ -921,12 +924,21 @@ impl LatexEditor {
         {
             return;
         }
+        if mode == self.mode() {
+            self.focus();
+            return;
+        }
         if mode == EditorMode::Visual {
+            {
+                let mut runtime = self.runtime.borrow_mut();
+                runtime.source_cursor_before_visual = None;
+                runtime.visual_cursor_before_visual = None;
+                runtime.visual_edited = false;
+            }
             let source_offset = self
                 .source_buffer
                 .iter_at_mark(&self.source_buffer.get_insert())
                 .offset();
-            self.runtime.borrow_mut().source_cursor_before_visual = Some(source_offset);
             let source = self.text();
             let document = latex::split_document(&source);
             if document.valid {
@@ -939,15 +951,72 @@ impl LatexEditor {
                     character_count(&tokens_text(&latex::parse_visual_body(&body_prefix)));
                 self.visual_buffer
                     .place_cursor(&self.visual_buffer.iter_at_offset(visual_offset as i32));
+                let visual_cursor = self
+                    .visual_buffer
+                    .iter_at_mark(&self.visual_buffer.get_insert());
+                let mut runtime = self.runtime.borrow_mut();
+                runtime.source_cursor_before_visual = Some(source_offset);
+                runtime.visual_cursor_before_visual =
+                    Some((visual_cursor.line(), visual_cursor.line_offset()));
+                runtime.visual_edited = false;
             }
         } else {
-            let runtime = self.runtime.borrow();
-            if !runtime.visual_edited {
-                if let Some(offset) = runtime.source_cursor_before_visual {
-                    self.source_buffer
-                        .place_cursor(&self.source_buffer.iter_at_offset(offset));
+            let (visual_edited, source_anchor, visual_anchor) = {
+                let runtime = self.runtime.borrow();
+                (
+                    runtime.visual_edited,
+                    runtime.source_cursor_before_visual,
+                    runtime.visual_cursor_before_visual,
+                )
+            };
+            if visual_edited {
+                let source = self.text();
+                let document = latex::split_document(&source);
+                if document.valid {
+                    let tokens = tokens_from_visual(&self.visual_buffer, &self.tags);
+                    let visual_offset = self
+                        .visual_buffer
+                        .iter_at_mark(&self.visual_buffer.get_insert())
+                        .offset()
+                        .max(0) as usize;
+                    let prefix = latex::serialize_visual_tokens(&tokens_before_offset(
+                        &tokens,
+                        visual_offset,
+                    ));
+                    let source_offset =
+                        character_count(&document.preamble) + character_count(&prefix);
+                    self.source_buffer.place_cursor(
+                        &self
+                            .source_buffer
+                            .iter_at_offset(source_offset.min(character_count(&source)) as i32),
+                    );
                 }
+            } else if let (Some(source_offset), Some((visual_line, visual_column))) =
+                (source_anchor, visual_anchor)
+            {
+                let source_cursor = self.source_buffer.iter_at_offset(source_offset);
+                let visual_cursor = self
+                    .visual_buffer
+                    .iter_at_mark(&self.visual_buffer.get_insert());
+                let target_line =
+                    (source_cursor.line() + visual_cursor.line() - visual_line).max(0);
+                let target_column = (source_cursor.line_offset() + visual_cursor.line_offset()
+                    - visual_column)
+                    .max(0);
+                let mut target = self
+                    .source_buffer
+                    .iter_at_line(target_line)
+                    .unwrap_or_else(|| self.source_buffer.end_iter());
+                let mut line_end = target;
+                line_end.forward_to_line_end();
+                let target_column = target_column.min(line_end.offset() - target.offset());
+                target.forward_chars(target_column);
+                self.source_buffer.place_cursor(&target);
             }
+            let mut runtime = self.runtime.borrow_mut();
+            runtime.source_cursor_before_visual = None;
+            runtime.visual_cursor_before_visual = None;
+            runtime.visual_edited = false;
         }
         self.runtime.borrow_mut().mode = mode;
         self.stack.set_visible_child_name(match mode {
