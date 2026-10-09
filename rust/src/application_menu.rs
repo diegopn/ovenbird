@@ -6,6 +6,18 @@ pub struct ApplicationMenuItem {
     pub shortcut: &'static str,
 }
 
+pub const ABOUT_DEDICATION: &str =
+    "Dedicated to my wife, Karina, who always encourages me to go further.";
+
+pub const ABOUT_LINKS: &[(&str, &str)] = &[
+    ("Personal website", "https://diegopn.github.io/"),
+    ("Project repository", "https://github.com/diegopn/ovenbird"),
+    (
+        "Project website",
+        "https://diegopn.github.io/ovenbird-site/",
+    ),
+];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThemePreference {
     System,
@@ -74,6 +86,12 @@ pub const APPLICATION_MENU_GROUPS: &[&[ApplicationMenuItem]] = &[
             shortcut: "Ctrl+Q",
         },
     ],
+    &[ApplicationMenuItem {
+        icon: "help-about-symbolic",
+        label: "About Ovenbird",
+        action: "win.about",
+        shortcut: "",
+    }],
 ];
 
 pub const THEME_MENU_CHOICES: &[ApplicationMenuItem] = &[
@@ -111,6 +129,9 @@ mod tests {
         assert!(items.iter().any(|item| item.label == "Open project"));
         assert!(items.iter().any(|item| item.label == "Close project"));
         assert!(items.iter().any(|item| item.label == "Keyboard shortcuts"));
+        assert!(items
+            .iter()
+            .any(|item| { item.label == "About Ovenbird" && item.action == "win.about" }));
         assert!(!items.iter().any(|item| item.label == "Export PDF"));
         assert!(!items.iter().any(|item| item.label == "Save document"));
         assert_eq!(
@@ -147,7 +168,7 @@ mod tests {
         );
         assert!(!items
             .iter()
-            .any(|item| matches!(item.label, "Find in document" | "Local library" | "Zotero")));
+            .any(|item| matches!(item.label, "Find in document" | "Local library")));
     }
 
     #[test]

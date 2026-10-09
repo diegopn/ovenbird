@@ -41,6 +41,81 @@ fn bibtex_retains_macros_raw_values_and_directives() {
 }
 
 #[test]
+fn importing_bibtex_persists_individual_authors_for_library_management() {
+    use crate::storage::LocalLibrary;
+    use std::fs;
+
+    let root = test_build_path("author-catalog-import");
+    fs::create_dir_all(&root).unwrap();
+    let mut library = LocalLibrary::empty();
+    library.directory = root.clone();
+    library.path = root.join("library.bib");
+
+    let imported = parse_bibtex(
+        "@article{sample, title={Sample}, author={Ada Lovelace and {Open Research Group}}}",
+    )
+    .unwrap();
+    assert_eq!(library.merge_import(imported), 1);
+    library.save().unwrap();
+
+    let authors: Vec<String> =
+        serde_json::from_slice(&fs::read(root.join("authors.json")).unwrap()).unwrap();
+    assert_eq!(authors, ["Ada Lovelace", "{Open Research Group}"]);
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn renaming_an_author_updates_bibtex_author_fields() {
+    use crate::storage::LocalLibrary;
+
+    let mut library = LocalLibrary::empty();
+    let mut entry = BibEntry::new("article", "paper");
+    entry.set("title", "A Paper");
+    entry.set("author", "Doe, Jane and Smith, Alex");
+    library.add_in_memory(entry).unwrap();
+
+    library.rename_author("Doe, Jane", "Doe, Janet").unwrap();
+
+    assert_eq!(library.find("paper").unwrap().get("author"), "Doe, Janet and Smith, Alex");
+}
+
+#[test]
+fn deleting_an_author_requires_explicit_cascade_for_associated_references() {
+    use crate::storage::LocalLibrary;
+
+    let mut library = LocalLibrary::empty();
+    let mut entry = BibEntry::new("article", "paper");
+    entry.set("title", "A Paper");
+    entry.set("author", "Doe, Jane and Smith, Alex");
+    library.add_in_memory(entry).unwrap();
+
+    assert!(library.remove_author("Doe, Jane", false).is_err());
+    assert!(library.find("paper").is_some());
+
+    assert_eq!(library.remove_author("Doe, Jane", true).unwrap(), 1);
+    assert!(library.find("paper").is_none());
+    assert!(!library
+        .authors
+        .iter()
+        .any(|author| author.citation_name == "Doe, Jane"));
+}
+
+#[test]
+fn latex_compiler_diagnostics_report_the_source_line() {
+    assert_eq!(
+        crate::build::compile_error_line(
+            "error: main.tex:21: Paragraph ended before \\\\lstset@ was complete."
+        ),
+        Some(21)
+    );
+    assert_eq!(
+        crate::build::compile_error_line("! Undefined control sequence.\nl.42 \\\\unknown"),
+        Some(42)
+    );
+    assert_eq!(crate::build::compile_error_line("Fontconfig warning only"), None);
+}
+
+#[test]
 fn reference_fields_match_type_and_keep_unknown_fields() {
     let mut values = IndexMap::new();
     values.insert("date".into(), "2026-10-06".into());
@@ -129,6 +204,7 @@ fn application_menu_keeps_project_lifecycle_without_export_pdf() {
             vec!["win.new-project", "win.open-project"],
             vec!["win.open-document", "win.close-project"],
             vec!["win.shortcuts", "win.quit"],
+            vec!["win.about"],
         ]
     );
     assert!(!groups
@@ -138,39 +214,25 @@ fn application_menu_keeps_project_lifecycle_without_export_pdf() {
 }
 
 #[test]
-fn project_bibliography_merges_local_entries_without_overwriting_project_keys() {
-    use crate::build::prepare_project_bibliography;
+fn only_configured_bibliographies_satisfy_missing_citation_validation() {
     use std::fs;
 
-    let project = test_build_path("bibliography-test");
+    let project = test_build_path("citation-validation");
     fs::create_dir_all(&project).unwrap();
-    let existing = "@string{venue = {Project journal}}\n@article{shared, title={Project title}, journal=venue}\n";
-    fs::write(project.join("references.bib"), existing).unwrap();
-    let mut shared = BibEntry::new("article", "shared");
-    shared.set("title", "Local conflicting title");
-    let mut local = BibEntry::new("article", "local-only");
-    local.set("title", "New reference");
-    local.set("zotero_key", "SHOULD_NOT_BE_EXPORTED");
-    let library = Bibliography {
-        entries: vec![shared, local],
-        directives: vec!["@string{organization = {Local organization}}".to_owned()],
-    };
+    let source_path = project.join("main.tex");
+    fs::write(
+        project.join("references.bib"),
+        "@article{configured, title={Configured reference}}\n",
+    )
+    .unwrap();
+    let source = "\\addbibresource{references.bib}\n\\begin{document}\n\\cite{configured,local-only}\n\\end{document}\n";
+    fs::write(&source_path, source).unwrap();
 
-    let prepared =
-        prepare_project_bibliography("\\addbibresource{references}", &project, &library).unwrap();
-    assert_eq!(prepared.added, 1);
-    assert_eq!(prepared.conflicts, 1);
-    assert_eq!(prepared.files.len(), 1);
-    let merged = parse_bibtex(&prepared.files[0].content).unwrap();
-    assert_eq!(merged.entries.len(), 2);
-    assert_eq!(merged.entries[0].get("title"), "Project title");
-    assert_eq!(merged.entries[0].get("journal"), "Project journal");
-    assert_eq!(merged.entries[1].key, "local-only");
-    assert_eq!(merged.entries[1].get("zotero_key"), "");
-    assert!(merged
-        .directives
-        .iter()
-        .any(|directive| directive.contains("organization")));
+    let missing = crate::build::find_missing_citations(&source_path, source).unwrap();
+
+    assert_eq!(missing.len(), 1);
+    assert_eq!(missing[0].key, "local-only");
+    assert_eq!(missing[0].line, 3);
     fs::remove_dir_all(project).unwrap();
 }
 

@@ -1,6 +1,7 @@
 use crate::commands::{self, LatexInsertion};
 use crate::history::{EditorHistory, EditorMode, EditorState};
 use crate::latex::{self, Token};
+use crate::latex_diagnostics::{self, LatexDiagnostic, LatexDiagnosticKind};
 use crate::search::find_document_match;
 use gtk::glib::translate::IntoGlib;
 use gtk::prelude::*;
@@ -10,9 +11,12 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 const INDENT_PREFIX: &str = r"\hspace{1em}";
+const SYNTAX_CHECK_DELAY: Duration = Duration::from_millis(400);
+const MAX_VISIBLE_DIAGNOSTICS: usize = 8;
+type SyntaxTimer = Rc<RefCell<Option<gtk::glib::SourceId>>>;
 
 struct Runtime {
     file: Option<PathBuf>,
@@ -39,6 +43,11 @@ pub struct LatexEditor {
     tags: Rc<HashMap<String, TextTag>>,
     dirty_callback: DirtyCallback,
     history_callback: HistoryCallback,
+    diagnostics_revealer: gtk::Revealer,
+    diagnostics_heading: gtk::Label,
+    diagnostics_list: gtk::Box,
+    syntax_error_tag: TextTag,
+    diagnostics_timer: SyntaxTimer,
 }
 
 fn character_count(text: &str) -> usize {
@@ -71,6 +80,192 @@ fn visual_mode_supported(file: Option<&Path>) -> bool {
             .and_then(|extension| extension.to_str())
             .is_some_and(|extension| extension.eq_ignore_ascii_case("tex"))
     })
+}
+
+fn latex_syntax_check_supported(file: Option<&Path>) -> bool {
+    file.is_none_or(|path| {
+        path.extension()
+            .and_then(|extension| extension.to_str())
+            .is_some_and(|extension| {
+                matches!(
+                    extension.to_ascii_lowercase().as_str(),
+                    "tex" | "cls" | "sty"
+                )
+            })
+    })
+}
+
+fn clear_syntax_diagnostics(buffer: &sourceview5::Buffer, list: &gtk::Box, error_tag: &TextTag) {
+    let start = buffer.start_iter();
+    let end = buffer.end_iter();
+    buffer.remove_tag(error_tag, &start, &end);
+    while let Some(child) = list.first_child() {
+        list.remove(&child);
+    }
+}
+
+fn diagnostic_text(diagnostic: &LatexDiagnostic) -> String {
+    let message = match &diagnostic.kind {
+        LatexDiagnosticKind::UnmatchedClosingBrace => {
+            crate::i18n::gettext("Unmatched closing brace")
+        }
+        LatexDiagnosticKind::UnclosedOpeningBrace => {
+            crate::i18n::gettext("Opening brace is not closed")
+        }
+        LatexDiagnosticKind::UnmatchedEnvironmentEnd(name) => format!(
+            "{}{}",
+            crate::i18n::gettext("Environment end has no matching begin: "),
+            name
+        ),
+        LatexDiagnosticKind::UnclosedEnvironment(name) => format!(
+            "{}{}",
+            crate::i18n::gettext("Environment is not closed: "),
+            name
+        ),
+        LatexDiagnosticKind::UnmatchedMathDelimiter(delimiter) => format!(
+            "{}{}",
+            crate::i18n::gettext("Math delimiter has no matching opener: "),
+            delimiter
+        ),
+        LatexDiagnosticKind::UnclosedMathDelimiter(delimiter) => format!(
+            "{}{}",
+            crate::i18n::gettext("Math delimiter is not closed: "),
+            delimiter
+        ),
+        LatexDiagnosticKind::NestedMathDelimiter(delimiter) => format!(
+            "{}{}",
+            crate::i18n::gettext("Math delimiter opens inside another math expression: "),
+            delimiter
+        ),
+    };
+    format!(
+        "{} {}: {}",
+        crate::i18n::gettext("Line"),
+        diagnostic.line,
+        message
+    )
+}
+
+fn render_syntax_diagnostics(
+    buffer: &sourceview5::Buffer,
+    view: &sourceview5::View,
+    list: &gtk::Box,
+    (revealer, heading): (&gtk::Revealer, &gtk::Label),
+    error_tag: &TextTag,
+    diagnostics: &[LatexDiagnostic],
+) {
+    clear_syntax_diagnostics(buffer, list, error_tag);
+    revealer.set_reveal_child(true);
+    if diagnostics.is_empty() {
+        heading.set_label(&crate::i18n::gettext(
+            "The document appears ready to compile.",
+        ));
+        heading.remove_css_class("error");
+        heading.add_css_class("success");
+        return;
+    }
+    heading.set_label(&crate::i18n::gettext("Syntax problems"));
+    heading.remove_css_class("success");
+    heading.add_css_class("error");
+
+    for diagnostic in diagnostics.iter().take(MAX_VISIBLE_DIAGNOSTICS) {
+        if let Some(start) = buffer.iter_at_line(diagnostic.line.saturating_sub(1) as i32) {
+            let mut end = start;
+            end.forward_to_line_end();
+            if end.offset() > start.offset() {
+                buffer.apply_tag(error_tag, &start, &end);
+            }
+        }
+
+        let button = gtk::Button::with_label(&diagnostic_text(diagnostic));
+        button.set_halign(gtk::Align::Fill);
+        button.add_css_class("flat");
+        let buffer_for_click = buffer.clone();
+        let view_for_click = view.clone();
+        let line = diagnostic.line.saturating_sub(1) as i32;
+        let column = diagnostic.column.saturating_sub(1).min(i32::MAX as usize) as i32;
+        button.connect_clicked(move |_| {
+            let _ = view_for_click.activate_action("win.mode-code", None);
+            if let Some(mut iter) = buffer_for_click.iter_at_line(line) {
+                iter.forward_chars(column);
+                buffer_for_click.place_cursor(&iter);
+                view_for_click.scroll_to_iter(&mut iter, 0.15, true, 0.0, 0.3);
+                view_for_click.grab_focus();
+            }
+        });
+        list.append(&button);
+    }
+
+    if diagnostics.len() > MAX_VISIBLE_DIAGNOSTICS {
+        let more = gtk::Label::new(Some(&crate::i18n::gettext(
+            "Additional syntax problems are not shown.",
+        )));
+        more.set_halign(gtk::Align::Start);
+        more.add_css_class("dim-label");
+        list.append(&more);
+    }
+}
+
+fn schedule_syntax_check(
+    buffer: &sourceview5::Buffer,
+    view: &sourceview5::View,
+    list: &gtk::Box,
+    (revealer, heading): (&gtk::Revealer, &gtk::Label),
+    error_tag: &TextTag,
+    timer: &SyntaxTimer,
+    runtime: &Rc<RefCell<Runtime>>,
+) {
+    if let Some(previous) = timer.borrow_mut().take() {
+        previous.remove();
+    }
+
+    let enabled = latex_syntax_check_supported(runtime.borrow().file.as_deref());
+    if !enabled {
+        clear_syntax_diagnostics(buffer, list, error_tag);
+        revealer.set_reveal_child(false);
+        return;
+    }
+    heading.set_label(&crate::i18n::gettext("Checking document…"));
+    heading.remove_css_class("error");
+    heading.remove_css_class("success");
+    revealer.set_reveal_child(true);
+
+    let buffer = buffer.downgrade();
+    let view = view.downgrade();
+    let list = list.downgrade();
+    let revealer = revealer.downgrade();
+    let heading = heading.downgrade();
+    let error_tag = error_tag.downgrade();
+    let runtime = runtime.clone();
+    let timer_for_callback = timer.clone();
+    let source_id = gtk::glib::timeout_add_local_once(SYNTAX_CHECK_DELAY, move || {
+        timer_for_callback.borrow_mut().take();
+        let (Some(buffer), Some(view), Some(list), Some(revealer), Some(heading), Some(error_tag)) = (
+            buffer.upgrade(),
+            view.upgrade(),
+            list.upgrade(),
+            revealer.upgrade(),
+            heading.upgrade(),
+            error_tag.upgrade(),
+        ) else {
+            return;
+        };
+        if !latex_syntax_check_supported(runtime.borrow().file.as_deref()) {
+            clear_syntax_diagnostics(&buffer, &list, &error_tag);
+            revealer.set_reveal_child(false);
+            return;
+        }
+        let diagnostics = latex_diagnostics::check_structure(&buffer_text(&buffer));
+        render_syntax_diagnostics(
+            &buffer,
+            &view,
+            &list,
+            (&revealer, &heading),
+            &error_tag,
+            &diagnostics,
+        );
+    });
+    *timer.borrow_mut() = Some(source_id);
 }
 
 fn indent_line_starts(
@@ -359,6 +554,11 @@ impl LatexEditor {
         let source_buffer = sourceview5::Buffer::new(None);
         source_buffer.set_enable_undo(false);
         source_buffer.set_highlight_syntax(true);
+        let syntax_error_tag = TextTag::new(Some("latex-structural-error"));
+        syntax_error_tag.set_underline(pango::Underline::Error);
+        let error_color = gtk::gdk::RGBA::parse("#ff6b6b").expect("valid syntax error color");
+        syntax_error_tag.set_underline_rgba(Some(&error_color));
+        source_buffer.tag_table().add(&syntax_error_tag);
         let language_manager = sourceview5::LanguageManager::default();
         if let Some(language) = language_manager.language("latex") {
             source_buffer.set_language(Some(&language));
@@ -379,7 +579,8 @@ impl LatexEditor {
         source_view.set_indent_width(4);
         source_view.set_tab_width(4);
         source_view.set_highlight_current_line(true);
-        source_view.set_wrap_mode(gtk::WrapMode::None);
+        source_view.set_wrap_mode(gtk::WrapMode::WordChar);
+        source_view.set_right_margin(25);
         source_view.add_css_class("source-view");
 
         let visual_buffer = TextBuffer::new(None);
@@ -394,7 +595,7 @@ impl LatexEditor {
         let tags = Rc::new(create_tags(&visual_buffer));
 
         let source_scroll = gtk::ScrolledWindow::builder()
-            .hscrollbar_policy(gtk::PolicyType::Automatic)
+            .hscrollbar_policy(gtk::PolicyType::Never)
             .vscrollbar_policy(gtk::PolicyType::Automatic)
             .child(&source_view)
             .hexpand(true)
@@ -415,6 +616,33 @@ impl LatexEditor {
         stack.add_named(&source_scroll, Some("code"));
         stack.add_named(&visual_scroll, Some("visual"));
         root.append(&stack);
+
+        let diagnostics_list = gtk::Box::new(gtk::Orientation::Vertical, 2);
+        let diagnostics_scroll = gtk::ScrolledWindow::builder()
+            .hscrollbar_policy(gtk::PolicyType::Never)
+            .vscrollbar_policy(gtk::PolicyType::Automatic)
+            .max_content_height(132)
+            .propagate_natural_height(true)
+            .child(&diagnostics_list)
+            .build();
+        let diagnostics_panel = gtk::Box::new(gtk::Orientation::Vertical, 4);
+        diagnostics_panel.add_css_class("latex-diagnostics");
+        let diagnostics_heading =
+            gtk::Label::new(Some(&crate::i18n::gettext("Checking document…")));
+        diagnostics_heading.set_halign(gtk::Align::Start);
+        diagnostics_heading.set_wrap(true);
+        diagnostics_heading.set_xalign(0.0);
+        diagnostics_heading.add_css_class("heading");
+        diagnostics_panel.append(&diagnostics_heading);
+        diagnostics_panel.append(&diagnostics_scroll);
+        let diagnostics_revealer = gtk::Revealer::builder()
+            .transition_type(gtk::RevealerTransitionType::SlideUp)
+            .transition_duration(120)
+            .reveal_child(true)
+            .child(&diagnostics_panel)
+            .build();
+        let diagnostics_timer: SyntaxTimer = Rc::new(RefCell::new(None));
+        root.append(&diagnostics_revealer);
 
         let empty = EditorState {
             source: String::new(),
@@ -441,6 +669,12 @@ impl LatexEditor {
             let visual_buffer = visual_buffer.clone();
             let visual_view = visual_view.clone();
             let tags = tags.clone();
+            let source_view_weak = source_view.downgrade();
+            let diagnostics_list_weak = diagnostics_list.downgrade();
+            let diagnostics_revealer_weak = diagnostics_revealer.downgrade();
+            let diagnostics_heading_weak = diagnostics_heading.downgrade();
+            let syntax_error_tag_weak = syntax_error_tag.downgrade();
+            let diagnostics_timer = diagnostics_timer.clone();
             let dirty_callback = dirty_callback.clone();
             let history_callback = history_callback.clone();
             source_buffer.clone().connect_changed(move |buffer| {
@@ -464,6 +698,23 @@ impl LatexEditor {
                     },
                 );
                 notify_history(&runtime, &history_callback);
+                if let (Some(view), Some(list), Some(revealer), Some(heading), Some(error_tag)) = (
+                    source_view_weak.upgrade(),
+                    diagnostics_list_weak.upgrade(),
+                    diagnostics_revealer_weak.upgrade(),
+                    diagnostics_heading_weak.upgrade(),
+                    syntax_error_tag_weak.upgrade(),
+                ) {
+                    schedule_syntax_check(
+                        buffer,
+                        &view,
+                        &list,
+                        (&revealer, &heading),
+                        &error_tag,
+                        &diagnostics_timer,
+                        &runtime,
+                    );
+                }
             });
         }
         {
@@ -471,6 +722,12 @@ impl LatexEditor {
             let source_buffer = source_buffer.clone();
             let visual_buffer = visual_buffer.clone();
             let tags = tags.clone();
+            let source_view_weak = source_view.downgrade();
+            let diagnostics_list_weak = diagnostics_list.downgrade();
+            let diagnostics_revealer_weak = diagnostics_revealer.downgrade();
+            let diagnostics_heading_weak = diagnostics_heading.downgrade();
+            let syntax_error_tag_weak = syntax_error_tag.downgrade();
+            let diagnostics_timer = diagnostics_timer.clone();
             let dirty_callback = dirty_callback.clone();
             let history_callback = history_callback.clone();
             visual_buffer.clone().connect_changed(move |buffer| {
@@ -499,6 +756,23 @@ impl LatexEditor {
                 update_dirty(&runtime, &updated, &dirty_callback);
                 record_history(&runtime, &source_buffer, &visual_buffer, "typing:visual");
                 notify_history(&runtime, &history_callback);
+                if let (Some(view), Some(list), Some(revealer), Some(heading), Some(error_tag)) = (
+                    source_view_weak.upgrade(),
+                    diagnostics_list_weak.upgrade(),
+                    diagnostics_revealer_weak.upgrade(),
+                    diagnostics_heading_weak.upgrade(),
+                    syntax_error_tag_weak.upgrade(),
+                ) {
+                    schedule_syntax_check(
+                        &source_buffer,
+                        &view,
+                        &list,
+                        (&revealer, &heading),
+                        &error_tag,
+                        &diagnostics_timer,
+                        &runtime,
+                    );
+                }
             });
         }
 
@@ -513,6 +787,11 @@ impl LatexEditor {
             tags,
             dirty_callback,
             history_callback,
+            diagnostics_revealer,
+            diagnostics_heading,
+            diagnostics_list,
+            syntax_error_tag,
+            diagnostics_timer,
         };
         editor.load_text(&Self::new_document_text());
         editor
@@ -543,6 +822,18 @@ impl LatexEditor {
         self.runtime.borrow().mode
     }
 
+    fn refresh_syntax_diagnostics(&self) {
+        schedule_syntax_check(
+            &self.source_buffer,
+            &self.source_view,
+            &self.diagnostics_list,
+            (&self.diagnostics_revealer, &self.diagnostics_heading),
+            &self.syntax_error_tag,
+            &self.diagnostics_timer,
+            &self.runtime,
+        );
+    }
+
     pub fn set_dirty_changed<F: Fn(bool) + 'static>(&self, callback: F) {
         *self.dirty_callback.borrow_mut() = Some(Box::new(callback));
     }
@@ -568,6 +859,7 @@ impl LatexEditor {
                 }),
         };
         self.source_buffer.set_language(language.as_ref());
+        self.refresh_syntax_diagnostics();
     }
 
     pub fn load_text(&self, text: &str) {
@@ -597,6 +889,7 @@ impl LatexEditor {
             callback(false);
         }
         notify_history(&self.runtime, &self.history_callback);
+        self.refresh_syntax_diagnostics();
     }
 
     pub fn mark_saved(&self, saved_text: &str) {
@@ -655,6 +948,7 @@ impl LatexEditor {
             EditorMode::Code => "code",
             EditorMode::Visual => "visual",
         });
+        self.refresh_syntax_diagnostics();
         self.focus();
     }
 
@@ -741,6 +1035,7 @@ impl LatexEditor {
             group,
         );
         notify_history(&self.runtime, &self.history_callback);
+        self.refresh_syntax_diagnostics();
     }
 
     fn sync_source_from_visual(&self) {
@@ -856,6 +1151,39 @@ impl LatexEditor {
             },
             group,
         );
+    }
+
+    pub fn insert_source_at_offset(&self, snippet: &str, offset: usize, group: &str) {
+        let source = self.text();
+        let offset = offset.min(character_count(&source));
+        let visual_cursor = (self.mode() == EditorMode::Visual).then(|| {
+            self.visual_buffer
+                .iter_at_mark(&self.visual_buffer.get_insert())
+                .offset()
+                .max(0) as usize
+        });
+        let mut insert_at = self.source_buffer.iter_at_offset(offset as i32);
+        self.runtime.borrow_mut().synchronizing = true;
+        self.source_buffer.insert(&mut insert_at, snippet);
+        let updated = self.text();
+        render_visual(&updated, &self.visual_buffer, &self.visual_view, &self.tags);
+        if let Some(cursor) = visual_cursor {
+            let visual_length = character_count(&buffer_text(&self.visual_buffer));
+            self.visual_buffer.place_cursor(
+                &self
+                    .visual_buffer
+                    .iter_at_offset(cursor.min(visual_length) as i32),
+            );
+        }
+        self.runtime.borrow_mut().synchronizing = false;
+        update_dirty(&self.runtime, &updated, &self.dirty_callback);
+        record_history(
+            &self.runtime,
+            &self.source_buffer,
+            &self.visual_buffer,
+            group,
+        );
+        notify_history(&self.runtime, &self.history_callback);
     }
 
     pub fn insert_comment(&self) {
@@ -1049,6 +1377,7 @@ impl LatexEditor {
         });
         update_dirty(&self.runtime, &state.source, &self.dirty_callback);
         notify_history(&self.runtime, &self.history_callback);
+        self.refresh_syntax_diagnostics();
     }
 
     pub fn focus(&self) {
@@ -1069,6 +1398,7 @@ mod tests {
     use crate::history::EditorMode;
     use gtk::prelude::*;
     use std::path::{Path, PathBuf};
+    use std::time::{Duration, Instant};
 
     fn editor_with_text(text: &str) -> LatexEditor {
         let editor = LatexEditor::new();
@@ -1079,6 +1409,44 @@ mod tests {
     #[test]
     fn editor_interactions_preserve_search_mode_and_indentation_behavior() {
         gtk::init().expect("GTK must initialize for editor tests");
+
+        let editor = editor_with_text("\\begin{document}\n  café $x\n\\end{document}");
+        let context = gtk::glib::MainContext::default();
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while editor.diagnostics_list.first_child().is_none() && Instant::now() < deadline {
+            context.iteration(false);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(editor.diagnostics_revealer.reveals_child());
+        let button = editor
+            .diagnostics_list
+            .first_child()
+            .expect("syntax diagnostic should be listed")
+            .downcast::<gtk::Button>()
+            .expect("syntax diagnostic should be clickable");
+        let location = format!("{} 2:", crate::i18n::gettext("Line"));
+        assert!(button.label().unwrap().contains(&location));
+        button.emit_clicked();
+        let cursor = editor
+            .source_buffer
+            .iter_at_mark(&editor.source_buffer.get_insert());
+        assert_eq!((cursor.line(), cursor.line_offset()), (1, 7));
+
+        editor
+            .source_buffer
+            .set_text("\\begin{document}\n  café $x$\n\\end{document}");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while !editor.diagnostics_heading.has_css_class("success") && Instant::now() < deadline {
+            context.iteration(false);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(editor.diagnostics_revealer.reveals_child());
+        assert!(editor.diagnostics_heading.has_css_class("success"));
+        assert_eq!(
+            editor.diagnostics_heading.text().as_str(),
+            crate::i18n::gettext("The document appears ready to compile.")
+        );
+        assert!(editor.diagnostics_list.first_child().is_none());
 
         let editor = editor_with_text("a a a");
         let buffer = editor.source_buffer.clone().upcast::<gtk::TextBuffer>();

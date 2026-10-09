@@ -1,21 +1,43 @@
-# Contribuindo
+# Contributing
 
-Ovenbird está em desenvolvimento inicial. Mudanças pequenas e focadas são mais fáceis de revisar.
+Ovenbird is in early development. Small, focused changes are easiest to review. Before opening an issue or pull request, check the project status and build instructions in the [README](README.md).
 
-## Ambiente
+## Development setup
 
-Use o GNOME SDK/Platform 51 com GTK 4, Libadwaita, GtkSourceView 5, Secret Service e a extensão Rust stable. Para builds nativos, instale `rust`, `cargo`, Meson, Ninja e os pacotes `-devel` descritos no README. Mantenha o build nativo separado do build Flatpak/Builder.
+For a native Fedora build, install the packages listed in the README, then run:
 
-Para criar projetos pelos modelos incluídos, o utilitário `unzip` precisa estar disponível no ambiente de execução. Para compilar LaTeX, instale `latexmk`, `tectonic` ou `pdflatex`; com `pdflatex`, instale BibTeX para documentos BibTeX e Biber para documentos `biblatex`.
+```sh
+meson setup build
+meson compile -C build
+meson test -C build --print-errorlogs
+```
 
-## Antes de abrir um pull request
+The repository pins Rust 1.92.0 in `rust-toolchain.toml`; rustup selects it when working in this directory. The pinned toolchain includes `rustfmt` and Clippy. Before submitting Rust changes, run:
 
-- Descreva o comportamento que mudou e como reproduzi-lo.
-- Mantenha os documentos do usuário em LaTeX comum e a biblioteca local exportável em BibTeX.
-- Evite permissões Flatpak amplas; use portais para selecionar arquivos.
-- Não sobrescreva referências locais automaticamente quando a sincronização Zotero detectar mudanças concorrentes.
-- Não inclua dados pessoais, chaves de API, referências reais ou PDFs privados nos commits.
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --all-targets -- -D warnings
+meson compile -C build
+meson test -C build --print-errorlogs
+```
 
-## Licença
+GitHub Actions runs the same quality checks on pushes and pull requests. Meson is the integration build and runs Cargo offline with the repository's dependency cache.
 
-A licença do projeto ainda precisa ser escolhida antes de aceitar contribuições externas.
+For a local Flatpak build, use the GNOME SDK and Rust extension described in the README. Keep native and Flatpak build directories separate.
+
+## Pull requests
+
+- Explain the user-visible change and how to reproduce or review it.
+- Include focused tests for behavior changes when practical.
+- Keep user documents as standard LaTeX and the reference library exportable as BibTeX.
+- Use XDG portals for file access where available; avoid adding broad Flatpak permissions.
+- Do not include private documents, real personal references, PDFs, API keys, or other credentials.
+- Keep documentation, issue forms, and pull request templates in English.
+
+## Translations
+
+The interface uses gettext catalogs in `po/`. English is the source language; Brazilian Portuguese and Spanish translations are maintained in `po/pt_BR.po` and `po/es.po`.
+
+## License
+
+Ovenbird is licensed under the GNU General Public License, version 3 or later; see [LICENSE](LICENSE). Bundled LaTeX templates have separate licenses and notices documented in [src/templates/README.md](src/templates/README.md). Preserve those notices and check compatibility before adding third-party files.

@@ -12,6 +12,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Syntax problems"
+msgstr "Problemas de sintaxe"
+
+msgid "Checking document…"
+msgstr "Verificando documento…"
+
+msgid "The document appears ready to compile."
+msgstr "Aparentemente, o documento está pronto para ser compilado."
+
+msgid "Line"
+msgstr "Linha"
+
+msgid "Unmatched closing brace"
+msgstr "Chave de fechamento sem par"
+
+msgid "Opening brace is not closed"
+msgstr "Chave de abertura não foi fechada"
+
+msgid "Environment is not closed: "
+msgstr "Ambiente não fechado: "
+
+msgid "Environment end has no matching begin: "
+msgstr "Fim do ambiente sem início correspondente: "
+
+msgid "Additional syntax problems are not shown."
+msgstr "Os problemas de sintaxe adicionais não são exibidos."
+
+msgid "Math delimiter has no matching opener: "
+msgstr "Delimitador matemático sem abertura correspondente: "
+
+msgid "Math delimiter is not closed: "
+msgstr "Delimitador matemático não foi fechado: "
+
+msgid "Math delimiter opens inside another math expression: "
+msgstr "Delimitador matemático dentro de outra expressão matemática: "
+
 #: rust/src/bibtex.rs:50
 msgid "Journal article"
 msgstr "Artigo de periódico"
@@ -64,6 +100,10 @@ msgstr "Editor(es)"
 msgid "Year / date"
 msgstr "Ano / data"
 
+#: rust/src/bibtex.rs
+msgid "Year"
+msgstr "Ano"
+
 #: rust/src/bibtex.rs:68
 msgid "Journal"
 msgstr "Periódico"
@@ -99,6 +139,73 @@ msgstr "URL"
 #: rust/src/bibtex.rs:76
 msgid "Keywords"
 msgstr "Palavras-chave"
+
+#: rust/src/bibtex.rs:106
+msgid "Tags"
+msgstr "Tags"
+
+msgid "Manage tags"
+msgstr "Gerenciar tags"
+
+msgid "Add tag"
+msgstr "Adicionar tag"
+
+msgid "Edit tag"
+msgstr "Editar tag"
+
+msgid "Remove tag"
+msgstr "Remover tag"
+
+msgid "Create and organize tags for your references."
+msgstr "Crie e organize tags para suas referências."
+
+msgid "No tags yet. Add a tag to organize your references."
+msgstr "Ainda não há tags. Adicione uma tag para organizar suas referências."
+
+msgid "Tag name"
+msgstr "Nome da tag"
+
+msgid "Tag saved"
+msgstr "Tag salva"
+
+msgid "Tag removed"
+msgstr "Tag removida"
+
+msgid "Remove tag ‘%s’ from the list and all references?"
+msgstr "Remover a tag ‘%s’ da lista e de todas as referências?"
+
+msgid "Find tags…"
+msgstr "Buscar tags…"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "New tag"
+msgstr "Nova tag"
+
+msgid "Create and select this tag"
+msgstr "Criar e selecionar esta tag"
+
+msgid "Select or create tags"
+msgstr "Selecionar ou criar tags"
+
+msgid "Remove tag from this reference"
+msgstr "Remover tag desta referência"
+
+msgid "No matching tags"
+msgstr "Nenhuma tag correspondente"
+
+msgid "Enter a tag name."
+msgstr "Digite um nome para a tag."
+
+msgid "That tag already exists."
+msgstr "Essa tag já existe."
+
+msgid "The tag no longer exists."
+msgstr "Essa tag não existe mais."
+
+msgid "Type: %s"
+msgstr "Tipo: %s"
 
 #: rust/src/bibtex.rs:77
 msgid "Series"
@@ -180,6 +287,14 @@ msgstr "Página anterior"
 msgid "Next page"
 msgstr "Próxima página"
 
+#: rust/src/pdf_preview.rs:207
+msgid "Zoom out"
+msgstr "Reduzir zoom"
+
+#: rust/src/pdf_preview.rs:212
+msgid "Zoom in"
+msgstr "Ampliar zoom"
+
 #: rust/src/pdf_preview.rs:128
 msgid "The compiled PDF will appear here"
 msgstr "O PDF compilado aparecerá aqui"
@@ -208,6 +323,30 @@ msgstr "Buscar no documento"
 msgid "Main menu"
 msgstr "Menu do aplicativo"
 
+#: rust/src/window.rs:379
+msgid "About Ovenbird"
+msgstr "Sobre o Ovenbird"
+
+#: rust/src/window.rs
+msgid "Created by Diego Pereira do Nascimento"
+msgstr "Criado por Diego Pereira do Nascimento"
+
+#: rust/src/window.rs:381
+msgid "Dedicated to my wife, Karina, who always encourages me to go further."
+msgstr "Dedicado à minha esposa Karina, que sempre me incentiva a ir além."
+
+#: rust/src/window.rs:383
+msgid "Personal website"
+msgstr "Página pessoal"
+
+#: rust/src/window.rs:384
+msgid "Project repository"
+msgstr "Repositório do projeto"
+
+#: rust/src/window.rs:385
+msgid "Project website"
+msgstr "Site do projeto"
+
 #: rust/src/window.rs:234
 msgid "WORKSPACE"
 msgstr "ESPAÇO DE TRABALHO"
@@ -231,10 +370,6 @@ msgstr "Criar arquivos e pastas"
 #: rust/src/window.rs:271
 msgid "References"
 msgstr "Referências"
-
-#: rust/src/window.rs:279 rust/src/window.rs:588 rust/src/window.rs:2467
-msgid "Sync with Zotero"
-msgstr "Sincronizar com o Zotero"
 
 #: rust/src/window.rs:284
 msgid "LaTeX · local references"
@@ -282,6 +417,22 @@ msgstr "Símbolos matemáticos"
 msgid "Insert citation"
 msgstr "Inserir citação"
 
+#: rust/src/window.rs
+msgid "Citation"
+msgstr "Citação"
+
+#: rust/src/window.rs
+msgid "Bibliographic reference"
+msgstr "Referência bibliográfica"
+
+#: rust/src/window.rs
+msgid "Bibliographic reference format"
+msgstr "Formato da referência bibliográfica"
+
+#: rust/src/window.rs
+msgid "Add bibliographic reference"
+msgstr "Adicionar referência bibliográfica"
+
 #: rust/src/window.rs:442
 msgid "Find and insert a bibliography reference"
 msgstr "Buscar e inserir uma referência bibliográfica"
@@ -307,6 +458,27 @@ msgstr ""
 msgid "Search references…"
 msgstr "Buscar referências…"
 
+msgid "Search tags…"
+msgstr "Pesquisar tags…"
+
+msgid "No tags match your search."
+msgstr "Nenhuma tag corresponde à sua pesquisa."
+
+msgid "Tag"
+msgstr "Tag"
+
+msgid "Sort by"
+msgstr "Ordenar por"
+
+msgid "Author"
+msgstr "Autor"
+
+msgid "Ascending"
+msgstr "Crescente"
+
+msgid "Descending"
+msgstr "Decrescente"
+
 msgid "All authors"
 msgstr "Todos os autores"
 
@@ -316,9 +488,15 @@ msgstr "Todos os anos"
 msgid "All tags"
 msgstr "Todas as tags"
 
+msgid "All types"
+msgstr "Todos os tipos"
+
 #: rust/src/window.rs:566
 msgid "Add reference"
 msgstr "Adicionar referência"
+
+msgid "View all references"
+msgstr "Ver todas as referências"
 
 msgid "Add"
 msgstr "Adicionar"
@@ -552,6 +730,18 @@ msgstr "Renomear"
 msgid "Move to Trash"
 msgstr "Mover para a lixeira"
 
+#: rust/src/window.rs
+msgid "Confirm deletion"
+msgstr "Confirmar exclusão"
+
+#: rust/src/window.rs
+msgid "Move ‘%s’ to Trash? You can restore it later."
+msgstr "Mover ‘%s’ para a lixeira? Você poderá restaurá-lo depois."
+
+#: rust/src/window.rs
+msgid "Move folder ‘%s’ and its contents to Trash?"
+msgstr "Mover a pasta ‘%s’ e seu conteúdo para a lixeira?"
+
 #: rust/src/window.rs:1591 rust/src/window.rs:1659 rust/src/window.rs:1852
 msgid "Create"
 msgstr "Criar"
@@ -780,13 +970,6 @@ msgstr "Tentar novamente"
 msgid "Loading local library…"
 msgstr "Carregando biblioteca local…"
 
-#: rust/src/window.rs:2252
-msgid ""
-"Your library starts here: add a reference, import BibTeX, or connect Zotero."
-msgstr ""
-"Sua biblioteca começa aqui: adicione uma referência, importe BibTeX ou "
-"conecte o Zotero."
-
 #: rust/src/window.rs:2253
 msgid "No references match this search."
 msgstr "Nenhuma referência corresponde à pesquisa."
@@ -801,6 +984,10 @@ msgstr "Nova referência"
 #: rust/src/window.rs:2288
 msgid "Delete reference"
 msgstr "Excluir referência"
+
+#: rust/src/window.rs
+msgid "Delete reference ‘%s’ from the local library? This cannot be undone."
+msgstr "Excluir a referência ‘%s’ da biblioteca local? Essa ação não pode ser desfeita."
 
 #: rust/src/window.rs:2295 rust/src/window.rs:2388
 msgid "Reference deleted"
@@ -819,6 +1006,78 @@ msgstr "Excluir"
 #: rust/src/window.rs:2328
 msgid "Reference type"
 msgstr "Tipo de referência"
+
+#: rust/src/window.rs
+msgid "Reference details"
+msgstr "Detalhes da referência"
+
+#: rust/src/window.rs
+msgid "Show reference details"
+msgstr "Mostrar detalhes da referência"
+
+#: rust/src/window.rs
+msgid "Cite this reference"
+msgstr "Citar esta referência"
+
+#: rust/src/window.rs
+msgid "Citation format"
+msgstr "Formato da referência"
+
+#: rust/src/window.rs
+msgid "ABNT"
+msgstr "ABNT"
+
+#: rust/src/window.rs
+msgid "MLA"
+msgstr "MLA"
+
+#: rust/src/window.rs
+msgid "AMS"
+msgstr "AMS"
+
+#: rust/src/window.rs
+msgid "APA 7"
+msgstr "APA 7"
+
+#: rust/src/window.rs
+msgid "IEEE"
+msgstr "IEEE"
+
+#: rust/src/window.rs
+msgid "Chicago (author-date)"
+msgstr "Chicago (autor-data)"
+
+#: rust/src/window.rs
+msgid "Harvard (author-date)"
+msgstr "Harvard (autor-data)"
+
+#: rust/src/window.rs
+msgid "Vancouver"
+msgstr "Vancouver"
+
+#: rust/src/window.rs
+msgid "Copy value"
+msgstr "Copiar valor"
+
+#: rust/src/window.rs
+msgid "Open a BibTeX file before adding a bibliographic reference."
+msgstr "Abra um arquivo BibTeX antes de adicionar uma referência bibliográfica."
+
+#: rust/src/window.rs
+msgid "This reference is already in the BibTeX file."
+msgstr "Esta referência já está no arquivo BibTeX."
+
+#: rust/src/window.rs
+msgid "Could not add the reference to the BibTeX file"
+msgstr "Não foi possível adicionar a referência ao arquivo BibTeX"
+
+#: rust/src/window.rs
+msgid "Copy formatted reference"
+msgstr "Copiar referência formatada"
+
+#: rust/src/window.rs
+msgid "Copied to clipboard"
+msgstr "Copiado para a área de transferência"
 
 #: rust/src/window.rs:2343
 msgid "Full title of the work"
@@ -851,78 +1110,6 @@ msgstr "BibTeX exportado"
 #: rust/src/window.rs:2461
 msgid "Could not export BibTeX"
 msgstr "Não foi possível exportar o BibTeX"
-
-#: rust/src/window.rs:2470
-msgid "Save and sync"
-msgstr "Salvar e sincronizar"
-
-#: rust/src/window.rs:2479
-msgid ""
-"The local library works without an account. To sync, enter your library ID "
-"and a Zotero key with read and write access."
-msgstr ""
-"A biblioteca local funciona sem conta. Para sincronizar, informe o ID da "
-"biblioteca e uma chave Zotero com permissão de leitura e escrita."
-
-#: rust/src/window.rs:2484
-msgid "Don’t have a Zotero account?"
-msgstr "Ainda não tem uma conta no Zotero?"
-
-#: rust/src/window.rs:2487
-msgid "Create a Zotero account"
-msgstr "Criar uma conta Zotero"
-
-#: rust/src/window.rs:2492
-msgid "Found at zotero.org/settings/keys"
-msgstr "Encontrado em zotero.org/settings/keys"
-
-#: rust/src/window.rs:2495
-msgid "Zotero key with write access"
-msgstr "Chave Zotero com acesso de escrita"
-
-#: rust/src/window.rs:2498
-msgid "User ID"
-msgstr "ID do usuário"
-
-#: rust/src/window.rs:2500
-msgid "API key"
-msgstr "Chave da API"
-
-#: rust/src/window.rs:2510
-msgid "Zotero settings are still loading."
-msgstr "As configurações do Zotero ainda estão carregando."
-
-#: rust/src/window.rs:2515
-msgid "Enter the ID and API key"
-msgstr "Informe o ID e a chave da API"
-
-#: rust/src/window.rs:2524
-msgid "Saving Zotero settings…"
-msgstr "Salvando as configurações do Zotero…"
-
-#: rust/src/window.rs:2529
-msgid "Could not save the Zotero key"
-msgstr "Não foi possível salvar a chave do Zotero"
-
-#: rust/src/window.rs:2551 rust/src/window.rs:2583
-msgid "Could not load Zotero settings"
-msgstr "Não foi possível carregar as configurações do Zotero"
-
-#: rust/src/window.rs:2607
-msgid "Syncing…"
-msgstr "Sincronizando…"
-
-#: rust/src/window.rs:2608
-msgid "Syncing references…"
-msgstr "Sincronizando referências…"
-
-#: rust/src/window.rs:2613
-msgid "No Zotero API key is saved."
-msgstr "Nenhuma chave de API do Zotero está salva."
-
-#: rust/src/window.rs:2645
-msgid "Zotero sync failed"
-msgstr "Falha ao sincronizar com o Zotero"
 
 #: rust/src/window.rs:2652
 msgid "Export"
@@ -977,6 +1164,66 @@ msgstr "Não foi possível abrir a prévia do PDF"
 msgid "Could not compile the document"
 msgstr "Não foi possível compilar o documento"
 
+#: rust/src/window.rs
+msgid "PDF generation failed"
+msgstr "Falha na geração do PDF"
+
+#: rust/src/window.rs
+msgid "PDF generation failed: Image on line %d was not found."
+msgstr "Falha na geração do PDF: Imagem da linha %d não foi encontrada."
+
+#: rust/src/window.rs
+msgid "PDF generation failed: The document contains errors that prevent compilation."
+msgstr "Falha na geração do PDF: O documento contém erros que impedem a compilação."
+
+#: rust/src/window.rs
+msgid "PDF generation failed: Compilation stopped unexpectedly."
+msgstr "Falha na geração do PDF: A compilação foi interrompida inesperadamente."
+
+#: rust/src/window.rs
+msgid "PDF generation failed: Compilation timed out."
+msgstr "Falha na geração do PDF: O tempo limite da compilação foi excedido."
+
+#: rust/src/window.rs
+msgid "%d more lines have missing citations."
+msgstr "Há citações sem referência em mais %d linhas."
+
+#: rust/src/window.rs
+msgid "%d additional citation problems are not shown."
+msgstr "%d problemas adicionais de citação não são exibidos."
+
+#: rust/src/build.rs
+msgid "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live."
+msgstr "Nenhum compilador LaTeX foi encontrado. Instale latexmk, Tectonic ou TeX Live."
+
+#: rust/src/build.rs
+msgid "This document uses biblatex and needs Biber. Install Biber, latexmk, or Tectonic."
+msgstr "Este documento usa biblatex e precisa do Biber. Instale Biber, latexmk ou Tectonic."
+
+#: rust/src/build.rs
+msgid "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic."
+msgstr "Este documento precisa do BibTeX. Instale BibTeX, latexmk ou Tectonic."
+
+#: rust/src/window.rs
+msgid "Citation on line %d has no bibliographic reference in the document."
+msgstr "A citação da linha %d não possui referência bibliográfica no documento."
+
+#: rust/src/window.rs
+msgid "Citations on lines %s have no bibliographic references in the document."
+msgstr "As citações das linhas %s não possuem referências bibliográficas no documento."
+
+#: rust/src/window.rs
+msgid "Line %d: %s"
+msgstr "Linha %d: %s"
+
+#: rust/src/window.rs
+msgid "Could not add the reference to the document"
+msgstr "Não foi possível adicionar a referência ao documento"
+
+#: rust/src/window.rs
+msgid "Save the document before inserting a citation."
+msgstr "Salve o documento antes de inserir uma citação."
+
 #: rust/src/window.rs:2783
 msgid "Open or create a LaTeX project before compiling."
 msgstr "Abra ou crie um projeto LaTeX antes de compilar."
@@ -1008,10 +1255,6 @@ msgstr "Não foi possível representar o caminho da imagem em relação ao docum
 #: rust/src/window.rs
 msgid "Open a LaTeX document before inserting a citation."
 msgstr "Abra um documento LaTeX antes de inserir uma citação."
-
-#: rust/src/window.rs
-msgid "Could not check Zotero settings"
-msgstr "Não foi possível verificar as configurações do Zotero"
 
 #: rust/src/window.rs
 msgid "New LaTeX document"
@@ -1258,3 +1501,126 @@ msgstr "Não foi possível acessar a área de transferência."
 #: rust/src/window.rs
 msgid "Could not find the containing folder."
 msgstr "Não foi possível localizar a pasta que contém este item."
+
+#: rust/src/window.rs
+msgid "Authors"
+msgstr "Autores"
+
+#: rust/src/window.rs
+msgid "Manage references"
+msgstr "Gerenciar referências"
+
+#: rust/src/window.rs
+msgid "Manage authors"
+msgstr "Gerenciar autores"
+
+#: rust/src/window.rs
+msgid "Add author"
+msgstr "Adicionar autor"
+
+#: rust/src/window.rs
+msgid "Edit author"
+msgstr "Editar autor"
+
+#: rust/src/window.rs
+msgid "Author details"
+msgstr "Detalhes do autor"
+
+#: rust/src/window.rs
+msgid "Full name"
+msgstr "Nome completo"
+
+#: rust/src/window.rs
+msgid "Name used in references"
+msgstr "Nome usado nas referências"
+
+#: rust/src/window.rs
+msgid "Generate"
+msgstr "Gerar"
+
+#: rust/src/window.rs
+msgid "ORCID"
+msgstr "ORCID"
+
+#: rust/src/window.rs
+msgid "Email"
+msgstr "E-mail"
+
+#: rust/src/window.rs
+msgid "Delete author"
+msgstr "Excluir autor"
+
+#: rust/src/window.rs
+msgid "No authors yet. Add authors to organize your references."
+msgstr "Ainda não há autores. Adicione autores para organizar suas referências."
+
+msgid "No authors match this search."
+msgstr "Nenhum autor corresponde à pesquisa."
+
+#: rust/src/window.rs
+msgid "Author name"
+msgstr "Nome do autor"
+
+#: rust/src/window.rs
+msgid "Author saved"
+msgstr "Autor salvo"
+
+#: rust/src/window.rs
+msgid "Author deleted"
+msgstr "Autor excluído"
+
+#: rust/src/window.rs
+msgid "Author has associated references"
+msgstr "Autor associado a referências"
+
+#: rust/src/window.rs
+msgid "The author ‘%s’ is associated with these references. Delete the author and all listed references?"
+msgstr "O autor ‘%s’ está associado a estas referências. Excluir o autor e todas as referências listadas?"
+
+#: rust/src/window.rs
+msgid "Delete author and references"
+msgstr "Excluir autor e referências"
+
+#: rust/src/window.rs
+msgid "Deleted author and %d references"
+msgstr "Autor e %d referências excluídos"
+
+#: rust/src/window.rs
+msgid "Find authors…"
+msgstr "Buscar autores…"
+
+#: rust/src/window.rs
+msgid "New author"
+msgstr "Novo autor"
+
+#: rust/src/window.rs
+msgid "Create and select this author"
+msgstr "Criar e selecionar este autor"
+
+#: rust/src/window.rs
+msgid "Select or create authors"
+msgstr "Selecionar ou criar autores"
+
+#: rust/src/window.rs
+msgid "Remove author from this reference"
+msgstr "Remover autor desta referência"
+
+#: rust/src/window.rs
+msgid "Move author up"
+msgstr "Mover autor para cima"
+
+#: rust/src/window.rs
+msgid "Move author down"
+msgstr "Mover autor para baixo"
+
+#: rust/src/window.rs
+msgid "No matching authors"
+msgstr "Nenhum autor correspondente"
+
+#: rust/src/window.rs
+msgid "PDF generation failed: An error on line %d prevents compilation and PDF generation."
+msgstr "Falha na geração do PDF: Há um erro na linha %d que impede a compilação e a geração do PDF."
+
+#: rust/src/window.rs
+msgid "Your library starts here: add a reference or import BibTeX."
+msgstr "Sua biblioteca começa aqui: adicione uma referência ou importe BibTeX."

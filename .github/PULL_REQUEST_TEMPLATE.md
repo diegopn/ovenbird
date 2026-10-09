@@ -1,13 +1,13 @@
-## O que mudou
+## What changed
 
-Descreva a mudança e o motivo.
+Describe the user-visible change and why it is needed.
 
-## Como revisar
+## How to review
 
-Liste os passos para observar o comportamento alterado e qualquer verificação manual feita.
+List steps to observe the change and any manual checks performed.
 
-## Antes de enviar
+## Before submitting
 
-- [ ] Os documentos continuam sendo LaTeX comum e a biblioteca continua exportável em BibTeX.
-- [ ] A mudança não amplia permissões Flatpak sem necessidade.
-- [ ] Não incluí documentos privados, referências reais, PDFs ou chaves de API.
+- [ ] User documents remain standard LaTeX and the library remains exportable as BibTeX.
+- [ ] The change does not add unnecessary Flatpak permissions.
+- [ ] No private documents, real personal references, PDFs, API keys, or credentials are included.

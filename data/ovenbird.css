@@ -1,3 +1,23 @@
+.dialog headerbar,
+dialog headerbar {
+  background-color: @window_bg_color;
+  background-image: none;
+  box-shadow: none;
+}
+
+.ovenbird-about-version {
+  border-radius: 999px;
+  padding: 6px 18px;
+  color: @accent_color;
+  background-color: alpha(@accent_bg_color, 0.12);
+  font-weight: 700;
+}
+
+.ovenbird-about-link {
+  padding: 14px;
+  color: @window_fg_color;
+}
+
 .ovenbird-sidebar {
   background: @sidebar_bg_color;
   color: @sidebar_fg_color;
@@ -26,6 +46,15 @@
 .ovenbird-brand {
   font-size: 14px;
   font-weight: 600;
+}
+
+.ovenbird-sidebar-brand .ovenbird-main-menu-button {
+  background: transparent;
+  box-shadow: none;
+}
+
+.ovenbird-sidebar-brand .ovenbird-main-menu-button:hover {
+  background-color: alpha(@view_fg_color, 0.08);
 }
 
 .ovenbird-editor-toolbar,
@@ -163,6 +192,20 @@
   font-size: 12pt;
 }
 
+.latex-diagnostics {
+  padding: 6px 12px;
+  border-top: 1px solid alpha(@borders, 0.65);
+  background-color: @view_bg_color;
+}
+
+.latex-diagnostics .heading.error {
+  color: @error_color;
+}
+
+.latex-diagnostics .heading.success {
+  color: @success_color;
+}
+
 .preview-placeholder {
   color: @dim_label;
 }
@@ -170,4 +213,18 @@
 .sidebar-section {
   font-size: 0.85em;
   font-weight: 600;
+}
+
+.reference-author-row {
+  padding: 6px 6px 6px 14px;
+}
+
+.reference-tag-chip {
+  padding: 6px 14px;
+}
+
+.reference-detail-tag-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, currentColor 7.5%, transparent);
 }

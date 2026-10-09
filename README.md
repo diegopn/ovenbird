@@ -1,109 +1,85 @@
 # Ovenbird
 
-Editor LaTeX para GNOME, escrito em Rust com GTK 4, Libadwaita e GtkSourceView. Os documentos continuam em arquivos `.tex`; o projeto não converte o conteúdo para Markdown nem para um formato proprietário.
+Ovenbird is a native GNOME workspace for writing LaTeX documents and managing a local BibTeX library. It is written in Rust with GTK 4, Libadwaita, and GtkSourceView. Project documents remain ordinary files; Ovenbird does not convert them to a proprietary format.
 
-## Recursos
+> **Development status:** Ovenbird is in early development. There is no stable release or Flathub package yet, and features may change.
 
-- Modos Código e Visual para o mesmo documento, com histórico compartilhado de desfazer e refazer.
-- Edição de `.tex`, `.bib` e `.sty`; os demais arquivos do projeto aparecem como recursos.
-- Navegador recursivo de arquivos do projeto, criação de arquivos e pastas, arrastar para mover, renomear e enviar à lixeira.
-- Busca no documento, inserção de links, imagens, tabelas, equações, listas, notas e citações.
-- Biblioteca BibTeX local independente dos projetos, com formulários por tipo de referência e importação e exportação `.bib`.
-- Sincronização bidirecional manual com Zotero Web API v3. Credenciais ficam no Secret Service do sistema.
-- Projetos em branco, ABNT, IEEE, ACM, Elsevier e Springer Nature criados a partir dos modelos incluídos, sem baixar modelos da internet.
-- Compilação por `latexmk`, `pdflatex` ou Tectonic, com referências locais combinadas em um `.bib` temporário.
-- Prévia de PDF dentro do editor quando Poppler-GLib está disponível no build; sem ele, o PDF abre no leitor padrão.
-- Interface traduzida para português do Brasil e espanhol, respeitando o idioma do sistema e usando inglês como fallback.
+## Features
 
-O modo Visual cobre um subconjunto conservador de LaTeX. Comandos e ambientes desconhecidos permanecem como texto-fonte para evitar perda de conteúdo.
+- Edit `.tex` documents in Code or Visual mode, with shared undo and redo history.
+- Browse project files, create folders, move and rename items, and send files to Trash.
+- Insert and format tables, equations, lists, images, links, notes, and citations.
+- Manage a project-independent BibTeX library with reference types, tags, search, and `.bib` import and export.
+- Compile with `latexmk`, `pdflatex`, or Tectonic. The local Flatpak manifest includes Tectonic.
+- Preview PDFs and images in the editor. Embedded PDF preview requires Poppler-GLib at build time.
+- Start projects from bundled blank, ABNT, IEEE, ACM, Elsevier, and Springer Nature templates.
+- Use the interface in English, Brazilian Portuguese, or Spanish.
 
-## Requisitos no Fedora
+Visual mode supports a conservative subset of LaTeX. Unknown commands and environments remain source text so the editor does not discard document content.
 
-Para compilar e executar fora do Flatpak:
+## Building on Fedora
+
+Install the native build dependencies:
 
 ```sh
-sudo dnf install gcc rust cargo pkgconf-pkg-config meson ninja-build gettext-devel gtk4-devel libadwaita-devel gtksourceview5-devel libsecret-devel unzip
+sudo dnf install gcc rust cargo pkgconf-pkg-config meson ninja-build gettext-devel gtk4-devel libadwaita-devel gtksourceview5-devel libpanel-devel unzip
 ```
 
-O `rust` e o `cargo` são necessários para o build nativo pelo Meson. A extensão Rust do Flatpak é usada pelo GNOME Builder e não instala o Cargo no Fedora fora do SDK.
-
-O Poppler é opcional e habilita a prévia embutida:
+Poppler-GLib is optional and enables embedded PDF preview:
 
 ```sh
 sudo dnf install poppler-glib-devel
 ```
 
-Para compilar LaTeX fora do Flatpak no Fedora:
+To build and run the app:
 
 ```sh
-sudo dnf install latexmk texlive
+meson setup build
+meson compile -C build
+meson test -C build --print-errorlogs
 ```
 
-Isso fornece `latexmk`, `pdflatex` e BibTeX. Projetos que usam `biblatex` podem precisar do Biber:
+Meson invokes Cargo with `Cargo.lock` and network access disabled. Build artifacts and the Cargo home stay inside the build directory. If you already have a build directory from another Meson version, configure a new directory instead of deleting existing project files.
+
+The repository pins Rust 1.92.0, including `rustfmt` and Clippy, in `rust-toolchain.toml`. See [CONTRIBUTING.md](CONTRIBUTING.md) for the checks to run before submitting Rust changes; GitHub Actions runs them on pushes and pull requests.
+
+LaTeX engines are installed separately for native builds. For example, Fedora's `latexmk` and TeX Live packages provide `latexmk`, `pdflatex`, and BibTeX; `biblatex` projects may also need Biber:
 
 ```sh
-sudo dnf install biber
+sudo dnf install latexmk texlive biber
 ```
 
-Para sincronizar com Zotero, é necessária uma sessão Secret Service, como GNOME Keyring, e uma chave Zotero com acesso de leitura e escrita.
+## Local Flatpak development
 
-## GNOME Builder e Flatpak
-
-O manifesto usa GNOME Platform/SDK 51 e a extensão `org.freedesktop.Sdk.Extension.rust-stable`. Com Builder, compile pelo perfil Flatpak do projeto. No Fedora, o runtime Flatpak e a extensão Rust devem estar instalados na mesma instalação do Flatpak usada pelo Builder. A extensão que acompanha este ambiente é a branch 26.08; o manifesto inclui a extensão para que o Builder a monte no SDK.
-
-Para construir pelo terminal com `flatpak-builder` (instalado no Fedora como `flatpak-builder`):
+The in-repository manifest is intended for local builds while the packaging is being prepared. It is not yet the Flathub submission manifest.
 
 ```sh
-flatpak-builder --user --force-clean .flatpak-build org.ovenbird.Ovenbird.json
+flatpak-builder --user --force-clean .flatpak-build io.github.diegopn.ovenbird.json
+flatpak-builder --user --install --force-clean .flatpak-build io.github.diegopn.ovenbird.json
+flatpak run io.github.diegopn.ovenbird
 ```
 
-O módulo do aplicativo limpa o diretório Meson interno antes de configurar o build. Assim o Flatpak Builder não reutiliza `coredata.dat` criado por outra versão do Meson. Para recuperar um checkout Flatpak antigo, use o comando acima da raiz do repositório; mantenha `.flatpak-build` dentro da pasta do projeto.
+The manifest uses GNOME Platform/SDK 51 and the stable Rust SDK extension. The first Tectonic build may download LaTeX support files at runtime. Creating a project from a bundled template does not require a network connection.
 
-Para instalar localmente depois do build:
+In GNOME Builder, use `io.github.diegopn.ovenbird.json` as the Flatpak manifest. If the build still reports `org.ovenbird.Ovenbird`, recreate the build configuration from the current manifest; Builder is using the old application ID.
 
-```sh
-flatpak-builder --user --install --force-clean .flatpak-build org.ovenbird.Ovenbird.json
-flatpak run org.ovenbird.Ovenbird
-```
+## Local data
 
-No Flatpak, Tectonic é incluído. A criação de projetos pelos modelos funciona offline; a primeira compilação com Tectonic pode baixar os arquivos de suporte do LaTeX. A prévia embutida de PDF depende de Poppler-GLib no ambiente de build; caso contrário, o aplicativo usa o visualizador padrão do sistema.
+- Bibliography: `$XDG_DATA_HOME/ovenbird/library.bib`
+- Author catalog: `$XDG_DATA_HOME/ovenbird/authors.json`
+- Author profiles: `$XDG_DATA_HOME/ovenbird/author_profiles.json`
+- App settings: `$XDG_CONFIG_HOME/ovenbird/settings.json`
+- Build PDFs and intermediate files: Ovenbird's private cache, outside the project folder
+- Project documents: remain in the folders selected by the user
 
-## Build com Meson e Cargo
+The local reference library is stored as BibTeX in `library.bib`; the current application does not use SQLite. Tags and author metadata are kept in JSON sidecar files. In Flatpak, `$XDG_DATA_HOME` is private to the application ID, so changing the ID creates a different data directory.
 
-Execute a partir da raiz do repositório e mantenha o diretório de build dentro dele. Para o build nativo:
+Imported `.bib` files are added to the local library. During compilation, Ovenbird combines the local library with bibliography entries declared by the project in a temporary BibTeX file. Export the library when you need a permanent `.bib` file to share.
 
-```sh
-rm -rf rust-build-fedora
-meson setup rust-build-fedora
-meson compile -C rust-build-fedora
-meson test -C rust-build-fedora --print-errorlogs
-```
+## Contributing
 
-Meson é a entrada do build GNOME. Ele chama Cargo usando `Cargo.lock`, sem rede, e mantém o `CARGO_HOME` e os artefatos Cargo dentro do diretório de build Meson. Se aparecer a incompatibilidade entre Meson 1.11.2 e 1.12.0, apague apenas o diretório de build nativo e configure novamente. O comando de build Flatpak acima limpa seu próprio diretório interno automaticamente.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull request guidance. Details and upstream notices for bundled template archives are in [src/templates/README.md](src/templates/README.md).
 
-## Dados locais
+## License
 
-- Biblioteca: `$XDG_DATA_HOME/ovenbird/library.bib`.
-- Estado de sincronização Zotero: `$XDG_DATA_HOME/ovenbird/zotero-sync.json`.
-- ID da biblioteca Zotero: `$XDG_CONFIG_HOME/ovenbird/settings.json`.
-- Chave Zotero: Secret Service, schema `org.ovenbird.Ovenbird` e atributo `application=ovenbird`.
-- PDFs e arquivos intermediários: cache privado do Ovenbird, fora da pasta do projeto.
-- Arquivos do projeto: permanecem nas pastas escolhidas pela pessoa usuária.
-
-Os `.bib` importados são incorporados à biblioteca local. Durante a compilação, o Ovenbird cria um BibTeX temporário com a biblioteca e as referências declaradas no projeto; exporte a biblioteca quando quiser compartilhar um `.bib` permanente.
-
-## Estrutura
-
-```text
-.
-├── data/                  # Ícone, desktop entry e metadados AppStream
-├── docs/                  # Inventário e plano da migração Rust
-├── po/                    # Catálogos gettext pt_BR e es
-├── rust/src/              # Aplicação, editor, projetos, referências e serviços
-├── src/templates/         # Modelos LaTeX incluídos
-├── cargo-cache/           # Cache local de crates para builds offline
-├── Cargo.toml
-├── Cargo.lock
-├── meson.build
-└── org.ovenbird.Ovenbird.json
-```
+Ovenbird is licensed under the GNU General Public License, version 3 or later. See [LICENSE](LICENSE) for the complete terms. Bundled LaTeX templates retain their own licenses and notices; see [src/templates/README.md](src/templates/README.md).

@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Ovenbird
+Comment=LaTeX editor and local bibliography manager
+Comment[pt_BR]=Editor LaTeX e gerenciador local de referências
+Comment[es]=Editor de LaTeX y gestor de bibliografía local
+Exec=ovenbird %f
+Icon=io.github.diegopn.ovenbird
+Terminal=false
+Type=Application
+Categories=Office;Publishing;
+MimeType=text/x-tex;application/x-bibtex;
+StartupNotify=true
+Keywords=LaTeX;TeX;Bibliography;Writing;
+Keywords[pt_BR]=LaTeX;TeX;Bibliografia;Escrita;
+Keywords[es]=LaTeX;TeX;Bibliografía;Escritura;

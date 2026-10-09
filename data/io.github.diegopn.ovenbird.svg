@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Ovenbird</title>
+  <desc>An ivory paper bird with document lines on a sage rounded square.</desc>
+  <defs>
+    <linearGradient id="sage-wing" x1="245" y1="290" x2="333" y2="438" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#879f8d"/>
+      <stop offset="1" stop-color="#557a69"/>
+    </linearGradient>
+    <linearGradient id="paper-body" x1="546" y1="458" x2="329" y2="733" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fbf8ef"/>
+      <stop offset="0.58" stop-color="#f6f3e9"/>
+      <stop offset="1" stop-color="#e4dfd2"/>
+    </linearGradient>
+    <linearGradient id="paper-wing" x1="273" y1="425" x2="383" y2="521" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f6f3e9"/>
+      <stop offset="0.65" stop-color="#eeeadf"/>
+      <stop offset="1" stop-color="#d3d0c3"/>
+    </linearGradient>
+    <linearGradient id="paper-fold" x1="440" y1="493" x2="345" y2="688" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9b9e8e"/>
+      <stop offset="0.3" stop-color="#e2dfd2"/>
+      <stop offset="0.62" stop-color="#f6f3e9"/>
+      <stop offset="1" stop-color="#faf7ee"/>
+    </linearGradient>
+    <linearGradient id="sage-beak" x1="579" y1="434" x2="594" y2="467" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#90a692"/>
+      <stop offset="1" stop-color="#5d806e"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="29.714285714" fill="#a8bdb0"/>
+  <g transform="matrix(0.223776224 0 0 0.220689655 -21.930069930 -44.358620689)" stroke="#657b6a" stroke-width="3" stroke-linejoin="round">
+    <path d="m568 430 51 13-45 39-17-31Z" fill="url(#sage-beak)"/>
+    <path d="M494 449c28-28 54-38 75-27 24 13 19 35 9 61l-23 60c-18 48-31 69-62 96-36 32-75 58-117 87l-24-11 1-228Z" fill="url(#paper-body)"/>
+    <path d="M340 234c-30 47-46 84-38 118 5 27 16 57 29 81l167 19c-41-45-87-96-132-145-31-32-35-52-26-73Z" fill="#faf7ee"/>
+    <path d="M340 234c-41 26-109 70-141 110-11 14-11 20-5 29l137 60c-27-55-38-86-29-118 7-27 23-55 38-81Z" fill="url(#sage-wing)"/>
+    <path d="M498 452c10 8 8 22 3 44-20 93-67 183-126 242-14 14-23 12-42 6l-110-34c-20-6-34-18-25-32 39-53 94-117 149-172Z" fill="url(#paper-fold)"/>
+    <path d="M194 373c15 57 38 113 60 160 12 25 23 30 40 22l204-103Z" fill="url(#paper-wing)" stroke-width="2.5"/>
+    <path d="m194 373 304 79" fill="none" stroke="#fcf9f0" stroke-width="2"/>
+    <g fill="#7b9781" stroke="none">
+      <path d="M282 596h128c7 0 9 4 6 10l-3 7c-1 3-4 5-9 5H280c-7 0-9-4-6-10l3-7c1-3 3-5 5-5Z"/>
+      <path d="M265 634h108c7 0 9 4 6 10l-3 7c-1 3-4 5-9 5H263c-7 0-9-4-6-10l3-7c1-3 3-5 5-5Z"/>
+    </g>
+    <circle cx="548" cy="451" r="11" fill="#5d7b6b" stroke="none"/>
+  </g>
+</svg>

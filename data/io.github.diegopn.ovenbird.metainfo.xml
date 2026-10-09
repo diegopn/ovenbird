@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.diegopn.ovenbird</id>
+  <name>Ovenbird</name>
+  <summary>LaTeX writing and bibliography management</summary>
+  <summary xml:lang="pt_BR">Editor LaTeX e gerenciador de bibliografia</summary>
+  <summary xml:lang="es">Editor de LaTeX y gestor de bibliografía</summary>
+  <url type="homepage">https://github.com/diegopn/ovenbird</url>
+  <url type="vcs-browser">https://github.com/diegopn/ovenbird</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>A native GNOME workspace for writing LaTeX documents and managing a local bibliography.</p>
+    <p>Projects remain ordinary LaTeX files. The local bibliography works offline and can be imported from or exported to BibTeX.</p>
+  </description>
+  <launchable type="desktop-id">io.github.diegopn.ovenbird.desktop</launchable>
+  <provides>
+    <binary>ovenbird</binary>
+  </provides>
+  <developer id="io.github.diegopn">
+    <name>Ovenbird contributors</name>
+  </developer>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2026-10-06">
+      <description><p>Initial development release.</p></description>
+    </release>
+  </releases>
+</component>

@@ -31,7 +31,6 @@ rust_sources = files(
   '../rust/src/storage.rs',
   '../rust/src/templates.rs',
   '../rust/src/tests.rs',
-  '../rust/src/zotero.rs',
   '../rust/build.rs',
   '../data/ovenbird.css',
   '../Cargo.toml',
@@ -63,6 +62,9 @@ if ! cmp -s "$OVENBIRD_CARGO_CACHE/CACHE_VERSION" "$CARGO_HOME/.ovenbird-registr
   mkdir -p "$CARGO_HOME/registry"
   cp -a "$OVENBIRD_CARGO_CACHE/registry/index" "$CARGO_HOME/registry/"
   cp -a "$OVENBIRD_CARGO_CACHE/registry/cache" "$CARGO_HOME/registry/"
+  if [ -d "$OVENBIRD_CARGO_CACHE/registry/src" ]; then
+    cp -a "$OVENBIRD_CARGO_CACHE/registry/src" "$CARGO_HOME/registry/"
+  fi
   cp "$OVENBIRD_CARGO_CACHE/CACHE_VERSION" "$CARGO_HOME/.ovenbird-registry-cache-version"
 fi
 "$OVENBIRD_CARGO" build --manifest-path "$OVENBIRD_MANIFEST" --target-dir "$CARGO_TARGET_DIR" --locked --offline $OVENBIRD_PROFILE_ARGS $OVENBIRD_CARGO_FEATURES

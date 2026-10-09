@@ -241,8 +241,8 @@ fn create_project_with_tool(
         let mut content = extraction.clone();
         let mut children = std::fs::read_dir(&extraction)
             .map_err(|error| error.to_string())?
-            .filter_map(Result::ok)
-            .collect::<Vec<_>>();
+            .collect::<std::io::Result<Vec<_>>>()
+            .map_err(|error| error.to_string())?;
         if children.len() == 1 && children[0].path().is_dir() {
             content = children.remove(0).path();
         }

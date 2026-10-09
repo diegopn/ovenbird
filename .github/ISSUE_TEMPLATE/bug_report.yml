@@ -1,41 +1,41 @@
-name: Relatar um erro
-description: Informe algo que não está funcionando como esperado.
-title: "[Erro]: "
+name: Report a bug
+description: Report behavior that is not working as expected.
+title: "[Bug]: "
 body:
   - type: markdown
     attributes:
-      value: Obrigado por ajudar a melhorar o Ovenbird. Não anexe documentos ou bibliografias privadas.
+      value: Thanks for helping improve Ovenbird. Do not attach private documents or bibliographies.
   - type: input
     id: version
     attributes:
-      label: Versão do Ovenbird
-      placeholder: "0.1.0 ou commit usado"
+      label: Ovenbird version
+      placeholder: "0.1.0 or commit used"
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
-      label: Como reproduzir
-      description: Liste os passos que levam ao problema.
-      placeholder: "1. Abra… 2. Escolha… 3. Observe…"
+      label: Steps to reproduce
+      description: List the steps that lead to the problem.
+      placeholder: "1. Open… 2. Choose… 3. Observe…"
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: O que esperava acontecer?
+      label: What did you expect to happen?
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: O que aconteceu?
+      label: What happened instead?
     validations:
       required: true
   - type: textarea
     id: environment
     attributes:
-      label: Ambiente
-      description: Inclua sua distribuição Linux, versão do GNOME/Flatpak e compilador LaTeX, se aplicável.
+      label: Environment
+      description: Include your Linux distribution, GNOME/Flatpak version, and LaTeX compiler, if relevant.
     validations:
       required: false

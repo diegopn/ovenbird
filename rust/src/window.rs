@@ -15,7 +15,7 @@ use crate::editor::LatexEditor;
 use crate::history::EditorMode;
 use crate::i18n::ngettext;
 use crate::project::{self, ProjectEntryKind, ProjectFileKind};
-use crate::storage::{LocalLibrary, ZoteroSettings};
+use crate::storage::{AppSettings, AuthorProfile, LocalLibrary};
 
 const MAIN_HEADER_HEIGHT: i32 = 48;
 
@@ -51,8 +51,18 @@ struct State {
     file_tree_selection: gtk::SingleSelection,
     project_files_scroll: gtk::Adjustment,
     library_list: gtk::Box,
+    tags_list: gtk::Box,
+    tag_search: gtk::SearchEntry,
+    tag_sort: gtk::DropDown,
+    tag_sort_descending: gtk::ToggleButton,
+    authors_list: gtk::Box,
     library_search: gtk::SearchEntry,
+    reference_sort: gtk::DropDown,
+    reference_sort_descending: gtk::ToggleButton,
     reference_filters: ReferenceFilterWidgets,
+    author_search: gtk::SearchEntry,
+    author_sort: gtk::DropDown,
+    author_sort_descending: gtk::ToggleButton,
     library_filters_updating: Cell<bool>,
     page_stack: gtk::Stack,
     sidebar_pages: gtk::Stack,
@@ -69,7 +79,7 @@ struct State {
     code_mode_button: gtk::ToggleButton,
     visual_mode_button: gtk::ToggleButton,
     find_document_button: gtk::Button,
-    compact_find_document_button: gtk::Button,
+    bibtex_citation_button: gtk::Button,
     title: gtk::Label,
     status: gtk::Label,
     reference_summary: RefCell<Option<gtk::Label>>,
@@ -78,11 +88,10 @@ struct State {
     omni_bar: RefCell<Option<crate::libpanel::OmniBar>>,
     compile_action: RefCell<Option<gio::SimpleAction>>,
     build_state: RefCell<String>,
+    build_failure_message: RefCell<Option<String>>,
     last_build_at: RefCell<String>,
-    last_build_message: RefCell<String>,
     save_button: RefCell<Option<gtk::Button>>,
     toast: adw::ToastOverlay,
-    sync_button: gtk::Button,
     layout: gtk::Paned,
     sidebar_revealer: gtk::Revealer,
     sidebar_width: Cell<i32>,
@@ -91,16 +100,31 @@ struct State {
 
 type SaveCallback = Rc<dyn Fn(Rc<State>)>;
 
+enum CompileFailure {
+    MissingCitations(Vec<crate::build::MissingCitation>),
+    Other(String),
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ReferencePickerTarget {
+    Latex,
+    Bibtex,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum LatexInsertChoice {
+    Citation,
+    Bibliography,
+}
+
 struct BuildStatusWidgets {
     status_row: gtk::Box,
     icon: gtk::Image,
     details_popover: gtk::Popover,
     details_file: gtk::Label,
-    details_path: gtk::Label,
     details_engine: gtk::Label,
-    details_state: gtk::Label,
     details_last: gtk::Label,
-    details_output: gtk::Label,
+    details_failure: gtk::Label,
 }
 
 struct SidebarWidgets {
@@ -110,7 +134,6 @@ struct SidebarWidgets {
     file_tree: gtk::ListView,
     file_tree_selection: gtk::SingleSelection,
     project_files_scroll: gtk::Adjustment,
-    library_search: gtk::SearchEntry,
     pages: gtk::Stack,
     editor_tab: gtk::ToggleButton,
     references_tab: gtk::ToggleButton,
@@ -120,12 +143,41 @@ struct ReferenceFilterWidgets {
     author: gtk::DropDown,
     year: gtk::DropDown,
     tag: gtk::DropDown,
+    kind: gtk::DropDown,
 }
 
 struct ReferenceFilterOptions {
     authors: Vec<String>,
     years: Vec<String>,
     tags: Vec<String>,
+    kinds: Vec<String>,
+}
+
+struct LibraryPageWidgets {
+    page: gtk::Box,
+    list: gtk::Box,
+    search: gtk::SearchEntry,
+    sort_by: gtk::DropDown,
+    sort_descending: gtk::ToggleButton,
+    filters: ReferenceFilterWidgets,
+}
+
+struct AuthorsPageWidgets {
+    page: gtk::Box,
+    list: gtk::Box,
+    add: gtk::Button,
+    search: gtk::SearchEntry,
+    sort_by: gtk::DropDown,
+    sort_descending: gtk::ToggleButton,
+}
+
+struct TagsPageWidgets {
+    page: gtk::Box,
+    list: gtk::Box,
+    add: gtk::Button,
+    search: gtk::SearchEntry,
+    sort_by: gtk::DropDown,
+    sort_descending: gtk::ToggleButton,
 }
 
 #[derive(Clone)]
@@ -170,9 +222,11 @@ impl OvenbirdWindow {
             code_mode_button,
             visual_mode_button,
             find_document_button,
-            compact_find_document_button,
+            bibtex_citation_button,
         ) = build_editor_page(&editor);
         let library_page = build_library_page();
+        let tags_page = build_tags_manager_content();
+        let authors_page = build_authors_manager_content();
         let sidebar_widgets = build_sidebar(theme_preference);
         let page_stack = gtk::Stack::builder()
             .hexpand(true)
@@ -180,7 +234,9 @@ impl OvenbirdWindow {
             .transition_type(gtk::StackTransitionType::Crossfade)
             .build();
         page_stack.add_named(&editor_page, Some("editor"));
-        page_stack.add_named(&library_page.0, Some("references"));
+        page_stack.add_named(&library_page.page, Some("references"));
+        page_stack.add_named(&tags_page.page, Some("tags"));
+        page_stack.add_named(&authors_page.page, Some("authors"));
         page_stack.set_visible_child_name("editor");
         let toolbar_view = adw::ToolbarView::new();
         toolbar_view.set_hexpand(true);
@@ -203,9 +259,6 @@ impl OvenbirdWindow {
         title.add_css_class("ovenbird-header-title");
         let status = gtk::Label::new(Some(&crate::i18n::gettext("Ready")));
         status.add_css_class("ovenbird-header-status");
-        let sync_button = button("network-server-symbolic", &tr("Sync with Zotero"));
-        sync_button.set_action_name(Some("win.sync-zotero"));
-        sync_button.add_css_class("flat");
         let state = Rc::new(State {
             window: window.clone(),
             editor,
@@ -233,9 +286,19 @@ impl OvenbirdWindow {
             file_tree: sidebar_widgets.file_tree,
             file_tree_selection: sidebar_widgets.file_tree_selection,
             project_files_scroll: sidebar_widgets.project_files_scroll,
-            library_search: sidebar_widgets.library_search,
-            library_list: library_page.1,
-            reference_filters: library_page.2,
+            library_search: library_page.search,
+            reference_sort: library_page.sort_by,
+            reference_sort_descending: library_page.sort_descending,
+            library_list: library_page.list,
+            tags_list: tags_page.list,
+            tag_search: tags_page.search,
+            tag_sort: tags_page.sort_by,
+            tag_sort_descending: tags_page.sort_descending,
+            authors_list: authors_page.list,
+            reference_filters: library_page.filters,
+            author_search: authors_page.search,
+            author_sort: authors_page.sort_by,
+            author_sort_descending: authors_page.sort_descending,
             library_filters_updating: Cell::new(false),
             page_stack,
             sidebar_pages: sidebar_widgets.pages,
@@ -252,7 +315,7 @@ impl OvenbirdWindow {
             code_mode_button,
             visual_mode_button,
             find_document_button,
-            compact_find_document_button,
+            bibtex_citation_button,
             title,
             status,
             reference_summary: RefCell::new(None),
@@ -261,16 +324,23 @@ impl OvenbirdWindow {
             omni_bar: RefCell::new(None),
             compile_action: RefCell::new(None),
             build_state: RefCell::new("Ready".to_owned()),
+            build_failure_message: RefCell::new(None),
             last_build_at: RefCell::new(tr("Not built yet")),
-            last_build_message: RefCell::new(tr("This document has not been compiled yet.")),
             save_button: RefCell::new(None),
             toast,
-            sync_button,
             layout: layout.clone(),
             sidebar_revealer,
             sidebar_width: Cell::new(340),
             toolbar_view,
         });
+        let state_for_add_tag = state.clone();
+        tags_page
+            .add
+            .connect_clicked(move |_| edit_tag(&state_for_add_tag, None));
+        let state_for_add_author = state.clone();
+        authors_page
+            .add
+            .connect_clicked(move |_| edit_author(&state_for_add_author, None));
         setup_project_file_view(&state);
         build_header(&state);
         connect_navigation(&state);
@@ -306,6 +376,13 @@ fn tr_dynamic(message: &str) -> String {
         "Dark" => tr("Dark"),
         "Export PDF" => tr("Export PDF"),
         "Keyboard shortcuts" => tr("Keyboard shortcuts"),
+        "About Ovenbird" => tr("About Ovenbird"),
+        "Dedicated to my wife, Karina, who always encourages me to go further." => {
+            tr("Dedicated to my wife, Karina, who always encourages me to go further.")
+        }
+        "Personal website" => tr("Personal website"),
+        "Project repository" => tr("Project repository"),
+        "Project website" => tr("Project website"),
         "New LaTeX document" => tr("New LaTeX document"),
         "New bibliography (.bib)" => tr("New bibliography (.bib)"),
         "New style file (.sty)" => tr("New style file (.sty)"),
@@ -431,6 +508,8 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     let menu = gtk::MenuButton::new();
     menu.set_icon_name("open-menu-symbolic");
     menu.set_tooltip_text(Some(&tr("Main menu")));
+    menu.add_css_class("flat");
+    menu.add_css_class("ovenbird-main-menu-button");
     menu.set_popover(Some(&build_main_menu(theme_preference)));
     brand.set_center_widget(Some(&name));
     brand.set_end_widget(Some(&menu));
@@ -438,8 +517,7 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     let tabs = gtk::Box::new(gtk::Orientation::Horizontal, 4);
     tabs.set_margin_start(8);
     tabs.set_margin_end(8);
-    tabs.set_margin_bottom(8);
-    tabs.set_homogeneous(true);
+    tabs.set_margin_bottom(4);
     tabs.add_css_class("ovenbird-sidebar-tabs");
     let editor_tab = sidebar_tab_button("document-edit-symbolic", "LaTeX editor");
     editor_tab.set_action_name(Some("win.show-editor"));
@@ -522,22 +600,10 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     references_title.add_css_class("sidebar-section");
     references_title.add_css_class("dim-label");
     references_panel.append(&references_title);
-    let library_search = gtk::SearchEntry::new();
-    library_search.set_placeholder_text(Some(&tr("Search references…")));
-    library_search.set_hexpand(true);
-    references_panel.append(&library_search);
     for (icon, label, action) in [
-        ("list-add-symbolic", "Add reference", "win.add-reference"),
-        (
-            "document-open-symbolic",
-            "Import BibTeX",
-            "win.import-bibtex",
-        ),
-        (
-            "document-save-symbolic",
-            "Export BibTeX",
-            "win.export-bibtex",
-        ),
+        ("view-list-symbolic", "View all references", "win.show-references"),
+        ("bookmark-new-symbolic", "Tags", "win.show-tags"),
+        ("system-users-symbolic", "Authors", "win.show-authors"),
     ] {
         let item = labeled_button(icon, &tr(label));
         item.set_action_name(Some(action));
@@ -556,7 +622,6 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
         file_tree,
         file_tree_selection,
         project_files_scroll,
-        library_search,
         pages,
         editor_tab,
         references_tab,
@@ -609,7 +674,7 @@ fn build_main_menu(theme_preference: ThemePreference) -> gtk::Popover {
 }
 
 fn load_theme_preference() -> ThemePreference {
-    ZoteroSettings::load()
+    AppSettings::load()
         .ok()
         .and_then(|settings| {
             settings
@@ -623,6 +688,77 @@ fn load_theme_preference() -> ThemePreference {
         .unwrap_or(ThemePreference::System)
 }
 
+fn show_about_dialog(state: &Rc<State>) {
+    let dialog = adw::Dialog::builder()
+        .title(tr("About Ovenbird"))
+        .content_width(420)
+        .content_height(680)
+        .build();
+    let toolbar = adw::ToolbarView::new();
+    let header = adw::HeaderBar::new();
+    header.set_show_start_title_buttons(false);
+    header.set_title_widget(Some(&gtk::Label::new(None)));
+    toolbar.add_top_bar(&header);
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 12);
+    content.set_margin_top(12);
+    content.set_margin_bottom(24);
+    content.set_margin_start(24);
+    content.set_margin_end(24);
+
+    let icon = gtk::Image::from_icon_name("io.github.diegopn.ovenbird");
+    icon.set_pixel_size(128);
+    content.append(&icon);
+
+    let name = gtk::Label::new(Some("Ovenbird"));
+    name.add_css_class("title-1");
+    content.append(&name);
+
+    let creator = gtk::Label::new(Some(&tr("Created by Diego Pereira do Nascimento")));
+    creator.set_wrap(true);
+    creator.set_justify(gtk::Justification::Center);
+    content.append(&creator);
+
+    let version = gtk::Label::new(Some(env!("CARGO_PKG_VERSION")));
+    version.set_halign(gtk::Align::Center);
+    version.set_margin_bottom(12);
+    version.add_css_class("ovenbird-about-version");
+    content.append(&version);
+
+    let dedication = gtk::Label::new(Some(&tr_dynamic(crate::application_menu::ABOUT_DEDICATION)));
+    dedication.set_wrap(true);
+    dedication.set_xalign(0.5);
+    dedication.set_justify(gtk::Justification::Center);
+    dedication.set_margin_bottom(6);
+    content.append(&dedication);
+
+    let links = gtk::ListBox::new();
+    links.set_selection_mode(gtk::SelectionMode::None);
+    links.add_css_class("boxed-list");
+    for &(label, url) in crate::application_menu::ABOUT_LINKS {
+        let link = gtk::LinkButton::with_label(url, &tr_dynamic(label));
+        link.add_css_class("flat");
+        link.add_css_class("ovenbird-about-link");
+        let row = gtk::Box::new(gtk::Orientation::Horizontal, 12);
+        let label = gtk::Label::new(Some(&tr_dynamic(label)));
+        label.set_xalign(0.0);
+        label.set_hexpand(true);
+        row.append(&label);
+        row.append(&gtk::Image::from_icon_name("adw-external-link-symbolic"));
+        link.set_child(Some(&row));
+        links.append(&link);
+    }
+    content.append(&links);
+
+    let scroll = gtk::ScrolledWindow::builder()
+        .hscrollbar_policy(gtk::PolicyType::Never)
+        .child(&content)
+        .build();
+    toolbar.set_content(Some(&scroll));
+    dialog.set_child(Some(&toolbar));
+    dialog.present(Some(&state.window));
+}
+
 fn apply_theme_preference(preference: ThemePreference) {
     let scheme = match preference {
         ThemePreference::System => adw::ColorScheme::Default,
@@ -633,9 +769,9 @@ fn apply_theme_preference(preference: ThemePreference) {
 }
 
 fn save_theme_preference(preference: ThemePreference) {
-    let mut settings = match ZoteroSettings::load() {
+    let mut settings = match AppSettings::load() {
         Ok(settings) => settings,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => ZoteroSettings::default(),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => AppSettings::default(),
         Err(error) => {
             eprintln!("Could not load appearance settings: {error}");
             return;
@@ -880,10 +1016,11 @@ fn build_editor_page(
     let toolbar_spacer = gtk::Box::new(gtk::Orientation::Horizontal, 0);
     toolbar_spacer.set_hexpand(true);
     toolbar.append(&toolbar_spacer);
-    let compact_find_document = button("system-search-symbolic", &tr("Find in document"));
-    compact_find_document.set_action_name(Some("win.find-document"));
-    compact_find_document.set_visible(false);
-    toolbar.append(&compact_find_document);
+    let bibtex_citation = gtk::Button::with_label(&tr("Insert citation"));
+    bibtex_citation.set_tooltip_text(Some(&tr("Find and insert a bibliography reference")));
+    bibtex_citation.set_action_name(Some("win.insert-bibtex-reference"));
+    bibtex_citation.set_visible(false);
+    toolbar.append(&bibtex_citation);
     let toolbar_scroll = gtk::ScrolledWindow::builder()
         .hscrollbar_policy(gtk::PolicyType::Automatic)
         .vscrollbar_policy(gtk::PolicyType::Never)
@@ -944,7 +1081,7 @@ fn build_editor_page(
         code_mode_button,
         visual_mode_button,
         find_document,
-        compact_find_document,
+        bibtex_citation,
     )
 }
 
@@ -1054,7 +1191,11 @@ fn list_menu() -> gtk::Popover {
             "Numbered list",
             "win.list-enumerate",
         ),
-        ("quotation-mark", "Quotation block", "win.list-quote"),
+        (
+            "format-text-rich-symbolic",
+            "Quotation block",
+            "win.list-quote",
+        ),
         (
             "format-indent-more-symbolic",
             "Increase indent",
@@ -1091,31 +1232,197 @@ fn more_menu() -> gtk::Popover {
     ])
 }
 
-fn build_library_page() -> (gtk::Box, gtk::Box, ReferenceFilterWidgets) {
+fn sort_direction_button() -> gtk::ToggleButton {
+    let ascending = tr("Ascending");
+    let descending = tr("Descending");
+    let button = gtk::ToggleButton::new();
+    button.set_child(Some(&labeled_content(
+        "view-sort-ascending-symbolic",
+        &ascending,
+    )));
+    button.set_tooltip_text(Some(&ascending));
+    button.connect_toggled(move |button| {
+        let (icon, label) = if button.is_active() {
+            ("view-sort-descending-symbolic", descending.as_str())
+        } else {
+            ("view-sort-ascending-symbolic", ascending.as_str())
+        };
+        button.set_child(Some(&labeled_content(icon, label)));
+        button.set_tooltip_text(Some(label));
+    });
+    button
+}
+
+fn build_library_page() -> LibraryPageWidgets {
     let page = gtk::Box::new(gtk::Orientation::Vertical, 10);
     page.set_margin_top(20);
     page.set_margin_bottom(12);
     page.set_margin_start(22);
     page.set_margin_end(22);
+
+    let header = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    let title = gtk::Label::new(Some(&tr("Manage references")));
+    title.set_xalign(0.0);
+    title.add_css_class("title-2");
+    title.set_hexpand(true);
+    header.append(&title);
+    let add = labeled_button("list-add-symbolic", &tr("Add reference"));
+    add.set_action_name(Some("win.add-reference"));
+    add.add_css_class("suggested-action");
+    header.append(&add);
+    page.append(&header);
+
+    let search_and_sort = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let search = gtk::SearchEntry::new();
+    search.set_placeholder_text(Some(&tr("Search references…")));
+    search.set_hexpand(true);
+    search_and_sort.append(&search);
+    let sort_by = gtk::DropDown::from_strings(&[
+        &tr("Title"),
+        &tr("Author"),
+        &tr("Year"),
+        &tr("Tag"),
+    ]);
+    sort_by.set_tooltip_text(Some(&tr("Sort by")));
+    sort_by.set_selected(0);
+    search_and_sort.append(&sort_by);
+    let sort_descending = sort_direction_button();
+    search_and_sort.append(&sort_descending);
+    page.append(&search_and_sort);
+
     let filter_bar = gtk::Box::new(gtk::Orientation::Horizontal, 8);
     filter_bar.add_css_class("ovenbird-reference-filters");
     let author = reference_filter_dropdown("All authors");
     let year = reference_filter_dropdown("All years");
     let tag = reference_filter_dropdown("All tags");
-    for dropdown in [&author, &year, &tag] {
+    let kind = reference_filter_dropdown("All types");
+    for dropdown in [&author, &year, &tag, &kind] {
         dropdown.set_hexpand(true);
         dropdown.set_width_request(150);
         filter_bar.append(dropdown);
     }
     page.append(&filter_bar);
     let list = gtk::Box::new(gtk::Orientation::Vertical, 3);
+    list.set_margin_end(30);
     let scroll = gtk::ScrolledWindow::builder()
         .vexpand(true)
         .hexpand(true)
         .child(&list)
         .build();
     page.append(&scroll);
-    (page, list, ReferenceFilterWidgets { author, year, tag })
+    LibraryPageWidgets {
+        page,
+        list,
+        search,
+        sort_by,
+        sort_descending,
+        filters: ReferenceFilterWidgets {
+            author,
+            year,
+            tag,
+            kind,
+        },
+    }
+}
+
+fn build_tags_manager_content() -> TagsPageWidgets {
+    let page = gtk::Box::new(gtk::Orientation::Vertical, 10);
+    page.set_hexpand(true);
+    page.set_vexpand(true);
+    page.set_margin_top(20);
+    page.set_margin_bottom(12);
+    page.set_margin_start(22);
+    page.set_margin_end(22);
+    let header = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    let title = gtk::Label::new(Some(&tr("Manage tags")));
+    title.set_xalign(0.0);
+    title.add_css_class("title-2");
+    title.set_hexpand(true);
+    header.append(&title);
+    let add = labeled_button("list-add-symbolic", &tr("Add tag"));
+    add.add_css_class("suggested-action");
+    header.append(&add);
+    page.append(&header);
+
+    let search_and_sort = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let search = gtk::SearchEntry::new();
+    search.set_placeholder_text(Some(&tr("Search tags…")));
+    search.set_hexpand(true);
+    search_and_sort.append(&search);
+    let sort_by = gtk::DropDown::from_strings(&[&tr("Name")]);
+    sort_by.set_selected(0);
+    sort_by.set_tooltip_text(Some(&tr("Sort by")));
+    search_and_sort.append(&sort_by);
+    let sort_descending = sort_direction_button();
+    search_and_sort.append(&sort_descending);
+    page.append(&search_and_sort);
+
+    let list = gtk::Box::new(gtk::Orientation::Vertical, 3);
+    list.set_margin_end(30);
+    let scroll = gtk::ScrolledWindow::builder()
+        .vexpand(true)
+        .hexpand(true)
+        .child(&list)
+        .build();
+    page.append(&scroll);
+    TagsPageWidgets {
+        page,
+        list,
+        add,
+        search,
+        sort_by,
+        sort_descending,
+    }
+}
+
+fn build_authors_manager_content() -> AuthorsPageWidgets {
+    let page = gtk::Box::new(gtk::Orientation::Vertical, 10);
+    page.set_hexpand(true);
+    page.set_vexpand(true);
+    page.set_margin_top(20);
+    page.set_margin_bottom(12);
+    page.set_margin_start(22);
+    page.set_margin_end(22);
+    let header = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    let title = gtk::Label::new(Some(&tr("Manage authors")));
+    title.set_xalign(0.0);
+    title.add_css_class("title-2");
+    title.set_hexpand(true);
+    header.append(&title);
+    let add = labeled_button("list-add-symbolic", &tr("Add author"));
+    add.add_css_class("suggested-action");
+    header.append(&add);
+    page.append(&header);
+
+    let search_and_sort = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let search = gtk::SearchEntry::new();
+    search.set_placeholder_text(Some(&tr("Search authors…")));
+    search.set_hexpand(true);
+    search_and_sort.append(&search);
+    let sort_by = gtk::DropDown::from_strings(&[&tr("Full name"), &tr("Institution")]);
+    sort_by.set_selected(0);
+    sort_by.set_tooltip_text(Some(&tr("Sort by")));
+    search_and_sort.append(&sort_by);
+    let sort_descending = sort_direction_button();
+    search_and_sort.append(&sort_descending);
+    page.append(&search_and_sort);
+
+    let list = gtk::Box::new(gtk::Orientation::Vertical, 3);
+    list.set_margin_end(30);
+    let scroll = gtk::ScrolledWindow::builder()
+        .vexpand(true)
+        .hexpand(true)
+        .child(&list)
+        .build();
+    page.append(&scroll);
+    AuthorsPageWidgets {
+        page,
+        list,
+        add,
+        search,
+        sort_by,
+        sort_descending,
+    }
 }
 
 fn reference_filter_dropdown(all_label: &str) -> gtk::DropDown {
@@ -1181,7 +1488,6 @@ fn build_header(state: &Rc<State>) {
     save.add_css_class("flat");
     actions.append(&save);
     state.save_button.replace(Some(save));
-    actions.append(&state.sync_button);
     header.pack_end(&actions);
 
     install_main_header(&state.toolbar_view, &header);
@@ -1228,18 +1534,10 @@ fn build_status_widgets(status: gtk::Label) -> BuildStatusWidgets {
     details_file.set_selectable(true);
     content.append(&details_file);
 
-    let details_path = gtk::Label::new(None);
-    details_path.set_xalign(0.0);
-    details_path.set_wrap(true);
-    details_path.set_selectable(true);
-    details_path.add_css_class("dim-label");
-    content.append(&details_path);
-
     let grid = gtk::Grid::new();
     grid.set_column_spacing(14);
     grid.set_row_spacing(6);
     let details_engine = gtk::Label::new(None);
-    let details_state = gtk::Label::new(None);
     let details_last = gtk::Label::new(None);
     let engine_name = crate::build::find_latex_engine()
         .map(|(engine, _)| {
@@ -1253,7 +1551,6 @@ fn build_status_widgets(status: gtk::Label) -> BuildStatusWidgets {
     details_engine.set_label(&engine_name);
     for (row, (caption, value)) in [
         ("Compiler", &details_engine),
-        ("Status", &details_state),
         ("Last build", &details_last),
     ]
     .into_iter()
@@ -1270,13 +1567,15 @@ fn build_status_widgets(status: gtk::Label) -> BuildStatusWidgets {
     }
     content.append(&grid);
 
-    let details_output = gtk::Label::new(None);
-    details_output.set_xalign(0.0);
-    details_output.set_wrap(true);
-    details_output.set_selectable(true);
-    details_output.set_max_width_chars(48);
-    details_output.add_css_class("dim-label");
-    content.append(&details_output);
+    let details_failure = gtk::Label::new(None);
+    details_failure.set_xalign(0.0);
+    details_failure.set_wrap(true);
+    details_failure.set_selectable(true);
+    details_failure.add_css_class("dim-label");
+    details_failure.set_margin_top(6);
+    details_failure.set_visible(false);
+    content.append(&details_failure);
+
     details_popover.set_child(Some(&content));
 
     BuildStatusWidgets {
@@ -1284,20 +1583,35 @@ fn build_status_widgets(status: gtk::Label) -> BuildStatusWidgets {
         icon,
         details_popover,
         details_file,
-        details_path,
         details_engine,
-        details_state,
         details_last,
-        details_output,
+        details_failure,
     }
 }
 
 fn update_primary_action(state: &Rc<State>) {
-    let references = state.page_stack.visible_child_name().as_deref() == Some("references");
+    let page = state.page_stack.visible_child_name();
+    let references = page.as_deref() == Some("references");
+    let tags = page.as_deref() == Some("tags");
+    let authors = page.as_deref() == Some("authors");
+    let library_page = references || tags || authors;
+    let bibtex_file = !library_page && current_file_kind(state) == Some(ProjectFileKind::Bibtex);
     if let Some(omni_bar) = state.omni_bar.borrow().as_ref() {
         if references {
             omni_bar.set_action_name("win.add-reference");
             omni_bar.set_action_tooltip(&tr("Add a reference to the local library"));
+            omni_bar.set_icon_name("list-add-symbolic");
+        } else if tags {
+            omni_bar.set_action_name("win.add-tag");
+            omni_bar.set_action_tooltip(&tr("Add tag"));
+            omni_bar.set_icon_name("list-add-symbolic");
+        } else if authors {
+            omni_bar.set_action_name("win.add-author");
+            omni_bar.set_action_tooltip(&tr("Add author"));
+            omni_bar.set_icon_name("list-add-symbolic");
+        } else if bibtex_file {
+            omni_bar.set_action_name("win.insert-bibtex-reference");
+            omni_bar.set_action_tooltip(&tr("Add bibliographic reference"));
             omni_bar.set_icon_name("list-add-symbolic");
         } else {
             omni_bar.set_action_name("win.compile");
@@ -1309,6 +1623,8 @@ fn update_primary_action(state: &Rc<State>) {
                 ("Import BibTeX", "win.import-bibtex"),
                 ("Export BibTeX", "win.export-bibtex"),
             ]))
+        } else if library_page {
+            None
         } else if current_file_kind(state).is_none_or(ProjectFileKind::is_text_editable) {
             Some(action_menu(&[
                 ("Save document", "win.save-document"),
@@ -1323,7 +1639,7 @@ fn update_primary_action(state: &Rc<State>) {
                 .map(|menu| menu.upcast_ref::<gio::MenuModel>()),
         );
         let details = state.build_status_widgets.borrow();
-        let popover = if references {
+        let popover = if library_page || bibtex_file {
             None
         } else {
             details.as_ref().map(|widgets| &widgets.details_popover)
@@ -1331,10 +1647,12 @@ fn update_primary_action(state: &Rc<State>) {
         omni_bar.set_popover(popover);
     }
     if let Some(action) = state.compile_action.borrow().as_ref() {
-        action.set_enabled(state.build_state.borrow().as_str() != "Building…");
+        action.set_enabled(
+            !library_page && !bibtex_file && state.build_state.borrow().as_str() != "Building…",
+        );
     }
     if let Some(status) = state.build_status_widgets.borrow().as_ref() {
-        status.status_row.set_visible(!references);
+        status.status_row.set_visible(!library_page && !bibtex_file);
     }
     if let Some(summary) = state.reference_summary.borrow().as_ref() {
         let count = state.library.borrow().bibliography.entries.len();
@@ -1347,9 +1665,8 @@ fn update_primary_action(state: &Rc<State>) {
         group.set_visible(references);
     }
     if let Some(button) = state.save_button.borrow().as_ref() {
-        button.set_visible(!references);
+        button.set_visible(!library_page);
     }
-    state.sync_button.set_visible(references);
 }
 
 fn refresh_build_status(state: &Rc<State>) {
@@ -1360,7 +1677,7 @@ fn refresh_build_status(state: &Rc<State>) {
     let dirty = state.editor.dirty();
     let build_state = state.build_state.borrow().clone();
     let display_state = if build_state == "Error" {
-        tr("Error")
+        tr("PDF generation failed")
     } else if dirty {
         tr("Modified")
     } else {
@@ -1377,59 +1694,41 @@ fn refresh_build_status(state: &Rc<State>) {
     }));
     state.status.set_label(&display_state);
 
-    let file = state.current_file.borrow().clone();
-    let filename = file
+    let filename = state
+        .current_file
+        .borrow()
         .as_ref()
         .and_then(|path| path.file_name())
         .map(|name| name.to_string_lossy().into_owned())
         .unwrap_or_else(|| tr("New document not saved yet"));
     status.details_file.set_label(&filename);
-    let file_path = file
-        .as_ref()
-        .map(|path| path.to_string_lossy().into_owned())
-        .unwrap_or_else(|| tr("Save the document to set the project file."));
-    let project_folder = state
-        .project_root
-        .borrow()
-        .clone()
-        .or_else(|| {
-            file.as_ref()
-                .and_then(|path| path.parent().map(Path::to_path_buf))
-        })
-        .map(|path| path.to_string_lossy().into_owned())
-        .unwrap_or_else(|| tr("No project folder selected"));
-    let path_details = tr("File: %s\nProject: %s")
-        .replacen("%s", &file_path, 1)
-        .replacen("%s", &project_folder, 1);
-    status.details_path.set_label(&path_details);
 
-    let details_state = if dirty {
-        tr("%s · local changes pending").replacen("%s", &tr(&build_state), 1)
-    } else {
-        tr(&build_state)
-    };
-    status.details_state.set_label(&details_state);
     status
         .details_last
         .set_label(state.last_build_at.borrow().as_str());
-    status
-        .details_output
-        .set_label(state.last_build_message.borrow().as_str());
+    if let Some(message) = state.build_failure_message.borrow().as_ref() {
+        status.details_failure.set_label(message);
+        status.details_failure.set_visible(true);
+    } else {
+        status.details_failure.set_visible(false);
+    }
 }
 
 fn set_build_status(state: &Rc<State>, status: &str) {
-    set_build_status_with_message(state, status, None);
+    update_build_status(state, status, None);
 }
 
-fn set_build_status_with_message(state: &Rc<State>, status: &str, message: Option<&str>) {
+fn set_build_failure(state: &Rc<State>, message: &str) {
+    update_build_status(state, "Error", Some(message));
+}
+
+fn update_build_status(state: &Rc<State>, status: &str, failure_message: Option<&str>) {
     state.build_state.replace(status.to_owned());
+    state
+        .build_failure_message
+        .replace(failure_message.map(str::to_owned));
     if status == "Ready" {
         state.last_build_at.replace(tr("Not built yet"));
-        if message.is_none() {
-            state
-                .last_build_message
-                .replace(tr("This document has not been compiled yet."));
-        }
     } else if status == "Built" || status == "Error" {
         state.last_build_at.replace(
             glib::DateTime::now_local()
@@ -1438,12 +1737,6 @@ fn set_build_status_with_message(state: &Rc<State>, status: &str, message: Optio
                 .map(|time| time.to_string())
                 .unwrap_or_default(),
         );
-    }
-    if let Some(message) = message {
-        let start = message.chars().count().saturating_sub(600);
-        state
-            .last_build_message
-            .replace(message.chars().skip(start).collect());
     }
     if let Some(omni_bar) = state.omni_bar.borrow().as_ref() {
         if status == "Building…" {
@@ -1513,11 +1806,44 @@ fn connect_navigation(state: &Rc<State>) {
         let state = state.clone();
         move |_| refresh_library(&state)
     });
+    state.tag_search.connect_search_changed({
+        let state = state.clone();
+        move |_| refresh_tags(&state)
+    });
+    state.tag_sort.connect_selected_notify({
+        let state = state.clone();
+        move |_| refresh_tags(&state)
+    });
+    state.tag_sort_descending.connect_toggled({
+        let state = state.clone();
+        move |_| refresh_tags(&state)
+    });
+    state.author_search.connect_search_changed({
+        let state = state.clone();
+        move |_| refresh_authors(&state)
+    });
+    state.reference_sort.connect_selected_notify({
+        let state = state.clone();
+        move |_| refresh_library(&state)
+    });
+    state.reference_sort_descending.connect_toggled({
+        let state = state.clone();
+        move |_| refresh_library(&state)
+    });
+    state.author_sort.connect_selected_notify({
+        let state = state.clone();
+        move |_| refresh_authors(&state)
+    });
+    state.author_sort_descending.connect_toggled({
+        let state = state.clone();
+        move |_| refresh_authors(&state)
+    });
     let state_weak = Rc::downgrade(state);
     for filter in [
         state.reference_filters.author.clone(),
         state.reference_filters.year.clone(),
         state.reference_filters.tag.clone(),
+        state.reference_filters.kind.clone(),
     ] {
         let state_weak = state_weak.clone();
         filter.connect_selected_notify(move |_| {
@@ -1542,8 +1868,13 @@ fn install_action(state: &Rc<State>, name: &str, callback: impl Fn(Rc<State>) + 
 }
 
 fn connect_actions(state: &Rc<State>) {
+    install_action(state, "about", |state| show_about_dialog(&state));
     install_action(state, "show-editor", |s| show_page(&s, "editor"));
     install_action(state, "show-references", |s| show_page(&s, "references"));
+    install_action(state, "show-tags", |s| show_page(&s, "tags"));
+    install_action(state, "show-authors", |s| show_page(&s, "authors"));
+    install_action(state, "add-tag", |s| edit_tag(&s, None));
+    install_action(state, "add-author", |s| edit_author(&s, None));
     install_action(state, "find-document", toggle_search);
     install_action(state, "toggle-sidebar", |s| {
         set_sidebar_visible(
@@ -1697,6 +2028,7 @@ fn connect_actions(state: &Rc<State>) {
         insert_label_or_note(&s, "ref")
     });
     install_action(state, "insert-citation", show_citation_picker);
+    install_action(state, "insert-bibtex-reference", show_bibtex_reference_picker);
     let compile_action = gio::SimpleAction::new("compile", None);
     let weak = Rc::downgrade(state);
     compile_action.connect_activate(move |_, _| {
@@ -1710,8 +2042,6 @@ fn connect_actions(state: &Rc<State>) {
     install_action(state, "add-reference", |s| edit_reference(&s, None));
     install_action(state, "import-bibtex", import_bibtex);
     install_action(state, "export-bibtex", export_bibtex);
-    install_action(state, "zotero", show_zotero_settings);
-    install_action(state, "sync-zotero", sync_or_configure_zotero);
     install_action(state, "shortcuts", show_shortcuts);
     install_action(state, "close-window", |s| s.window.close());
     install_action(state, "quit", |s| s.window.close());
@@ -1801,13 +2131,13 @@ fn update_editor_capabilities(state: &Rc<State>) {
     let text_editable = kind.is_none_or(ProjectFileKind::is_text_editable);
     let supports_search = text_editable;
 
-    state.mode_toolbar.set_visible(supports_latex);
+    state.mode_toolbar.set_visible(text_editable);
     state.code_mode_button.set_visible(supports_latex);
     state.visual_mode_button.set_visible(supports_latex);
-    state.find_document_button.set_visible(supports_latex);
+    state.find_document_button.set_visible(supports_search);
     state
-        .compact_find_document_button
-        .set_visible(supports_search && !supports_latex);
+        .bibtex_citation_button
+        .set_visible(kind == Some(ProjectFileKind::Bibtex));
     state.latex_toolbar.set_visible(supports_latex);
     state.editor_toolbar.set_visible(text_editable);
     if !supports_search {
@@ -1843,18 +2173,23 @@ fn current_file_kind(state: &Rc<State>) -> Option<ProjectFileKind> {
 
 fn show_page(state: &Rc<State>, page: &str) {
     state.page_stack.set_visible_child_name(page);
-    state.sidebar_pages.set_visible_child_name(page);
+    let sidebar_page = if page == "editor" { "editor" } else { "references" };
+    state.sidebar_pages.set_visible_child_name(sidebar_page);
     state.editor_tab_button.set_active(page == "editor");
-    state.references_tab_button.set_active(page == "references");
-    state.title.set_label(&tr(if page == "references" {
-        "References"
-    } else {
-        "LaTeX editor"
+    state.references_tab_button.set_active(page != "editor");
+    state.title.set_label(&tr(match page {
+        "references" => "References",
+        "tags" => "Tags",
+        "authors" => "Authors",
+        _ => "LaTeX editor",
     }));
     update_primary_action(state);
     refresh_build_status(state);
-    if page == "references" {
-        refresh_library(state);
+    match page {
+        "references" => refresh_library(state),
+        "tags" => refresh_tags(state),
+        "authors" => refresh_authors(state),
+        _ => {}
     }
 }
 
@@ -1881,7 +2216,15 @@ fn set_sidebar_visible(
 
 fn toggle_search(state: Rc<State>) {
     if search_is_references_page(&state.page_stack) {
-        state.library_search.grab_focus();
+        match state.page_stack.visible_child_name().as_deref() {
+            Some("references") => {
+                state.library_search.grab_focus();
+            }
+            Some("authors") => {
+                state.author_search.grab_focus();
+            }
+            _ => {}
+        }
         return;
     }
     let kind = current_file_kind(&state);
@@ -1903,7 +2246,10 @@ fn toggle_search(state: Rc<State>) {
 }
 
 fn search_is_references_page(page_stack: &gtk::Stack) -> bool {
-    page_stack.visible_child_name().as_deref() == Some("references")
+    matches!(
+        page_stack.visible_child_name().as_deref(),
+        Some("references" | "tags" | "authors")
+    )
 }
 
 fn search_document(state: &Rc<State>, forward: bool) {
@@ -1982,6 +2328,7 @@ fn choose_file(
     action: gtk::FileChooserAction,
     title: &str,
     accept: &str,
+    default_name: Option<&str>,
     callback: impl Fn(Rc<State>, PathBuf) + 'static,
 ) {
     let dialog = gtk::FileChooserNative::new(
@@ -1991,6 +2338,10 @@ fn choose_file(
         Some(&tr_dynamic(accept)),
         Some(&tr("Cancel")),
     );
+    set_downloads_folder(&dialog);
+    if let Some(name) = default_name {
+        dialog.set_current_name(name);
+    }
     let filter = gtk::FileFilter::new();
     filter.set_name(Some(&tr("Supported documents and images")));
     for pattern in [
@@ -2012,12 +2363,23 @@ fn choose_file(
     dialog.show();
 }
 
+fn set_downloads_folder(dialog: &impl gtk::prelude::FileChooserExtManual) {
+    let fallback = glib::home_dir().join("Downloads");
+    let folder = glib::user_special_dir(glib::UserDirectory::Downloads)
+        .filter(|path| path.is_dir())
+        .or_else(|| fallback.is_dir().then_some(fallback));
+    if let Some(folder) = folder {
+        let _ = dialog.set_current_folder(Some(&gio::File::for_path(folder)));
+    }
+}
+
 fn choose_open_document(state: Rc<State>) {
     choose_file(
         &state,
         gtk::FileChooserAction::Open,
         "Open document",
         "Open",
+        None,
         |state, path| {
             with_discard_confirmation(&state, move |state| open_document(&state, &path, None));
         },
@@ -2030,6 +2392,7 @@ fn choose_project_folder(state: Rc<State>) {
         gtk::FileChooserAction::SelectFolder,
         "Open project",
         "Open",
+        None,
         |state, path| {
             with_discard_confirmation(&state, move |state| open_project(&state, &path));
         },
@@ -2077,6 +2440,7 @@ fn with_discard_confirmation(state: &Rc<State>, callback: impl Fn(Rc<State>) + '
                     gtk::FileChooserAction::Save,
                     "Save document",
                     "Save",
+                    None,
                     move |state, path| {
                         if !project::file_kind(&path).is_text_editable() {
                             show_toast(&state, &tr("Choose a supported text file type."));
@@ -2093,6 +2457,50 @@ fn with_discard_confirmation(state: &Rc<State>, callback: impl Fn(Rc<State>) + '
             }
         } else {
             dialog.close();
+        }
+    });
+    dialog.present();
+}
+
+fn confirm_destructive_action(
+    state: &Rc<State>,
+    parent: &gtk::Window,
+    title: &str,
+    message: &str,
+    action_label: &str,
+    callback: impl FnOnce(Rc<State>) + 'static,
+) {
+    let dialog = gtk::Dialog::builder()
+        .title(title)
+        .transient_for(parent)
+        .modal(true)
+        .default_width(600)
+        .build();
+    dialog.set_resizable(false);
+    dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
+    let confirm = dialog.add_button(action_label, gtk::ResponseType::Accept);
+    confirm.add_css_class("destructive-action");
+    dialog.set_default_response(gtk::ResponseType::Cancel);
+
+    let label = gtk::Label::new(Some(message));
+    label.set_wrap(true);
+    label.set_max_width_chars(68);
+    label.set_justify(gtk::Justification::Center);
+    label.set_xalign(0.5);
+    label.set_margin_top(24);
+    label.set_margin_bottom(24);
+    label.set_margin_start(24);
+    label.set_margin_end(24);
+    dialog.content_area().append(&label);
+
+    let state = state.clone();
+    let callback = RefCell::new(Some(callback));
+    dialog.connect_response(move |dialog, response| {
+        dialog.close();
+        if response == gtk::ResponseType::Accept {
+            if let Some(callback) = callback.borrow_mut().take() {
+                callback(state.clone());
+            }
         }
     });
     dialog.present();
@@ -2411,6 +2819,7 @@ fn save_document(state: Rc<State>) {
         gtk::FileChooserAction::Save,
         "Save document",
         "Save",
+        None,
         |state, path| {
             if !project::file_kind(&path).is_text_editable() {
                 show_toast(&state, &tr("Choose a supported text file type."));
@@ -2782,6 +3191,7 @@ fn restore_expanded_project_folders(
 
 fn refresh_project_files(state: &Rc<State>) {
     let scroll_position = state.project_files_scroll.value();
+    let expanded_folders = state.expanded_folders.borrow().clone();
     let request_id = state.project_scan_id.get().wrapping_add(1);
     state.project_scan_id.set(request_id);
     while let Some(child) = state.file_list.first_child() {
@@ -2839,7 +3249,8 @@ fn refresh_project_files(state: &Rc<State>) {
                         .map(|children| children.clone().upcast())
                 });
                 state.file_tree_selection.set_model(Some(&tree_model));
-                restore_expanded_project_folders(&tree_model, &state.expanded_folders.borrow());
+                *state.expanded_folders.borrow_mut() = expanded_folders.clone();
+                restore_expanded_project_folders(&tree_model, &expanded_folders);
                 if let Some(current_file) = state.current_file.borrow().as_ref() {
                     for position in 0..tree_model.n_items() {
                         let Some(row) = tree_model.row(position) else {
@@ -3185,6 +3596,7 @@ fn create_project_file_confirmed(state: &Rc<State>, extension: &str) {
             gtk::FileChooserAction::SelectFolder,
             "Choose a project folder",
             "Open",
+            None,
             move |state, folder| {
                 set_project_root(&state, Some(folder.clone()));
                 *state.project_target.borrow_mut() = Some(folder.clone());
@@ -3308,6 +3720,7 @@ fn create_project_folder(state: Rc<State>) {
             gtk::FileChooserAction::SelectFolder,
             "Choose a project folder",
             "Open",
+            None,
             |state, folder| {
                 set_project_root(&state, Some(folder.clone()));
                 *state.project_target.borrow_mut() = Some(folder.clone());
@@ -3439,16 +3852,38 @@ fn rename_project_file(state: &Rc<State>, path: &Path) {
 
 fn trash_project_file(state: &Rc<State>, path: &Path) {
     let path = path.to_path_buf();
-    let active_file_is_being_removed = state
-        .current_file
-        .borrow()
-        .as_ref()
-        .is_some_and(|current| project::path_contains(&path, current));
-    if active_file_is_being_removed && state.editor.dirty() {
-        with_discard_confirmation(state, move |state| trash_project_file_now(&state, &path));
+    let name = path
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| path.display().to_string());
+    let prompt = if path.is_dir() {
+        tr("Move folder ‘%s’ and its contents to Trash?")
     } else {
-        trash_project_file_now(state, &path);
+        tr("Move ‘%s’ to Trash? You can restore it later.")
     }
+    .replacen("%s", &name, 1);
+    let parent: &gtk::Window = state.window.upcast_ref();
+    confirm_destructive_action(
+        state,
+        parent,
+        &tr("Confirm deletion"),
+        &prompt,
+        &tr("Move to Trash"),
+        move |state| {
+            let active_file_is_being_removed = state
+                .current_file
+                .borrow()
+                .as_ref()
+                .is_some_and(|current| project::path_contains(&path, current));
+            if active_file_is_being_removed && state.editor.dirty() {
+                with_discard_confirmation(&state, move |state| {
+                    trash_project_file_now(&state, &path)
+                });
+            } else {
+                trash_project_file_now(&state, &path);
+            }
+        },
+    );
 }
 
 fn trash_project_file_now(state: &Rc<State>, path: &Path) {
@@ -3459,70 +3894,72 @@ fn trash_project_file_now(state: &Rc<State>, path: &Path) {
         glib::Priority::DEFAULT,
         None::<&gio::Cancellable>,
         move |result| match result {
-            Ok(()) => {
-                let current_removed = state
-                    .current_file
-                    .borrow()
-                    .as_ref()
-                    .is_some_and(|current| project::path_contains(&path, current));
-                let main_removed = state
-                    .main_tex
-                    .borrow()
-                    .as_ref()
-                    .is_some_and(|main| project::path_contains(&path, main));
-                if current_removed {
-                    state.current_file.borrow_mut().take();
-                    state.file_encoding.set(project::TextEncoding::Utf8);
-                    state.editor.set_file(None);
-                    state.editor.load_text(&LatexEditor::new_document_text());
-                    state.image_preview.set_filename(None::<&Path>);
-                    state
-                        .file_pdf_preview
-                        .set_message(&tr("Select a PDF file to preview it here."));
-                    state.editor.set_mode(EditorMode::Code);
-                    state.code_mode_button.set_active(true);
-                    state.visual_mode_button.set_active(false);
-                    update_editor_capabilities(&state);
-                    update_title(&state, false);
-                }
-                if main_removed {
-                    *state.main_tex.borrow_mut() = None;
-                }
-                if let Some(root) = state.project_root.borrow().clone() {
-                    if state
-                        .project_target
-                        .borrow()
-                        .as_ref()
-                        .is_some_and(|target| project::path_contains(&path, target))
-                    {
-                        *state.project_target.borrow_mut() = Some(root.clone());
-                    }
-                    state
-                        .expanded_folders
-                        .borrow_mut()
-                        .retain(|folder| !project::path_contains(&path, folder));
-                    if main_removed {
-                        open_project(&state, &root);
-                    } else if current_removed {
-                        if let Some(main) = state.main_tex.borrow().clone() {
-                            open_document(&state, &main, Some(root));
-                        } else {
-                            refresh_project_files(&state);
-                        }
-                    } else {
-                        refresh_project_files(&state);
-                    }
-                } else {
-                    refresh_project_files(&state);
-                }
-                show_toast(&state, &tr("Moved to Trash"));
-            }
+            Ok(()) => finish_project_file_removal(&state, &path, &tr("Moved to Trash")),
             Err(error) => show_toast(
                 &state,
                 &format!("{}: {error}", tr("Could not move to Trash")),
             ),
         },
     );
+}
+
+fn finish_project_file_removal(state: &Rc<State>, path: &Path, success_message: &str) {
+    let current_removed = state
+        .current_file
+        .borrow()
+        .as_ref()
+        .is_some_and(|current| project::path_contains(path, current));
+    let main_removed = state
+        .main_tex
+        .borrow()
+        .as_ref()
+        .is_some_and(|main| project::path_contains(path, main));
+    if current_removed {
+        state.current_file.borrow_mut().take();
+        state.file_encoding.set(project::TextEncoding::Utf8);
+        state.editor.set_file(None);
+        state.editor.load_text(&LatexEditor::new_document_text());
+        state.image_preview.set_filename(None::<&Path>);
+        state
+            .file_pdf_preview
+            .set_message(&tr("Select a PDF file to preview it here."));
+        state.editor.set_mode(EditorMode::Code);
+        state.code_mode_button.set_active(true);
+        state.visual_mode_button.set_active(false);
+        update_editor_capabilities(state);
+        update_title(state, false);
+    }
+    if main_removed {
+        *state.main_tex.borrow_mut() = None;
+    }
+    if let Some(root) = state.project_root.borrow().clone() {
+        if state
+            .project_target
+            .borrow()
+            .as_ref()
+            .is_some_and(|target| project::path_contains(path, target))
+        {
+            *state.project_target.borrow_mut() = Some(root.clone());
+        }
+        state
+            .expanded_folders
+            .borrow_mut()
+            .retain(|folder| !project::path_contains(path, folder));
+        if main_removed {
+            open_project(state, &root);
+        } else if current_removed {
+            if let Some(main) = state.main_tex.borrow().clone() {
+                open_document(state, &main, Some(root));
+            } else {
+                refresh_project_files(state);
+            }
+        } else {
+            refresh_project_files(state);
+        }
+    } else {
+        refresh_project_files(state);
+    }
+    show_toast(state, success_message);
 }
 
 fn show_template_picker(state: Rc<State>) {
@@ -3653,6 +4090,7 @@ fn show_template_picker(state: Rc<State>) {
             gtk::FileChooserAction::SelectFolder,
             "Choose where to create the project",
             "Create",
+            None,
             move |state, parent| {
                 prompt_project_name(&state, &parent, id);
             },
@@ -3877,6 +4315,7 @@ fn choose_image(state: Rc<State>) {
         filter.add_pattern(pattern);
     }
     dialog.add_filter(&filter);
+    set_downloads_folder(&dialog);
     let state_for_choice = state.clone();
     dialog.connect_response(move |dialog, response| {
         if response != gtk::ResponseType::Accept {
@@ -4092,73 +4531,228 @@ fn show_text_prompt(
 }
 
 fn show_citation_picker(state: Rc<State>) {
+    show_reference_picker(state, ReferencePickerTarget::Latex);
+}
+
+fn show_bibtex_reference_picker(state: Rc<State>) {
+    show_reference_picker(state, ReferencePickerTarget::Bibtex);
+}
+
+fn show_reference_picker(state: Rc<State>, target: ReferencePickerTarget) {
     show_page(&state, "editor");
-    if !supports_latex_document(&state) {
-        show_toast(
-            &state,
-            &tr("Open a LaTeX document before inserting a citation."),
-        );
-        return;
+    match target {
+        ReferencePickerTarget::Latex if !supports_latex_document(&state) => {
+            show_toast(
+                &state,
+                &tr("Open a LaTeX document before inserting a citation."),
+            );
+            return;
+        }
+        ReferencePickerTarget::Bibtex
+            if current_file_kind(&state) != Some(ProjectFileKind::Bibtex) =>
+        {
+            show_toast(
+                &state,
+                &tr("Open a BibTeX file before adding a bibliographic reference."),
+            );
+            return;
+        }
+        _ => {}
     }
     let dialog = gtk::Dialog::builder()
-        .title(tr("Insert citation"))
+        .title(tr(match target {
+            ReferencePickerTarget::Latex => "Insert citation",
+            ReferencePickerTarget::Bibtex => "Add bibliographic reference",
+        }))
         .transient_for(&state.window)
         .modal(true)
         .build();
     dialog.add_button(&tr("Close"), gtk::ResponseType::Close);
-    dialog.set_default_size(580, 500);
+    dialog.set_default_size(580, 560);
+    let dialog_content = dialog.content_area();
+    dialog_content.set_spacing(8);
     let list = gtk::Box::new(gtk::Orientation::Vertical, 2);
     let query = gtk::SearchEntry::new();
     query.set_placeholder_text(Some(&tr("Search references…")));
     query.set_margin_top(10);
     query.set_margin_start(10);
     query.set_margin_end(10);
+    dialog_content.append(&query);
+
+    let insert_choice = Rc::new(Cell::new(LatexInsertChoice::Citation));
+    let style_selector = if target == ReferencePickerTarget::Latex {
+        let choice_row = gtk::FlowBox::new();
+        choice_row.set_selection_mode(gtk::SelectionMode::None);
+        choice_row.set_min_children_per_line(1);
+        choice_row.set_max_children_per_line(2);
+        choice_row.set_column_spacing(12);
+        choice_row.set_margin_start(10);
+        choice_row.set_margin_end(10);
+
+        let citation_radio = gtk::CheckButton::with_label(&tr("Citation"));
+        citation_radio.set_active(true);
+        let bibliography_radio =
+            gtk::CheckButton::with_label(&tr("Bibliographic reference"));
+        bibliography_radio.set_group(Some(&citation_radio));
+        choice_row.append(&citation_radio);
+        choice_row.append(&bibliography_radio);
+        dialog_content.append(&choice_row);
+
+        let format_row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+        format_row.set_margin_start(10);
+        format_row.set_margin_end(10);
+        let format_label = gtk::Label::new(Some(&tr("Bibliographic reference format")));
+        format_label.set_xalign(0.0);
+        format_row.append(&format_label);
+        let format_names = [
+            tr("ABNT"),
+            tr("MLA"),
+            tr("AMS"),
+            tr("APA 7"),
+            tr("Chicago (author-date)"),
+            tr("Harvard (author-date)"),
+            tr("Vancouver"),
+            tr("IEEE"),
+        ];
+        let format_name_refs = format_names.iter().map(String::as_str).collect::<Vec<_>>();
+        let selector = gtk::DropDown::from_strings(&format_name_refs);
+        selector.set_selected(0);
+        selector.set_hexpand(true);
+        format_row.append(&selector);
+        format_row.set_visible(false);
+        dialog_content.append(&format_row);
+
+        let choice_for_citation = insert_choice.clone();
+        citation_radio.connect_toggled(move |radio| {
+            if radio.is_active() {
+                choice_for_citation.set(LatexInsertChoice::Citation);
+            }
+        });
+        let choice_for_bibliography = insert_choice.clone();
+        bibliography_radio.connect_toggled(move |radio| {
+            if radio.is_active() {
+                choice_for_bibliography.set(LatexInsertChoice::Bibliography);
+            }
+            format_row.set_visible(radio.is_active());
+        });
+        Some(selector)
+    } else {
+        None
+    };
+
     let scroll = gtk::ScrolledWindow::builder()
         .vexpand(true)
         .child(&list)
         .build();
-    dialog.content_area().append(&query);
-    dialog.content_area().append(&scroll);
+    dialog_content.append(&scroll);
     let fill = Rc::new(RefCell::new(None::<Box<dyn Fn(&str)>>));
     *fill.borrow_mut() = Some(Box::new({
         let state = state.clone();
         let dialog = dialog.clone();
         let list = list.clone();
+        let insert_choice = insert_choice.clone();
+        let style_selector = style_selector.clone();
         move |term: &str| {
             while let Some(child) = list.first_child() {
                 list.remove(&child);
             }
             let library_is_empty = state.library.borrow().bibliography.entries.is_empty();
+            let term_lower = term.trim().to_lowercase();
             for entry in state.library.borrow().bibliography.entries.iter() {
-                if !bibtex::entry_matches_search(entry, term) {
+                let type_label = bibtex::reference_type_label(&entry.entry_type);
+                if !bibtex::entry_matches_search(entry, term)
+                    && !type_label.to_lowercase().contains(&term_lower)
+                    && !entry.entry_type.to_lowercase().contains(&term_lower)
+                {
                     continue;
                 }
                 let item = gtk::Button::new();
                 item.set_has_frame(false);
                 item.set_halign(gtk::Align::Fill);
-                let row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
-                let title = gtk::Label::new(Some(if entry.get("title").is_empty() {
+                let content = gtk::Box::new(gtk::Orientation::Vertical, 2);
+                content.set_hexpand(true);
+                let title_row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+                let display_title = bibtex::display_bibtex_text(if entry.get("title").is_empty() {
                     &entry.key
                 } else {
                     entry.get("title")
-                }));
+                });
+                let title = gtk::Label::new(Some(&display_title));
                 title.set_xalign(0.0);
                 title.set_hexpand(true);
-                row.append(&title);
+                title.set_wrap(true);
+                title.add_css_class("heading");
+                title_row.append(&title);
                 let key = gtk::Label::new(Some(&entry.key));
                 key.add_css_class("dim-label");
-                row.append(&key);
-                item.set_child(Some(&row));
+                key.set_valign(gtk::Align::Start);
+                title_row.append(&key);
+                content.append(&title_row);
+
+                let author_value = if entry.get("author").trim().is_empty() {
+                    entry.get("editor")
+                } else {
+                    entry.get("author")
+                };
+                let authors = bibtex::display_bibtex_names(author_value).join(" · ");
+                let authors_label = gtk::Label::new(Some(&authors));
+                authors_label.set_xalign(0.0);
+                authors_label.set_hexpand(true);
+                authors_label.set_wrap(true);
+                authors_label.add_css_class("dim-label");
+                authors_label.set_visible(!authors.is_empty());
+                content.append(&authors_label);
+
+                let type_text = tr("Type: %s").replacen("%s", &type_label, 1);
+                let type_label = gtk::Label::new(Some(&type_text));
+                type_label.set_xalign(0.0);
+                type_label.add_css_class("dim-label");
+                content.append(&type_label);
+                item.set_child(Some(&content));
                 let state2 = state.clone();
-                let key_value = entry.key.clone();
+                let entry_value = entry.clone();
                 let dialog = dialog.clone();
+                let insert_choice = insert_choice.clone();
+                let style_selector = style_selector.clone();
                 item.connect_clicked(move |_| {
-                    let snippet = format!("\\cite{{{key_value}}}");
-                    state2.editor.insert_at_cursor(
-                        &snippet,
-                        snippet.chars().count(),
-                        "insert:citation",
-                    );
+                    let result = match target {
+                        ReferencePickerTarget::Latex => match insert_choice.get() {
+                            LatexInsertChoice::Citation => {
+                                insert_latex_citation(&state2, &entry_value)
+                            }
+                            LatexInsertChoice::Bibliography => {
+                                let style = style_selector
+                                    .as_ref()
+                                    .map(|selector| reference_style_from_index(selector.selected()))
+                                    .unwrap_or(bibtex::ReferenceStyle::Abnt);
+                                insert_latex_bibliography_reference(
+                                    &state2,
+                                    &entry_value,
+                                    style,
+                                )
+                            }
+                        },
+                        ReferencePickerTarget::Bibtex => {
+                            insert_bibtex_reference(&state2, &entry_value)
+                        }
+                    };
+                    if let Err(error) = result {
+                        show_toast(
+                            &state2,
+                            &format!(
+                                "{}: {error}",
+                                tr(match target {
+                                    ReferencePickerTarget::Latex => {
+                                        "Could not add the reference to the document"
+                                    }
+                                    ReferencePickerTarget::Bibtex => {
+                                        "Could not add the reference to the BibTeX file"
+                                    }
+                                })
+                            ),
+                        );
+                        return;
+                    }
                     dialog.close();
                     show_page(&state2, "editor");
                 });
@@ -4174,7 +4768,14 @@ fn show_citation_picker(state: Rc<State>) {
                     let dialog_for_add = dialog.clone();
                     add.connect_clicked(move |_| {
                         dialog_for_add.close();
-                        show_page(&state_for_add, "references");
+                        show_page(
+                            &state_for_add,
+                            if target == ReferencePickerTarget::Latex {
+                                "references"
+                            } else {
+                                "editor"
+                            },
+                        );
                         edit_reference(&state_for_add, None);
                     });
                     list.append(&add);
@@ -4183,7 +4784,14 @@ fn show_citation_picker(state: Rc<State>) {
                     let dialog_for_import = dialog.clone();
                     import.connect_clicked(move |_| {
                         dialog_for_import.close();
-                        show_page(&state_for_import, "references");
+                        show_page(
+                            &state_for_import,
+                            if target == ReferencePickerTarget::Latex {
+                                "references"
+                            } else {
+                                "editor"
+                            },
+                        );
                         import_bibtex(state_for_import.clone());
                     });
                     list.append(&import);
@@ -4204,12 +4812,136 @@ fn show_citation_picker(state: Rc<State>) {
     dialog.present();
 }
 
+fn insert_latex_citation(state: &Rc<State>, entry: &BibEntry) -> Result<(), String> {
+    let current_file = state
+        .current_file
+        .borrow()
+        .clone()
+        .ok_or_else(|| tr("Save the document before inserting a citation."))?;
+    if project::file_kind(&current_file) != ProjectFileKind::Latex {
+        return Err(tr("Open a LaTeX document before inserting a citation."));
+    }
+    let snippet = format!("\\cite{{{}}}", entry.key);
+    state
+        .editor
+        .insert_at_cursor(&snippet, snippet.chars().count(), "insert:citation");
+    Ok(())
+}
+
+fn insert_latex_bibliography_reference(
+    state: &Rc<State>,
+    entry: &BibEntry,
+    style: bibtex::ReferenceStyle,
+) -> Result<(), String> {
+    let current_file = state
+        .current_file
+        .borrow()
+        .clone()
+        .ok_or_else(|| tr("Save the document before inserting a citation."))?;
+    let main_path = state
+        .main_tex
+        .borrow()
+        .clone()
+        .filter(|path| {
+            path.extension()
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("tex"))
+        })
+        .or_else(|| {
+            current_file
+                .extension()
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("tex"))
+                .then(|| current_file.clone())
+        })
+        .ok_or_else(|| tr("Open a LaTeX document before inserting a citation."))?;
+    let main_is_open = current_file == main_path;
+    let (main_source, source_encoding) = if main_is_open {
+        (state.editor.text(), state.file_encoding.get())
+    } else {
+        let bytes = std::fs::read(&main_path).map_err(|error| error.to_string())?;
+        project::decode_text(&bytes)
+    };
+    let update = crate::build::prepare_inline_bibliography_update(
+        &main_source,
+        source_encoding,
+        entry,
+        style,
+    )?;
+    match update {
+        crate::build::CitationBibliographyUpdate::InlineTex {
+            content,
+            inserted_text,
+            insertion_offset,
+            encoding,
+        } => {
+            project::encode_text(&content, encoding)?;
+            if main_is_open {
+                state.editor.insert_source_at_offset(
+                    &inserted_text,
+                    insertion_offset,
+                    "insert:citation",
+                );
+            } else {
+                let bytes = project::encode_text(&content, encoding)?;
+                crate::storage::atomic_write(&main_path, &bytes)
+                    .map_err(|error| error.to_string())?;
+                refresh_project_files(state);
+            }
+        }
+        crate::build::CitationBibliographyUpdate::BibFile { .. } => unreachable!(),
+        crate::build::CitationBibliographyUpdate::AlreadyPresent => {}
+    }
+    Ok(())
+}
+
+fn insert_bibtex_reference(state: &Rc<State>, entry: &BibEntry) -> Result<(), String> {
+    let current_file = state
+        .current_file
+        .borrow()
+        .clone()
+        .ok_or_else(|| tr("Open a BibTeX file before adding a bibliographic reference."))?;
+    if project::file_kind(&current_file) != ProjectFileKind::Bibtex {
+        return Err(tr("Open a BibTeX file before adding a bibliographic reference."));
+    }
+    let source = state.editor.text();
+    let bibliography = bibtex::parse_bibtex(&source).map_err(|error| error.to_string())?;
+    if bibliography
+        .entries
+        .iter()
+        .any(|existing| existing.key.eq_ignore_ascii_case(&entry.key))
+    {
+        return Err(tr("This reference is already in the BibTeX file."));
+    }
+
+    let line_ending = if source.contains("\r\n") { "\r\n" } else { "\n" };
+    let serialized = bibtex::serialize_bibtex(&bibtex::Bibliography {
+        entries: vec![entry.clone()],
+        directives: Vec::new(),
+    })
+    .replace("\r\n", "\n")
+    .replace('\n', line_ending);
+    let separator = if source.is_empty() {
+        String::new()
+    } else if source.ends_with('\n') {
+        line_ending.to_owned()
+    } else {
+        format!("{line_ending}{line_ending}")
+    };
+    let insertion = format!("{separator}{serialized}");
+    let offset = source.chars().count();
+    state
+        .editor
+        .insert_source_at_offset(&insertion, offset, "insert:bibtex-reference");
+    Ok(())
+}
+
 fn load_library_async(state: &Rc<State>) {
     if state.library_loading.replace(true) {
         return;
     }
     state.library_load_error.borrow_mut().take();
     refresh_library(state);
+    refresh_tags(state);
+    refresh_authors(state);
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn(move || {
         let result = LocalLibrary::open().map_err(|error| error.to_string());
@@ -4222,6 +4954,8 @@ fn load_library_async(state: &Rc<State>) {
             *state.library.borrow_mut() = library;
             state.library_ready.set(true);
             refresh_library(&state);
+            refresh_tags(&state);
+            refresh_authors(&state);
         }
         Err(error) => {
             state.library_loading.set(false);
@@ -4231,6 +4965,8 @@ fn load_library_async(state: &Rc<State>) {
                 &format!("{}: {error}", tr("Could not load the local library")),
             );
             refresh_library(&state);
+            refresh_tags(&state);
+            refresh_authors(&state);
         }
     });
 }
@@ -4256,6 +4992,8 @@ fn persist_library_async(state: Rc<State>, updated: LocalLibrary, success_messag
             Ok(()) => {
                 *state.library.borrow_mut() = updated;
                 refresh_library(&state);
+                refresh_tags(&state);
+                refresh_authors(&state);
                 show_toast(&state, &success_message);
             }
             Err(error) => show_toast(
@@ -4313,7 +5051,11 @@ fn refresh_library(state: &Rc<State>) {
     }
     let term = state.library_search.text();
     let library = state.library.borrow();
-    let filter_options = reference_filter_values(&library.bibliography.entries);
+    let mut filter_options = reference_filter_values(&library.bibliography.entries);
+    filter_options.authors =
+        reference_filter_author_names(&filter_options.authors, &library.authors);
+    filter_options.tags.extend(library.tags.iter().cloned());
+    filter_options.tags = sorted_reference_values(filter_options.tags);
     state.library_filters_updating.set(true);
     set_reference_filter_options(
         &state.reference_filters.author,
@@ -4330,28 +5072,41 @@ fn refresh_library(state: &Rc<State>) {
         &tr("All tags"),
         filter_options.tags,
     );
+    set_reference_filter_options(
+        &state.reference_filters.kind,
+        &tr("All types"),
+        filter_options.kinds,
+    );
     state.library_filters_updating.set(false);
     let author_filter = selected_reference_filter(&state.reference_filters.author);
     let year_filter = selected_reference_filter(&state.reference_filters.year);
     let tag_filter = selected_reference_filter(&state.reference_filters.tag);
-    let entries = library
+    let kind_filter = selected_reference_filter(&state.reference_filters.kind);
+    let mut entries = library
         .bibliography
         .entries
         .iter()
         .filter(|entry| bibtex::entry_matches_search(entry, &term))
         .filter(|entry| {
-            reference_matches_filters(
+            reference_matches_filters_with_type(
                 entry,
                 author_filter.as_deref(),
                 year_filter.as_deref(),
                 tag_filter.as_deref(),
+                kind_filter.as_deref(),
+                &library.authors,
             )
         })
         .cloned()
         .collect::<Vec<_>>();
+    sort_reference_entries(
+        &mut entries,
+        state.reference_sort.selected(),
+        state.reference_sort_descending.is_active(),
+    );
     if entries.is_empty() {
         let message = if library.bibliography.entries.is_empty() {
-            tr("Your library starts here: add a reference, import BibTeX, or connect Zotero.")
+            tr("Your library starts here: add a reference or import BibTeX.")
         } else {
             tr("No references match the current search and filters.")
         };
@@ -4367,15 +5122,16 @@ fn refresh_library(state: &Rc<State>) {
             row.set_margin_top(4);
             row.set_margin_bottom(4);
             let title = if entry.get("title").is_empty() {
-                entry.key.clone()
+                bibtex::display_bibtex_text(&entry.key)
             } else {
-                entry.get("title").to_owned()
+                bibtex::display_bibtex_text(entry.get("title"))
             };
-            let author = if entry.get("author").is_empty() {
+            let author_field = if entry.get("author").is_empty() {
                 entry.get("editor")
             } else {
                 entry.get("author")
             };
+            let author = bibtex::display_bibtex_names(author_field).join(" · ");
             let subtitle = format!(
                 "{}{}{}",
                 author,
@@ -4396,26 +5152,42 @@ fn refresh_library(state: &Rc<State>) {
             subtitle_label.add_css_class("dim-label");
             details.append(&subtitle_label);
             details.set_hexpand(true);
-            row.append(&details);
+            let summary = gtk::Box::new(gtk::Orientation::Horizontal, 12);
+            summary.set_hexpand(true);
+            summary.append(&details);
             let key = gtk::Label::new(Some(&entry.key));
             key.add_css_class("dim-label");
-            row.append(&key);
+            summary.append(&key);
+            let open_details = gtk::Button::new();
+            open_details.set_has_frame(false);
+            open_details.add_css_class("flat");
+            open_details.set_hexpand(true);
+            open_details.set_halign(gtk::Align::Fill);
+            open_details.set_child(Some(&summary));
+            open_details.set_tooltip_text(Some(&tr("Show reference details")));
+            let entry_copy = entry.clone();
+            let state_copy = state.clone();
+            open_details.connect_clicked(move |_| {
+                show_reference_details(&state_copy, entry_copy.clone());
+            });
+            row.append(&open_details);
             let edit = button("document-edit-symbolic", &tr("Edit reference"));
             let entry_copy = entry.clone();
             let state_copy = state.clone();
             edit.connect_clicked(move |_| edit_reference(&state_copy, Some(entry_copy.clone())));
             row.append(&edit);
             let delete = button("user-trash-symbolic", &tr("Delete reference"));
-            let key_copy = entry.key.clone();
+            delete.add_css_class("destructive-action");
+            let entry_copy = entry.clone();
             let state_copy = state.clone();
             delete.connect_clicked(move |_| {
-                if !library_is_ready(&state_copy) {
-                    return;
-                }
-                let mut updated = state_copy.library.borrow().clone();
-                if updated.remove_in_memory(&key_copy) {
-                    persist_library_async(state_copy.clone(), updated, tr("Reference deleted"));
-                }
+                let parent: &gtk::Window = state_copy.window.upcast_ref();
+                request_reference_deletion(
+                    &state_copy,
+                    parent,
+                    entry_copy.clone(),
+                    || {},
+                );
             });
             row.append(&delete);
             state.library_list.append(&row);
@@ -4427,14 +5199,1210 @@ fn refresh_library(state: &Rc<State>) {
     update_primary_action(state);
 }
 
+fn refresh_tags(state: &Rc<State>) {
+    while let Some(child) = state.tags_list.first_child() {
+        state.tags_list.remove(&child);
+    }
+    if !state.library_ready.get() {
+        let message = if let Some(error) = state.library_load_error.borrow().as_ref() {
+            format!("{}: {error}", tr("Could not load the local library"))
+        } else {
+            tr("Loading local library…")
+        };
+        let label = gtk::Label::new(Some(&message));
+        label.set_xalign(0.0);
+        label.set_wrap(true);
+        label.set_margin_top(24);
+        label.add_css_class("dim-label");
+        state.tags_list.append(&label);
+        return;
+    }
+
+    let tags = state.library.borrow().tags.clone();
+    if tags.is_empty() {
+        let empty = gtk::Label::new(Some(&tr("No tags yet. Add a tag to organize your references.")));
+        empty.set_xalign(0.0);
+        empty.set_margin_top(18);
+        empty.add_css_class("dim-label");
+        state.tags_list.append(&empty);
+        return;
+    }
+
+    let query = state.tag_search.text().to_lowercase();
+    let mut tags = tags
+        .into_iter()
+        .filter(|tag| query.is_empty() || tag.to_lowercase().contains(&query))
+        .collect::<Vec<_>>();
+    tags.sort_by_key(|tag| tag.to_lowercase());
+    if state.tag_sort_descending.is_active() {
+        tags.reverse();
+    }
+    if tags.is_empty() {
+        let empty = gtk::Label::new(Some(&tr("No tags match your search.")));
+        empty.set_xalign(0.0);
+        empty.set_margin_top(18);
+        empty.add_css_class("dim-label");
+        state.tags_list.append(&empty);
+        return;
+    }
+
+    for tag in tags {
+        let row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+        row.set_margin_top(3);
+        row.set_margin_bottom(3);
+        let label = gtk::Label::new(Some(&tag));
+        label.set_xalign(0.0);
+        label.set_hexpand(true);
+        row.append(&label);
+
+        let edit = button("document-edit-symbolic", &tr("Edit tag"));
+        let state_for_edit = state.clone();
+        let tag_for_edit = tag.clone();
+        edit.connect_clicked(move |_| edit_tag(&state_for_edit, Some(tag_for_edit.clone())));
+        row.append(&edit);
+
+        let delete = button("user-trash-symbolic", &tr("Remove tag"));
+        delete.add_css_class("destructive-action");
+        let state_for_delete = state.clone();
+        let tag_for_delete = tag.clone();
+        delete.connect_clicked(move |_| request_tag_deletion(&state_for_delete, &tag_for_delete));
+        row.append(&delete);
+        state.tags_list.append(&row);
+        state
+            .tags_list
+            .append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+    }
+}
+
+fn refresh_authors(state: &Rc<State>) {
+    while let Some(child) = state.authors_list.first_child() {
+        state.authors_list.remove(&child);
+    }
+    if !state.library_ready.get() {
+        let message = if let Some(error) = state.library_load_error.borrow().as_ref() {
+            format!("{}: {error}", tr("Could not load the local library"))
+        } else {
+            tr("Loading local library…")
+        };
+        let label = gtk::Label::new(Some(&message));
+        label.set_xalign(0.0);
+        label.set_wrap(true);
+        label.set_margin_top(24);
+        label.add_css_class("dim-label");
+        state.authors_list.append(&label);
+        return;
+    }
+
+    let search = state.author_search.text().to_lowercase();
+    let library = state.library.borrow();
+    let mut authors = library.authors.clone();
+    authors.retain(|author| {
+        search.is_empty()
+            || author.full_name.to_lowercase().contains(&search)
+            || bibtex::display_bibtex_text(&author.citation_name)
+                .to_lowercase()
+                .contains(&search)
+            || author.orcid.to_lowercase().contains(&search)
+            || author.email.to_lowercase().contains(&search)
+            || author.institution.to_lowercase().contains(&search)
+    });
+    authors.sort_by(|left, right| {
+        let primary = match state.author_sort.selected() {
+            1 => left
+                .institution
+                .to_lowercase()
+                .cmp(&right.institution.to_lowercase()),
+            _ => left
+                .full_name
+                .to_lowercase()
+                .cmp(&right.full_name.to_lowercase()),
+        };
+        let primary = if state.author_sort_descending.is_active() {
+            primary.reverse()
+        } else {
+            primary
+        };
+        primary
+            .then_with(|| left.full_name.to_lowercase().cmp(&right.full_name.to_lowercase()))
+            .then_with(|| {
+                left.citation_name
+                    .to_lowercase()
+                    .cmp(&right.citation_name.to_lowercase())
+            })
+    });
+    drop(library);
+    if authors.is_empty() {
+        let message = if search.is_empty() {
+            tr("No authors yet. Add authors to organize your references.")
+        } else {
+            tr("No authors match this search.")
+        };
+        let empty = gtk::Label::new(Some(&message));
+        empty.set_xalign(0.0);
+        empty.set_margin_top(18);
+        empty.add_css_class("dim-label");
+        state.authors_list.append(&empty);
+        return;
+    }
+
+    for author in authors {
+        let row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+        row.set_margin_top(3);
+        row.set_margin_bottom(3);
+        let labels = gtk::Box::new(gtk::Orientation::Vertical, 2);
+        labels.set_hexpand(true);
+        let full_name = gtk::Label::new(Some(&author.full_name));
+        full_name.set_xalign(0.0);
+        full_name.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        labels.append(&full_name);
+        let citation_name = gtk::Label::new(Some(&bibtex::display_bibtex_text(
+            &author.citation_name,
+        )));
+        citation_name.set_xalign(0.0);
+        citation_name.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        citation_name.add_css_class("dim-label");
+        labels.append(&citation_name);
+        let open_details = gtk::Button::new();
+        open_details.set_has_frame(false);
+        open_details.add_css_class("flat");
+        open_details.set_hexpand(true);
+        open_details.set_halign(gtk::Align::Fill);
+        open_details.set_child(Some(&labels));
+        open_details.set_tooltip_text(Some(&tr("Author details")));
+        let state_for_details = state.clone();
+        let author_for_details = author.citation_name.clone();
+        open_details.connect_clicked(move |_| {
+            show_author_details(&state_for_details, &author_for_details);
+        });
+        row.append(&open_details);
+
+        let edit = button("document-edit-symbolic", &tr("Edit author"));
+        let state_for_edit = state.clone();
+        let author_for_edit = author.citation_name.clone();
+        edit.connect_clicked(move |_| {
+            edit_author(&state_for_edit, Some(author_for_edit.clone()));
+        });
+        row.append(&edit);
+
+        let delete = button("user-trash-symbolic", &tr("Delete author"));
+        delete.add_css_class("destructive-action");
+        let state_for_delete = state.clone();
+        let author_for_delete = author.citation_name.clone();
+        delete.connect_clicked(move |_| {
+            request_author_deletion(&state_for_delete, &author_for_delete);
+        });
+        row.append(&delete);
+        state.authors_list.append(&row);
+        state
+            .authors_list
+            .append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+    }
+}
+
+fn author_form_row(content: &gtk::Box, label: &str, input: &gtk::Entry) {
+    let row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    let label = gtk::Label::new(Some(label));
+    label.set_xalign(1.0);
+    label.set_width_chars(20);
+    row.append(&label);
+    input.set_hexpand(true);
+    row.append(input);
+    content.append(&row);
+}
+
+fn edit_author(state: &Rc<State>, previous: Option<String>) {
+    if !library_is_ready(state) {
+        return;
+    }
+    let dialog = gtk::Dialog::builder()
+        .title(tr(if previous.is_some() {
+            "Edit author"
+        } else {
+            "Add author"
+        }))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(580)
+        .build();
+    dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
+    let save = dialog.add_button(&tr("Save"), gtk::ResponseType::Accept);
+    save.add_css_class("suggested-action");
+    dialog.set_default_response(gtk::ResponseType::Accept);
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 8);
+    content.set_margin_top(18);
+    content.set_margin_bottom(18);
+    content.set_margin_start(20);
+    content.set_margin_end(20);
+    let existing_profile = previous.as_ref().and_then(|previous| {
+        state
+            .library
+            .borrow()
+            .authors
+            .iter()
+            .find(|author| {
+                author_selection_identity(&author.citation_name)
+                    == author_selection_identity(previous)
+            })
+            .cloned()
+    });
+    let full_name = gtk::Entry::new();
+    full_name.set_placeholder_text(Some(&tr("Full name")));
+    full_name.set_activates_default(true);
+    full_name.set_text(
+        existing_profile
+            .as_ref()
+            .map(|profile| profile.full_name.as_str())
+            .unwrap_or_default(),
+    );
+    author_form_row(&content, &tr("Full name"), &full_name);
+
+    let citation_name = gtk::Entry::new();
+    citation_name.set_placeholder_text(Some(&tr("Name used in references")));
+    citation_name.set_activates_default(true);
+    let initial_citation_display = existing_profile
+        .as_ref()
+        .map(|profile| bibtex::display_bibtex_text(&profile.citation_name))
+        .unwrap_or_default();
+    citation_name.set_text(&initial_citation_display);
+    let citation_row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let citation_label = gtk::Label::new(Some(&tr("Name used in references")));
+    citation_label.set_xalign(1.0);
+    citation_label.set_width_chars(20);
+    citation_row.append(&citation_label);
+    citation_name.set_hexpand(true);
+    citation_row.append(&citation_name);
+    let generate = labeled_button("document-edit-symbolic", &tr("Generate"));
+    citation_row.append(&generate);
+    content.append(&citation_row);
+
+    let orcid = gtk::Entry::new();
+    orcid.set_placeholder_text(Some(&tr("ORCID")));
+    orcid.set_text(
+        existing_profile
+            .as_ref()
+            .map(|profile| profile.orcid.as_str())
+            .unwrap_or_default(),
+    );
+    author_form_row(&content, &tr("ORCID"), &orcid);
+
+    let email = gtk::Entry::new();
+    email.set_placeholder_text(Some(&tr("Email")));
+    email.set_text(
+        existing_profile
+            .as_ref()
+            .map(|profile| profile.email.as_str())
+            .unwrap_or_default(),
+    );
+    author_form_row(&content, &tr("Email"), &email);
+
+    let institution = gtk::Entry::new();
+    institution.set_placeholder_text(Some(&tr("Institution")));
+    institution.set_text(
+        existing_profile
+            .as_ref()
+            .map(|profile| profile.institution.as_str())
+            .unwrap_or_default(),
+    );
+    author_form_row(&content, &tr("Institution"), &institution);
+
+    let citation_was_manually_edited = Rc::new(Cell::new(false));
+    let updating_citation = Rc::new(Cell::new(false));
+    {
+        let citation_was_manually_edited = citation_was_manually_edited.clone();
+        let updating_citation = updating_citation.clone();
+        citation_name.connect_changed(move |_| {
+            if !updating_citation.get() {
+                citation_was_manually_edited.set(true);
+            }
+        });
+    }
+    {
+        let citation_name = citation_name.clone();
+        let citation_was_manually_edited = citation_was_manually_edited.clone();
+        let updating_citation = updating_citation.clone();
+        full_name.connect_changed(move |input| {
+            if citation_was_manually_edited.get() {
+                return;
+            }
+            let generated = AuthorProfile::from_full_name(input.text().as_str()).citation_name;
+            updating_citation.set(true);
+            citation_name.set_text(&generated);
+            updating_citation.set(false);
+        });
+    }
+    {
+        let full_name = full_name.clone();
+        let citation_name = citation_name.clone();
+        let citation_was_manually_edited = citation_was_manually_edited.clone();
+        let updating_citation = updating_citation.clone();
+        generate.connect_clicked(move |_| {
+            citation_was_manually_edited.set(false);
+            let generated = AuthorProfile::from_full_name(full_name.text().as_str()).citation_name;
+            updating_citation.set(true);
+            citation_name.set_text(&generated);
+            updating_citation.set(false);
+        });
+    }
+    let original_citation = existing_profile
+        .as_ref()
+        .map(|profile| profile.citation_name.clone());
+    dialog.content_area().append(&content);
+
+    let previous_for_response = previous.clone();
+    let state_for_response = state.clone();
+    let full_name_for_response = full_name.clone();
+    let citation_name_for_response = citation_name.clone();
+    let orcid_for_response = orcid.clone();
+    let email_for_response = email.clone();
+    let institution_for_response = institution.clone();
+    let original_citation_for_response = original_citation.clone();
+    let initial_citation_for_response = initial_citation_display.clone();
+    dialog.connect_response(move |dialog, response| {
+        if response == gtk::ResponseType::Accept {
+            let mut updated = state_for_response.library.borrow().clone();
+            let entered_citation = citation_name_for_response.text().to_string();
+            let citation_name = if original_citation_for_response.is_some()
+                && entered_citation == initial_citation_for_response
+            {
+                original_citation_for_response.clone().unwrap_or_default()
+            } else {
+                entered_citation
+            };
+            let profile = AuthorProfile {
+                full_name: full_name_for_response.text().to_string(),
+                citation_name,
+                orcid: orcid_for_response.text().to_string(),
+                email: email_for_response.text().to_string(),
+                institution: institution_for_response.text().to_string(),
+            };
+            let result = if let Some(previous) = previous_for_response.as_deref() {
+                updated.update_author_profile(previous, profile)
+            } else {
+                updated.add_author_profile(profile)
+            };
+            match result {
+                Ok(()) => {
+                    persist_library_async(state_for_response.clone(), updated, tr("Author saved"));
+                    dialog.close();
+                }
+                Err(error) => show_toast(&state_for_response, &tr(&error)),
+            }
+        } else {
+            dialog.close();
+        }
+    });
+    dialog.present();
+    full_name.grab_focus();
+}
+
+fn show_author_details(state: &Rc<State>, citation_name: &str) {
+    let profile = state
+        .library
+        .borrow()
+        .authors
+        .iter()
+        .find(|author| {
+            author_selection_identity(&author.citation_name)
+                == author_selection_identity(citation_name)
+        })
+        .cloned();
+    let Some(profile) = profile else {
+        return;
+    };
+    let reference_count = state
+        .library
+        .borrow()
+        .references_for_author(&profile.citation_name)
+        .len();
+    let dialog = gtk::Dialog::builder()
+        .title(tr("Author details"))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(600)
+        .build();
+    let edit = dialog.add_button(&tr("Edit author"), gtk::ResponseType::Accept);
+    edit.add_css_class("suggested-action");
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 5);
+    content.set_margin_top(16);
+    content.set_margin_bottom(16);
+    content.set_margin_start(18);
+    content.set_margin_end(18);
+    content.append(&author_detail_row(state, &tr("Full name"), &profile.full_name));
+    content.append(&author_detail_row(
+        state,
+        &tr("Name used in references"),
+        &profile.citation_name,
+    ));
+    content.append(&author_detail_row(state, &tr("ORCID"), &profile.orcid));
+    content.append(&author_detail_row(state, &tr("Email"), &profile.email));
+    content.append(&author_detail_row(
+        state,
+        &tr("Institution"),
+        &profile.institution,
+    ));
+    content.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+    let count = gtk::Label::new(Some(
+        &ngettext("%d reference", "%d references", reference_count)
+            .replace("%d", &reference_count.to_string()),
+    ));
+    count.set_xalign(0.0);
+    count.set_margin_top(4);
+    content.append(&count);
+    dialog.content_area().append(&content);
+    let state_for_edit = state.clone();
+    let author_for_edit = profile.citation_name.clone();
+    dialog.connect_response(move |dialog, response| {
+        dialog.close();
+        if response == gtk::ResponseType::Accept {
+            let state = state_for_edit.clone();
+            let author = author_for_edit.clone();
+            glib::idle_add_local_once(move || edit_author(&state, Some(author)));
+        }
+    });
+    dialog.present();
+}
+
+fn author_detail_row(state: &Rc<State>, name: &str, value: &str) -> gtk::Box {
+    let row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    row.set_margin_top(3);
+    row.set_margin_bottom(3);
+    let name_label = gtk::Label::new(Some(name));
+    name_label.set_xalign(0.0);
+    name_label.set_width_chars(24);
+    name_label.set_valign(gtk::Align::Start);
+    name_label.add_css_class("dim-label");
+    row.append(&name_label);
+    let display_value = bibtex::display_bibtex_text(value);
+    let value_label = gtk::Label::new(Some(if display_value.is_empty() {
+        "—"
+    } else {
+        &display_value
+    }));
+    value_label.set_xalign(0.0);
+    value_label.set_valign(gtk::Align::Start);
+    value_label.set_wrap(true);
+    value_label.set_selectable(true);
+    value_label.set_hexpand(true);
+    row.append(&value_label);
+    let copy = button("edit-copy-symbolic", &tr("Copy value"));
+    copy.set_valign(gtk::Align::Start);
+    copy.set_sensitive(!display_value.is_empty());
+    let state = state.clone();
+    copy.connect_clicked(move |_| copy_text_to_clipboard(&state, &display_value));
+    row.append(&copy);
+    row
+}
+
+fn request_author_deletion(state: &Rc<State>, author: &str) {
+    if !library_is_ready(state) {
+        return;
+    }
+    let library = state.library.borrow();
+    let references = library.references_for_author(author);
+    drop(library);
+
+    if references.is_empty() {
+        let mut updated = state.library.borrow().clone();
+        if updated.remove_author(author, false).is_ok() {
+            persist_library_async(state.clone(), updated, tr("Author deleted"));
+        }
+        return;
+    }
+
+    let dialog = gtk::Dialog::builder()
+        .title(tr("Author has associated references"))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(600)
+        .default_height(420)
+        .build();
+    dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
+    let delete = dialog.add_button(&tr("Delete author and references"), gtk::ResponseType::Accept);
+    delete.add_css_class("destructive-action");
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 10);
+    content.set_margin_top(16);
+    content.set_margin_bottom(16);
+    content.set_margin_start(18);
+    content.set_margin_end(18);
+    let author_name = bibtex::display_bibtex_text(author);
+    let explanation = tr("The author ‘%s’ is associated with these references. Delete the author and all listed references?")
+        .replacen("%s", &author_name, 1);
+    let label = gtk::Label::new(Some(&explanation));
+    label.set_xalign(0.0);
+    label.set_wrap(true);
+    content.append(&label);
+
+    let titles = gtk::Box::new(gtk::Orientation::Vertical, 4);
+    for entry in &references {
+        let title = if entry.get("title").trim().is_empty() {
+            bibtex::display_bibtex_text(&entry.key)
+        } else {
+            bibtex::display_bibtex_text(entry.get("title"))
+        };
+        let item = gtk::Label::new(Some(&format!("• {title}")));
+        item.set_xalign(0.0);
+        item.set_wrap(true);
+        item.set_selectable(true);
+        titles.append(&item);
+    }
+    let scroll = gtk::ScrolledWindow::builder()
+        .hexpand(true)
+        .vexpand(true)
+        .min_content_height(100)
+        .child(&titles)
+        .build();
+    content.append(&scroll);
+    dialog.content_area().append(&content);
+
+    let author = author.to_owned();
+    let state_for_response = state.clone();
+    dialog.connect_response(move |dialog, response| {
+        if response == gtk::ResponseType::Accept {
+            let mut updated = state_for_response.library.borrow().clone();
+            match updated.remove_author(&author, true) {
+                Ok(count) => persist_library_async(
+                    state_for_response.clone(),
+                    updated,
+                    tr("Deleted author and %d references").replace("%d", &count.to_string()),
+                ),
+                Err(error) => show_toast(&state_for_response, &tr(&error)),
+            }
+        }
+        dialog.close();
+    });
+    dialog.present();
+}
+
+fn edit_tag(state: &Rc<State>, previous: Option<String>) {
+    if !library_is_ready(state) {
+        return;
+    }
+    let dialog = gtk::Dialog::builder()
+        .title(tr(if previous.is_some() { "Edit tag" } else { "Add tag" }))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(420)
+        .build();
+    dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
+    let save = dialog.add_button(&tr("Save"), gtk::ResponseType::Accept);
+    save.add_css_class("suggested-action");
+    dialog.set_default_response(gtk::ResponseType::Accept);
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 8);
+    content.set_margin_top(18);
+    content.set_margin_bottom(18);
+    content.set_margin_start(20);
+    content.set_margin_end(20);
+    let input = gtk::Entry::new();
+    input.set_placeholder_text(Some(&tr("Tag name")));
+    input.set_hexpand(true);
+    if let Some(previous) = previous.as_ref() {
+        input.set_text(previous);
+    }
+    content.append(&input);
+    dialog.content_area().append(&content);
+
+    let previous_for_response = previous.clone();
+    let state_for_response = state.clone();
+    let input_for_response = input.clone();
+    dialog.connect_response(move |dialog, response| {
+        if response == gtk::ResponseType::Accept {
+            let mut updated = state_for_response.library.borrow().clone();
+            let result = if let Some(previous) = previous_for_response.as_deref() {
+                updated.rename_tag(previous, input_for_response.text().as_str())
+            } else {
+                updated.add_tag(input_for_response.text().as_str())
+            };
+            match result {
+                Ok(()) => {
+                    persist_library_async(state_for_response.clone(), updated, tr("Tag saved"));
+                    dialog.close();
+                }
+                Err(error) => show_toast(&state_for_response, &tr(&error)),
+            }
+        } else {
+            dialog.close();
+        }
+    });
+    dialog.present();
+    input.grab_focus();
+}
+
+fn request_tag_deletion(state: &Rc<State>, tag: &str) {
+    if !library_is_ready(state) {
+        return;
+    }
+    let message = tr("Remove tag ‘%s’ from the list and all references?")
+        .replacen("%s", tag, 1);
+    let parent: &gtk::Window = state.window.upcast_ref();
+    let tag = tag.to_owned();
+    confirm_destructive_action(
+        state,
+        parent,
+        &tr("Confirm deletion"),
+        &message,
+        &tr("Remove tag"),
+        move |state| {
+            if !library_is_ready(&state) {
+                return;
+            }
+            let mut updated = state.library.borrow().clone();
+            if updated.remove_tag(&tag) {
+                persist_library_async(state, updated, tr("Tag removed"));
+            }
+        },
+    );
+}
+
+fn reference_style_from_index(index: u32) -> bibtex::ReferenceStyle {
+    match index {
+        1 => bibtex::ReferenceStyle::Mla,
+        2 => bibtex::ReferenceStyle::Ams,
+        3 => bibtex::ReferenceStyle::Apa7,
+        4 => bibtex::ReferenceStyle::ChicagoAuthorDate,
+        5 => bibtex::ReferenceStyle::Harvard,
+        6 => bibtex::ReferenceStyle::Vancouver,
+        7 => bibtex::ReferenceStyle::Ieee,
+        _ => bibtex::ReferenceStyle::Abnt,
+    }
+}
+
+fn show_reference_details(state: &Rc<State>, entry: BibEntry) {
+    let dialog = gtk::Dialog::builder()
+        .title(tr("Reference details"))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(680)
+        .default_height(620)
+        .build();
+    let edit = dialog.add_button(&tr("Edit reference"), gtk::ResponseType::Accept);
+    edit.add_css_class("suggested-action");
+
+    let content = dialog.content_area();
+    content.set_spacing(12);
+    content.set_margin_top(16);
+    content.set_margin_bottom(16);
+    content.set_margin_start(18);
+    content.set_margin_end(18);
+
+    let title = if entry.get("title").trim().is_empty() {
+        bibtex::display_bibtex_text(&entry.key)
+    } else {
+        bibtex::display_bibtex_text(entry.get("title"))
+    };
+    let title_label = gtk::Label::new(Some(&title));
+    title_label.set_xalign(0.0);
+    title_label.set_wrap(true);
+    title_label.add_css_class("title-3");
+    content.append(&title_label);
+
+    let fields = gtk::Box::new(gtk::Orientation::Vertical, 4);
+    fields.set_margin_end(30);
+    fields.append(&reference_detail_row(
+        state,
+        &tr("Reference type"),
+        &bibtex::reference_type_label(&entry.entry_type),
+    ));
+    fields.append(&reference_detail_row(state, &tr("Citation key"), &entry.key));
+    for (name, value) in &entry.fields {
+        if value.trim().is_empty() {
+            continue;
+        }
+        if name == "year" && !entry.get("date").trim().is_empty() {
+            continue;
+        }
+        let label = bibtex::reference_field_label(name, &entry.entry_type);
+        let row = if name == "tags" {
+            reference_detail_tags_row(&label, value)
+        } else {
+            reference_detail_row(state, &label, value)
+        };
+        fields.append(&row);
+    }
+    let fields_scroll = gtk::ScrolledWindow::builder()
+        .vexpand(true)
+        .min_content_height(180)
+        .child(&fields)
+        .build();
+    content.append(&fields_scroll);
+    content.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+
+    let citation_heading = gtk::Label::new(Some(&tr("Cite this reference")));
+    citation_heading.set_xalign(0.0);
+    citation_heading.add_css_class("heading");
+    content.append(&citation_heading);
+
+    let format_row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let format_label = gtk::Label::new(Some(&tr("Citation format")));
+    format_label.set_xalign(0.0);
+    format_row.append(&format_label);
+    let format_names = [
+        tr("ABNT"),
+        tr("MLA"),
+        tr("AMS"),
+        tr("APA 7"),
+        tr("Chicago (author-date)"),
+        tr("Harvard (author-date)"),
+        tr("Vancouver"),
+        tr("IEEE"),
+    ];
+    let format_name_refs = format_names.iter().map(String::as_str).collect::<Vec<_>>();
+    let format_selector = gtk::DropDown::from_strings(&format_name_refs);
+    format_selector.set_selected(0);
+    format_selector.set_hexpand(true);
+    format_row.append(&format_selector);
+    content.append(&format_row);
+
+    let citation_row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    citation_row.add_css_class("card");
+    citation_row.set_margin_top(2);
+    citation_row.set_margin_bottom(2);
+    citation_row.set_margin_start(2);
+    citation_row.set_margin_end(2);
+    let citation_text = gtk::Label::new(None);
+    citation_text.set_xalign(0.0);
+    citation_text.set_yalign(0.0);
+    citation_text.set_wrap(true);
+    citation_text.set_selectable(true);
+    citation_text.set_hexpand(true);
+    citation_text.set_margin_top(10);
+    citation_text.set_margin_bottom(10);
+    citation_text.set_margin_start(10);
+    citation_text.set_margin_end(4);
+    citation_row.append(&citation_text);
+    let copy_citation = button("edit-copy-symbolic", &tr("Copy formatted reference"));
+    let citation_for_copy = citation_text.clone();
+    let state_for_copy = state.clone();
+    copy_citation.connect_clicked(move |_| {
+        let text = citation_for_copy.text();
+        copy_text_to_clipboard(&state_for_copy, text.as_str());
+    });
+    citation_row.append(&copy_citation);
+    content.append(&citation_row);
+
+    let entry_for_format = entry.clone();
+    let citation_for_format = citation_text.clone();
+    format_selector.connect_selected_notify(move |selector| {
+        let style = reference_style_from_index(selector.selected());
+        citation_for_format.set_text(&bibtex::display_bibtex_text(
+            &bibtex::format_reference_citation(&entry_for_format, style),
+        ));
+    });
+    citation_text.set_text(&bibtex::display_bibtex_text(
+        &bibtex::format_reference_citation(&entry, bibtex::ReferenceStyle::Abnt),
+    ));
+
+    let state_for_edit = state.clone();
+    dialog.connect_response(move |dialog, response| {
+        dialog.close();
+        if response == gtk::ResponseType::Accept {
+            let state = state_for_edit.clone();
+            let entry = entry.clone();
+            glib::idle_add_local_once(move || edit_reference(&state, Some(entry)));
+        }
+    });
+    dialog.present();
+}
+
+fn reference_detail_row(state: &Rc<State>, name: &str, value: &str) -> gtk::Box {
+    let row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    row.set_margin_top(3);
+    row.set_margin_bottom(3);
+    let name_label = gtk::Label::new(Some(name));
+    name_label.set_xalign(0.0);
+    name_label.set_width_chars(18);
+    name_label.set_valign(gtk::Align::Start);
+    name_label.add_css_class("dim-label");
+    row.append(&name_label);
+    let display_value = bibtex::display_bibtex_text(value);
+    let value_label = gtk::Label::new(Some(&display_value));
+    value_label.set_xalign(0.0);
+    value_label.set_valign(gtk::Align::Start);
+    value_label.set_wrap(true);
+    value_label.set_selectable(true);
+    value_label.set_hexpand(true);
+    row.append(&value_label);
+    let copy = button("edit-copy-symbolic", &tr("Copy value"));
+    copy.set_valign(gtk::Align::Start);
+    let state = state.clone();
+    let value = display_value;
+    copy.connect_clicked(move |_| copy_text_to_clipboard(&state, &value));
+    row.append(&copy);
+    row
+}
+
+fn reference_detail_tags_row(name: &str, value: &str) -> gtk::Box {
+    let row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    row.set_margin_top(3);
+    row.set_margin_bottom(3);
+    let name_label = gtk::Label::new(Some(name));
+    name_label.set_xalign(0.0);
+    name_label.set_width_chars(18);
+    name_label.set_valign(gtk::Align::Start);
+    name_label.add_css_class("dim-label");
+    row.append(&name_label);
+
+    let chips = gtk::FlowBox::new();
+    chips.set_selection_mode(gtk::SelectionMode::None);
+    chips.set_row_spacing(4);
+    chips.set_column_spacing(4);
+    chips.set_max_children_per_line(8);
+    chips.set_min_children_per_line(1);
+    chips.set_hexpand(true);
+    for tag in parse_tag_values(value) {
+        let chip = gtk::Label::new(Some(&bibtex::display_bibtex_text(&tag)));
+        chip.add_css_class("reference-detail-tag-chip");
+        chip.set_selectable(true);
+        chips.append(&chip);
+    }
+    row.append(&chips);
+    row
+}
+
+fn copy_text_to_clipboard(state: &Rc<State>, text: &str) {
+    if let Some(display) = gdk::Display::default() {
+        display.clipboard().set_text(text);
+        show_toast(state, &tr("Copied to clipboard"));
+    } else {
+        show_toast(state, &tr("Could not access the clipboard."));
+    }
+}
+
 fn reference_filter_values(entries: &[BibEntry]) -> ReferenceFilterOptions {
     let authors = sorted_reference_values(entries.iter().flat_map(reference_authors));
     let years = sorted_reference_values(entries.iter().filter_map(reference_year));
     let tags = sorted_reference_values(entries.iter().flat_map(reference_tags));
+    let kinds = sorted_reference_values(
+        entries
+            .iter()
+            .map(|entry| bibtex::reference_type_label(&entry.entry_type)),
+    );
     ReferenceFilterOptions {
         authors,
         years,
         tags,
+        kinds,
+    }
+}
+
+fn reference_filter_author_names(
+    citation_names: &[String],
+    profiles: &[AuthorProfile],
+) -> Vec<String> {
+    sorted_reference_values(citation_names.iter().map(|citation_name| {
+        profiles
+            .iter()
+            .find(|profile| {
+                author_selection_identity(&profile.citation_name)
+                    == author_selection_identity(citation_name)
+            })
+            .map(|profile| bibtex::display_bibtex_text(&profile.full_name))
+            .filter(|full_name| !full_name.trim().is_empty())
+            .unwrap_or_else(|| bibtex::display_bibtex_text(citation_name))
+    }))
+}
+
+fn parse_tag_values(value: &str) -> Vec<String> {
+    let mut tags = Vec::new();
+    for tag in value
+        .split([',', ';'])
+        .map(str::trim)
+        .filter(|tag| !tag.is_empty())
+    {
+        if !tags
+            .iter()
+            .any(|existing: &String| existing.eq_ignore_ascii_case(tag))
+        {
+            tags.push(tag.to_owned());
+        }
+    }
+    tags
+}
+
+fn add_tag_selection(
+    name: &str,
+    available: &Rc<RefCell<Vec<String>>>,
+    selected: &Rc<RefCell<Vec<String>>>,
+) -> bool {
+    let name = name.trim();
+    if name.is_empty() {
+        return false;
+    }
+    let existing = available
+        .borrow()
+        .iter()
+        .find(|tag| tag.eq_ignore_ascii_case(name))
+        .cloned();
+    let canonical = if let Some(existing) = existing {
+        existing
+    } else {
+        let name = name.to_owned();
+        available.borrow_mut().push(name.clone());
+        name
+    };
+    let mut selected = selected.borrow_mut();
+    if selected
+        .iter()
+        .any(|tag| tag.eq_ignore_ascii_case(&canonical))
+    {
+        return true;
+    }
+    selected.push(canonical);
+    true
+}
+
+fn refresh_reference_tag_chips(
+    chips: &gtk::FlowBox,
+    selected: &Rc<RefCell<Vec<String>>>,
+) {
+    while let Some(child) = chips.first_child() {
+        chips.remove(&child);
+    }
+    for tag in selected.borrow().iter().cloned() {
+        let chip = gtk::Button::with_label(&format!("{tag}  ×"));
+        chip.add_css_class("pill");
+        chip.add_css_class("reference-tag-chip");
+        chip.set_tooltip_text(Some(&tr("Remove tag from this reference")));
+        let selected = selected.clone();
+        let chips_for_click = chips.clone();
+        let remove = tag.clone();
+        chip.connect_clicked(move |_| {
+            selected
+                .borrow_mut()
+                .retain(|tag| !tag.eq_ignore_ascii_case(&remove));
+            refresh_reference_tag_chips(&chips_for_click, &selected);
+        });
+        chips.append(&chip);
+    }
+}
+
+fn refresh_reference_tag_picker(
+    list: &gtk::Box,
+    chips: &gtk::FlowBox,
+    selected: &Rc<RefCell<Vec<String>>>,
+    available: &Rc<RefCell<Vec<String>>>,
+    query: &str,
+) {
+    while let Some(child) = list.first_child() {
+        list.remove(&child);
+    }
+    let query = query.trim().to_lowercase();
+    let choices = available
+        .borrow()
+        .iter()
+        .filter(|tag| query.is_empty() || tag.to_lowercase().contains(&query))
+        .cloned()
+        .collect::<Vec<_>>();
+    if choices.is_empty() {
+        let empty = gtk::Label::new(Some(&tr("No matching tags")));
+        empty.set_xalign(0.0);
+        empty.add_css_class("dim-label");
+        list.append(&empty);
+        return;
+    }
+    for tag in choices {
+        let choice = gtk::CheckButton::with_label(&tag);
+        choice.set_active(
+            selected
+                .borrow()
+                .iter()
+                .any(|selected| selected.eq_ignore_ascii_case(&tag)),
+        );
+        let selected = selected.clone();
+        let chips = chips.clone();
+        let tag_for_toggle = tag.clone();
+        choice.connect_toggled(move |choice| {
+            let mut selected_tags = selected.borrow_mut();
+            if choice.is_active() {
+                if !selected_tags
+                    .iter()
+                    .any(|selected| selected.eq_ignore_ascii_case(&tag_for_toggle))
+                {
+                    selected_tags.push(tag_for_toggle.clone());
+                }
+            } else {
+                selected_tags
+                    .retain(|selected| !selected.eq_ignore_ascii_case(&tag_for_toggle));
+            }
+            drop(selected_tags);
+            refresh_reference_tag_chips(&chips, &selected);
+        });
+        list.append(&choice);
+    }
+}
+
+fn author_selection_identity(name: &str) -> String {
+    bibtex::display_bibtex_text(name)
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase()
+}
+
+fn add_author_selection(
+    name: &str,
+    available: &Rc<RefCell<Vec<String>>>,
+    selected: &Rc<RefCell<Vec<String>>>,
+) -> bool {
+    let name = name.trim();
+    if name.is_empty() {
+        return false;
+    }
+    let identity = author_selection_identity(name);
+    let existing = available
+        .borrow()
+        .iter()
+        .find(|author| author_selection_identity(author) == identity)
+        .cloned();
+    let canonical = if let Some(existing) = existing {
+        existing
+    } else {
+        let name = name.to_owned();
+        available.borrow_mut().push(name.clone());
+        name
+    };
+    let mut selected = selected.borrow_mut();
+    if selected
+        .iter()
+        .any(|author| author_selection_identity(author) == identity)
+    {
+        return true;
+    }
+    selected.push(canonical);
+    true
+}
+
+fn refresh_reference_author_list(
+    selected_list: &gtk::Box,
+    selected: &Rc<RefCell<Vec<String>>>,
+) {
+    while let Some(child) = selected_list.first_child() {
+        selected_list.remove(&child);
+    }
+    for (index, author) in selected.borrow().iter().cloned().enumerate() {
+        let display_name = bibtex::display_bibtex_text(&author);
+        let row = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+        row.add_css_class("card");
+        row.add_css_class("reference-author-row");
+        row.set_hexpand(true);
+        row.set_margin_start(2);
+        row.set_margin_end(2);
+        let name = gtk::Label::new(Some(&display_name));
+        name.set_xalign(0.0);
+        name.set_hexpand(true);
+        name.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        row.append(&name);
+
+        let move_up = button("go-up-symbolic", &tr("Move author up"));
+        move_up.set_sensitive(index > 0);
+        let selected_for_up = selected.clone();
+        let list_for_up = selected_list.clone();
+        move_up.connect_clicked(move |_| {
+            {
+                let mut authors = selected_for_up.borrow_mut();
+                if index > 0 && index < authors.len() {
+                    authors.swap(index, index - 1);
+                }
+            }
+            refresh_reference_author_list(&list_for_up, &selected_for_up);
+        });
+        row.append(&move_up);
+
+        let move_down = button("go-down-symbolic", &tr("Move author down"));
+        move_down.set_sensitive(index + 1 < selected.borrow().len());
+        let selected_for_down = selected.clone();
+        let list_for_down = selected_list.clone();
+        move_down.connect_clicked(move |_| {
+            {
+                let mut authors = selected_for_down.borrow_mut();
+                if index + 1 < authors.len() {
+                    authors.swap(index, index + 1);
+                }
+            }
+            refresh_reference_author_list(&list_for_down, &selected_for_down);
+        });
+        row.append(&move_down);
+
+        let remove = button(
+            "window-close-symbolic",
+            &tr("Remove author from this reference"),
+        );
+        let selected_for_remove = selected.clone();
+        let list_for_remove = selected_list.clone();
+        let remove_identity = author_selection_identity(&author);
+        remove.connect_clicked(move |_| {
+            selected_for_remove
+                .borrow_mut()
+                .retain(|author| author_selection_identity(author) != remove_identity);
+            refresh_reference_author_list(&list_for_remove, &selected_for_remove);
+        });
+        row.append(&remove);
+        selected_list.append(&row);
+    }
+}
+
+fn refresh_reference_author_picker(
+    list: &gtk::Box,
+    selected_list: &gtk::Box,
+    selected: &Rc<RefCell<Vec<String>>>,
+    available: &Rc<RefCell<Vec<String>>>,
+    query: &str,
+) {
+    while let Some(child) = list.first_child() {
+        list.remove(&child);
+    }
+    let query = query.trim().to_lowercase();
+    let mut choices = available
+        .borrow()
+        .iter()
+        .filter(|author| {
+            query.is_empty()
+                || bibtex::display_bibtex_text(author)
+                    .to_lowercase()
+                    .contains(&query)
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+    choices.sort_by_key(|author| bibtex::display_bibtex_text(author).to_lowercase());
+    if choices.is_empty() {
+        let empty = gtk::Label::new(Some(&tr("No matching authors")));
+        empty.set_xalign(0.0);
+        empty.add_css_class("dim-label");
+        list.append(&empty);
+        return;
+    }
+    for author in choices {
+        let choice = gtk::CheckButton::with_label(&bibtex::display_bibtex_text(&author));
+        let identity = author_selection_identity(&author);
+        choice.set_active(
+            selected
+                .borrow()
+                .iter()
+                .any(|selected| author_selection_identity(selected) == identity),
+        );
+        let selected = selected.clone();
+        let selected_list = selected_list.clone();
+        let author_for_toggle = author.clone();
+        choice.connect_toggled(move |choice| {
+            let identity = author_selection_identity(&author_for_toggle);
+            let mut selected_authors = selected.borrow_mut();
+            if choice.is_active() {
+                if !selected_authors
+                    .iter()
+                    .any(|selected| author_selection_identity(selected) == identity)
+                {
+                    selected_authors.push(author_for_toggle.clone());
+                }
+            } else {
+                selected_authors
+                    .retain(|selected| author_selection_identity(selected) != identity);
+            }
+            drop(selected_authors);
+            refresh_reference_author_list(&selected_list, &selected);
+        });
+        list.append(&choice);
     }
 }
 
@@ -4456,12 +6424,7 @@ fn reference_authors(entry: &BibEntry) -> Vec<String> {
     } else {
         entry.get("author")
     };
-    author
-        .split(" and ")
-        .map(str::trim)
-        .filter(|author| !author.is_empty())
-        .map(str::to_owned)
-        .collect()
+    bibtex::display_bibtex_names(author)
 }
 
 fn reference_year(entry: &BibEntry) -> Option<String> {
@@ -4490,10 +6453,29 @@ fn reference_matches_filters(
     year: Option<&str>,
     tag: Option<&str>,
 ) -> bool {
+    reference_matches_filters_with_type(entry, author, year, tag, None, &[])
+}
+
+fn reference_matches_filters_with_type(
+    entry: &BibEntry,
+    author: Option<&str>,
+    year: Option<&str>,
+    tag: Option<&str>,
+    kind: Option<&str>,
+    author_profiles: &[AuthorProfile],
+) -> bool {
     let author_matches = author.is_none_or(|selected| {
+        let selected_identity = author_selection_identity(selected);
         reference_authors(entry)
             .iter()
-            .any(|candidate| candidate.eq_ignore_ascii_case(selected))
+            .any(|candidate| {
+                let candidate_identity = author_selection_identity(candidate);
+                candidate_identity == selected_identity
+                    || author_profiles.iter().any(|profile| {
+                        author_selection_identity(&profile.citation_name) == candidate_identity
+                            && author_selection_identity(&profile.full_name) == selected_identity
+                    })
+            })
     });
     let year_matches = year.is_none_or(|selected| {
         reference_year(entry).is_some_and(|candidate| candidate.eq_ignore_ascii_case(selected))
@@ -4503,7 +6485,54 @@ fn reference_matches_filters(
             .iter()
             .any(|candidate| candidate.eq_ignore_ascii_case(selected))
     });
-    author_matches && year_matches && tag_matches
+    let kind_matches = kind.is_none_or(|selected| {
+        bibtex::reference_type_label(&entry.entry_type).eq_ignore_ascii_case(selected)
+    });
+    author_matches && year_matches && tag_matches && kind_matches
+}
+
+fn sort_reference_entries(entries: &mut [BibEntry], sort_by: u32, descending: bool) {
+    entries.sort_by(|left, right| {
+        let primary = match sort_by {
+            1 => reference_authors(left)
+                .join(" ")
+                .to_lowercase()
+                .cmp(&reference_authors(right).join(" ").to_lowercase()),
+            2 => reference_year(left)
+                .and_then(|year| year.parse::<u32>().ok())
+                .cmp(&reference_year(right).and_then(|year| year.parse::<u32>().ok())),
+            3 => reference_tag_sort_key(left).cmp(&reference_tag_sort_key(right)),
+            _ => reference_title(left)
+                .to_lowercase()
+                .cmp(&reference_title(right).to_lowercase()),
+        };
+        let primary = if descending {
+            primary.reverse()
+        } else {
+            primary
+        };
+        primary
+            .then_with(|| reference_title(left).to_lowercase().cmp(&reference_title(right).to_lowercase()))
+            .then_with(|| left.key.to_lowercase().cmp(&right.key.to_lowercase()))
+    });
+}
+
+fn reference_tag_sort_key(entry: &BibEntry) -> Vec<String> {
+    let mut tags = reference_tags(entry)
+        .into_iter()
+        .map(|tag| tag.to_lowercase())
+        .collect::<Vec<_>>();
+    tags.sort();
+    tags.dedup();
+    tags
+}
+
+fn reference_title(entry: &BibEntry) -> String {
+    if entry.get("title").trim().is_empty() {
+        bibtex::display_bibtex_text(&entry.key)
+    } else {
+        bibtex::display_bibtex_text(entry.get("title"))
+    }
 }
 
 fn selected_reference_filter(dropdown: &gtk::DropDown) -> Option<String> {
@@ -4517,10 +6546,62 @@ fn selected_reference_filter(dropdown: &gtk::DropDown) -> Option<String> {
         .map(|item| item.string().to_string())
 }
 
+fn request_reference_deletion(
+    state: &Rc<State>,
+    parent: &gtk::Window,
+    entry: BibEntry,
+    after_delete: impl FnOnce() + 'static,
+) {
+    if !library_is_ready(state) {
+        return;
+    }
+    let name = if entry.get("title").trim().is_empty() {
+        bibtex::display_bibtex_text(&entry.key)
+    } else {
+        bibtex::display_bibtex_text(entry.get("title"))
+    };
+    let message = tr("Delete reference ‘%s’ from the local library? This cannot be undone.")
+        .replacen("%s", &name, 1);
+    let key = entry.key;
+    confirm_destructive_action(
+        state,
+        parent,
+        &tr("Confirm deletion"),
+        &message,
+        &tr("Delete"),
+        move |state| {
+            if !library_is_ready(&state) {
+                return;
+            }
+            let mut updated = state.library.borrow().clone();
+            if updated.remove_in_memory(&key) {
+                persist_library_async(state, updated, tr("Reference deleted"));
+                after_delete();
+            }
+        },
+    );
+}
+
 fn set_reference_filter_options(dropdown: &gtk::DropDown, all_label: &str, values: Vec<String>) {
-    let selection = selected_reference_filter(dropdown);
     let mut options = vec![all_label.to_owned()];
     options.extend(values);
+
+    let options_unchanged = dropdown
+        .model()
+        .and_then(|model| model.downcast::<gtk::StringList>().ok())
+        .is_some_and(|model| {
+            model.n_items() as usize == options.len()
+                && options.iter().enumerate().all(|(index, option)| {
+                    model
+                        .string(index as u32)
+                        .is_some_and(|current| current.as_str() == option)
+                })
+        });
+    if options_unchanged {
+        return;
+    }
+
+    let selection = selected_reference_filter(dropdown);
     let model_strings = options.iter().map(String::as_str).collect::<Vec<_>>();
     let model = gtk::StringList::new(&model_strings);
     dropdown.set_model(Some(&model));
@@ -4596,29 +6677,48 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
         .modal(true)
         .build();
     dialog.set_default_size(700, 660);
-    dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
-    if entry.is_some() {
-        dialog.add_button(&tr("Delete"), gtk::ResponseType::Reject);
-    }
-    dialog.add_button(
-        &tr_dynamic(if entry.is_some() { "Save" } else { "Add" }),
-        gtk::ResponseType::Accept,
-    );
-    dialog.set_default_response(gtk::ResponseType::Accept);
     let grid = gtk::Grid::builder()
         .column_spacing(12)
         .row_spacing(8)
         .margin_top(18)
         .margin_bottom(18)
         .margin_start(20)
-        .margin_end(20)
+        .margin_end(30)
         .build();
     let form_scroll = gtk::ScrolledWindow::builder()
         .vexpand(true)
         .hscrollbar_policy(gtk::PolicyType::Never)
         .child(&grid)
         .build();
-    dialog.content_area().append(&form_scroll);
+    let content = dialog.content_area();
+    content.append(&form_scroll);
+    let actions = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+    actions.set_margin_top(16);
+    actions.set_margin_bottom(0);
+    actions.set_margin_start(6);
+    actions.set_margin_end(6);
+    if entry.is_some() {
+        let delete = gtk::Button::with_label(&tr("Delete"));
+        delete.add_css_class("destructive-action");
+        let dialog_for_delete = dialog.clone();
+        delete.connect_clicked(move |_| dialog_for_delete.response(gtk::ResponseType::Reject));
+        actions.append(&delete);
+    }
+    let spacer = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+    spacer.set_hexpand(true);
+    actions.append(&spacer);
+    let cancel = gtk::Button::with_label(&tr("Cancel"));
+    let dialog_for_cancel = dialog.clone();
+    cancel.connect_clicked(move |_| dialog_for_cancel.response(gtk::ResponseType::Cancel));
+    actions.append(&cancel);
+    let save_label = tr_dynamic(if entry.is_some() { "Save" } else { "Add" });
+    let save = gtk::Button::with_label(&save_label);
+    save.add_css_class("suggested-action");
+    let dialog_for_save = dialog.clone();
+    save.connect_clicked(move |_| dialog_for_save.response(gtk::ResponseType::Accept));
+    actions.append(&save);
+    dialog.set_default_widget(Some(&save));
+    content.append(&actions);
     let translated_types = REFERENCE_TYPES
         .iter()
         .map(|kind| bibtex::reference_type_label(kind))
@@ -4659,6 +6759,9 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
         HashMap::<String, (gtk::Label, gtk::Entry)>::new(),
     ));
     for name in names {
+        if name == "tags" || name == "author" {
+            continue;
+        }
         let label = gtk::Label::new(Some(&bibtex::reference_field_label(name, selected_type)));
         label.set_xalign(1.0);
         label.add_css_class("dim-label");
@@ -4677,6 +6780,287 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
         }
         rows.borrow_mut().insert(name.to_owned(), (label, input));
     }
+
+    let selected_authors = Rc::new(RefCell::new(
+        entry
+            .as_ref()
+            .map(|entry| bibtex::split_bibtex_names(entry.get("author")))
+            .unwrap_or_default(),
+    ));
+    let available_authors = Rc::new(RefCell::new(
+        state
+            .library
+            .borrow()
+            .authors
+            .iter()
+            .map(|author| author.citation_name.clone())
+            .collect::<Vec<_>>(),
+    ));
+    for author in selected_authors.borrow().iter() {
+        let missing = {
+            let available = available_authors.borrow();
+            !available.iter().any(|existing| {
+                author_selection_identity(existing) == author_selection_identity(author)
+            })
+        };
+        if missing {
+            available_authors.borrow_mut().push(author.clone());
+        }
+    }
+    let author_list = gtk::Box::new(gtk::Orientation::Vertical, 4);
+    author_list.set_hexpand(true);
+    author_list.set_halign(gtk::Align::Fill);
+    refresh_reference_author_list(&author_list, &selected_authors);
+
+    let author_editor = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    author_editor.set_hexpand(true);
+    author_editor.append(&author_list);
+
+    let author_popover = gtk::Popover::new();
+    let author_picker_content = gtk::Box::new(gtk::Orientation::Vertical, 8);
+    author_picker_content.set_margin_top(8);
+    author_picker_content.set_margin_bottom(8);
+    author_picker_content.set_margin_start(8);
+    author_picker_content.set_margin_end(8);
+    author_picker_content.set_size_request(280, -1);
+    let author_search = gtk::SearchEntry::new();
+    author_search.set_placeholder_text(Some(&tr("Find authors…")));
+    author_picker_content.append(&author_search);
+    let author_choices = gtk::Box::new(gtk::Orientation::Vertical, 2);
+    author_choices.set_hexpand(true);
+    let author_choices_scroll = gtk::ScrolledWindow::builder()
+        .min_content_height(36)
+        .max_content_height(180)
+        .child(&author_choices)
+        .build();
+    author_picker_content.append(&author_choices_scroll);
+    let create_author_row = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+    let new_author_entry = gtk::Entry::new();
+    new_author_entry.set_placeholder_text(Some(&tr("New author")));
+    new_author_entry.set_hexpand(true);
+    let create_author_button = gtk::Button::with_label(&tr("Create"));
+    create_author_row.append(&new_author_entry);
+    create_author_row.append(&create_author_button);
+    author_picker_content.append(&create_author_row);
+    author_popover.set_child(Some(&author_picker_content));
+    refresh_reference_author_picker(
+        &author_choices,
+        &author_list,
+        &selected_authors,
+        &available_authors,
+        "",
+    );
+    author_search.connect_search_changed({
+        let author_choices = author_choices.clone();
+        let author_list = author_list.clone();
+        let selected_authors = selected_authors.clone();
+        let available_authors = available_authors.clone();
+        move |search| {
+            refresh_reference_author_picker(
+                &author_choices,
+                &author_list,
+                &selected_authors,
+                &available_authors,
+                search.text().as_str(),
+            );
+        }
+    });
+    create_author_button.connect_clicked({
+        let new_author_entry = new_author_entry.clone();
+        let author_choices = author_choices.clone();
+        let author_list = author_list.clone();
+        let selected_authors = selected_authors.clone();
+        let available_authors = available_authors.clone();
+        move |_| {
+            if add_author_selection(
+                new_author_entry.text().as_str(),
+                &available_authors,
+                &selected_authors,
+            ) {
+                new_author_entry.set_text("");
+                refresh_reference_author_list(&author_list, &selected_authors);
+                refresh_reference_author_picker(
+                    &author_choices,
+                    &author_list,
+                    &selected_authors,
+                    &available_authors,
+                    "",
+                );
+            }
+        }
+    });
+    create_author_button.set_tooltip_text(Some(&tr("Create and select this author")));
+    new_author_entry.connect_activate({
+        let create_author_button = create_author_button.clone();
+        move |_| create_author_button.emit_clicked()
+    });
+    let add_author_button = gtk::MenuButton::new();
+    add_author_button.set_child(Some(&labeled_content(
+        "list-add-symbolic",
+        &tr("Add author"),
+    )));
+    add_author_button.set_tooltip_text(Some(&tr("Select or create authors")));
+    add_author_button.set_popover(Some(&author_popover));
+    add_author_button.set_valign(gtk::Align::Start);
+    add_author_button.connect_active_notify({
+        let author_choices = author_choices.clone();
+        let author_list = author_list.clone();
+        let selected_authors = selected_authors.clone();
+        let available_authors = available_authors.clone();
+        let author_search = author_search.clone();
+        move |button| {
+            if button.is_active() {
+                refresh_reference_author_picker(
+                    &author_choices,
+                    &author_list,
+                    &selected_authors,
+                    &available_authors,
+                    author_search.text().as_str(),
+                );
+            }
+        }
+    });
+    author_editor.append(&add_author_button);
+    let author_label = gtk::Label::new(Some(&tr("Authors")));
+    author_label.set_xalign(1.0);
+    author_label.add_css_class("dim-label");
+
+    let selected_tags = Rc::new(RefCell::new(
+        entry
+            .as_ref()
+            .map(|entry| parse_tag_values(entry.get("tags")))
+            .unwrap_or_default(),
+    ));
+    let available_tags = Rc::new(RefCell::new(state.library.borrow().tags.clone()));
+    for tag in selected_tags.borrow().iter() {
+        let missing = {
+            let available = available_tags.borrow();
+            !available
+                .iter()
+                .any(|existing| existing.eq_ignore_ascii_case(tag))
+        };
+        if missing {
+            available_tags.borrow_mut().push(tag.clone());
+        }
+    }
+    let tag_chips = gtk::FlowBox::new();
+    tag_chips.set_selection_mode(gtk::SelectionMode::None);
+    tag_chips.set_row_spacing(4);
+    tag_chips.set_column_spacing(4);
+    tag_chips.set_max_children_per_line(8);
+    tag_chips.set_min_children_per_line(1);
+    tag_chips.set_hexpand(true);
+    tag_chips.set_halign(gtk::Align::Fill);
+    refresh_reference_tag_chips(&tag_chips, &selected_tags);
+
+    let tag_editor = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    tag_editor.set_hexpand(true);
+    tag_editor.append(&tag_chips);
+
+    let picker_popover = gtk::Popover::new();
+    let picker_content = gtk::Box::new(gtk::Orientation::Vertical, 8);
+    picker_content.set_margin_top(8);
+    picker_content.set_margin_bottom(8);
+    picker_content.set_margin_start(8);
+    picker_content.set_margin_end(8);
+    picker_content.set_size_request(260, -1);
+    let tag_search = gtk::SearchEntry::new();
+    tag_search.set_placeholder_text(Some(&tr("Find tags…")));
+    picker_content.append(&tag_search);
+    let tag_choices = gtk::Box::new(gtk::Orientation::Vertical, 2);
+    tag_choices.set_hexpand(true);
+    let tag_choices_scroll = gtk::ScrolledWindow::builder()
+        .min_content_height(36)
+        .max_content_height(180)
+        .child(&tag_choices)
+        .build();
+    picker_content.append(&tag_choices_scroll);
+    let create_row = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+    let new_tag_entry = gtk::Entry::new();
+    new_tag_entry.set_placeholder_text(Some(&tr("New tag")));
+    new_tag_entry.set_hexpand(true);
+    let create_tag_button = gtk::Button::with_label(&tr("Create"));
+    create_row.append(&new_tag_entry);
+    create_row.append(&create_tag_button);
+    picker_content.append(&create_row);
+    picker_popover.set_child(Some(&picker_content));
+    refresh_reference_tag_picker(
+        &tag_choices,
+        &tag_chips,
+        &selected_tags,
+        &available_tags,
+        "",
+    );
+    tag_search.connect_search_changed({
+        let tag_choices = tag_choices.clone();
+        let tag_chips = tag_chips.clone();
+        let selected_tags = selected_tags.clone();
+        let available_tags = available_tags.clone();
+        move |search| {
+            refresh_reference_tag_picker(
+                &tag_choices,
+                &tag_chips,
+                &selected_tags,
+                &available_tags,
+                search.text().as_str(),
+            );
+        }
+    });
+    create_tag_button.connect_clicked({
+        let new_tag_entry = new_tag_entry.clone();
+        let tag_choices = tag_choices.clone();
+        let tag_chips = tag_chips.clone();
+        let selected_tags = selected_tags.clone();
+        let available_tags = available_tags.clone();
+        move |_| {
+            if add_tag_selection(
+                new_tag_entry.text().as_str(),
+                &available_tags,
+                &selected_tags,
+            ) {
+                new_tag_entry.set_text("");
+                refresh_reference_tag_chips(&tag_chips, &selected_tags);
+                refresh_reference_tag_picker(
+                    &tag_choices,
+                    &tag_chips,
+                    &selected_tags,
+                    &available_tags,
+                    "",
+                );
+            }
+        }
+    });
+    create_tag_button.set_tooltip_text(Some(&tr("Create and select this tag")));
+    new_tag_entry.connect_activate({
+        let create_tag_button = create_tag_button.clone();
+        move |_| create_tag_button.emit_clicked()
+    });
+    let add_tag_button = gtk::MenuButton::new();
+    add_tag_button.set_child(Some(&labeled_content("list-add-symbolic", &tr("Add tag"))));
+    add_tag_button.set_tooltip_text(Some(&tr("Select or create tags")));
+    add_tag_button.set_popover(Some(&picker_popover));
+    add_tag_button.connect_active_notify({
+        let tag_choices = tag_choices.clone();
+        let tag_chips = tag_chips.clone();
+        let selected_tags = selected_tags.clone();
+        let available_tags = available_tags.clone();
+        move |button| {
+            if button.is_active() {
+                refresh_reference_tag_picker(
+                    &tag_choices,
+                    &tag_chips,
+                    &selected_tags,
+                    &available_tags,
+                    tag_search.text().as_str(),
+                );
+            }
+        }
+    });
+    tag_editor.append(&add_tag_button);
+    let tag_label = gtk::Label::new(Some(&tr("Tags")));
+    tag_label.set_xalign(1.0);
+    tag_label.add_css_class("dim-label");
+
     let key_label = gtk::Label::new(Some(&tr("Citation key")));
     key_label.set_xalign(1.0);
     key_label.add_css_class("dim-label");
@@ -4685,6 +7069,10 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
     let update_rows = {
         let rows = rows.clone();
         let grid = grid.clone();
+        let author_label = author_label.clone();
+        let author_editor = author_editor.clone();
+        let tag_label = tag_label.clone();
+        let tag_editor = tag_editor.clone();
         move |picker: &gtk::DropDown| {
             for (label, input) in rows.borrow().values() {
                 if label.parent().is_some() {
@@ -4699,7 +7087,19 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
                 .copied()
                 .unwrap_or("article");
             let mut row_num = 2;
+            if let Some((label, input)) = rows.borrow().get("title") {
+                label.set_label(&bibtex::reference_field_label("title", kind));
+                grid.attach(label, 0, row_num, 1, 1);
+                grid.attach(input, 1, row_num, 1, 1);
+                row_num += 1;
+            }
+            grid.attach(&author_label, 0, row_num, 1, 1);
+            grid.attach(&author_editor, 1, row_num, 1, 1);
+            row_num += 1;
             for name in crate::bibtex::fields_for_reference_type(kind) {
+                if *name == "tags" || *name == "title" || *name == "author" {
+                    continue;
+                }
                 if let Some((label, input)) = rows.borrow().get(*name) {
                     label.set_label(&bibtex::reference_field_label(name, kind));
                     grid.attach(label, 0, row_num, 1, 1);
@@ -4707,6 +7107,9 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
                     row_num += 1;
                 }
             }
+            tag_label.set_label(&bibtex::reference_field_label("tags", kind));
+            grid.attach(&tag_label, 0, row_num, 1, 1);
+            grid.attach(&tag_editor, 1, row_num, 1, 1);
         }
     };
     update_rows(&picker);
@@ -4717,12 +7120,17 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
     dialog.connect_response(move |dialog, response| {
         if response == gtk::ResponseType::Reject {
             if let Some(entry) = previous.as_ref() {
-                let mut updated = state2.library.borrow().clone();
-                if updated.remove_in_memory(&entry.key) {
-                    persist_library_async(state2.clone(), updated, tr("Reference deleted"));
-                }
+                let parent: &gtk::Window = dialog.upcast_ref();
+                let edit_dialog = dialog.clone();
+                request_reference_deletion(
+                    &state2,
+                    parent,
+                    entry.clone(),
+                    move || edit_dialog.close(),
+                );
+            } else {
+                dialog.close();
             }
-            dialog.close();
             return;
         }
         if response == gtk::ResponseType::Accept {
@@ -4730,11 +7138,13 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
                 .get(picker.selected() as usize)
                 .copied()
                 .unwrap_or("article");
-            let values = rows
+            let mut values = rows
                 .borrow()
                 .iter()
                 .map(|(name, (_, entry))| (name.clone(), entry.text().trim().to_owned()))
                 .collect::<indexmap::IndexMap<_, _>>();
+            values.insert("author".to_owned(), selected_authors.borrow().join(" and "));
+            values.insert("tags".to_owned(), selected_tags.borrow().join(", "));
             let old_fields = previous
                 .as_ref()
                 .map(|entry| &entry.fields)
@@ -4794,6 +7204,7 @@ fn import_bibtex(state: Rc<State>) {
         gtk::FileChooserAction::Open,
         "Import BibTeX",
         "Import",
+        None,
         |state, path| {
             let (sender, receiver) = mpsc::channel();
             std::thread::spawn(move || {
@@ -4835,6 +7246,7 @@ fn export_bibtex(state: Rc<State>) {
         gtk::FileChooserAction::Save,
         "Export BibTeX",
         "Export",
+        Some("export_bibitex_ovenbird.bib"),
         |state, path| {
             let source = bibtex::serialize_bibtex(&state.library.borrow().bibliography);
             let (sender, receiver) = mpsc::channel();
@@ -4853,200 +7265,17 @@ fn export_bibtex(state: Rc<State>) {
     );
 }
 
-fn sync_or_configure_zotero(state: Rc<State>) {
-    if !library_is_ready(&state) {
-        show_toast(&state, &tr("The local library is still loading."));
-        return;
-    }
-    let (sender, receiver) = mpsc::channel();
-    std::thread::spawn(move || {
-        let result = ZoteroSettings::load()
-            .map_err(|error| error.to_string())
-            .and_then(|settings| {
-                crate::zotero::load_api_key()
-                    .map(|key| {
-                        !settings.user_id.trim().is_empty()
-                            && key.is_some_and(|key| !key.trim().is_empty())
-                    })
-                    .map_err(|error| error.to_string())
-            });
-        let _ = sender.send(result);
-    });
-    poll_result(receiver, move |result| match result {
-        Ok(true) => sync_zotero(state),
-        Ok(false) => show_zotero_settings(state),
-        Err(error) => {
-            show_toast(
-                &state,
-                &format!("{}: {error}", tr("Could not check Zotero settings")),
-            );
-            show_zotero_settings(state);
-        }
-    });
-}
-
-fn show_zotero_settings(state: Rc<State>) {
-    let dialog = gtk::Dialog::builder()
-        .title(tr("Sync with Zotero"))
-        .transient_for(&state.window)
-        .modal(true)
-        .build();
-    dialog.set_default_size(620, 360);
-    dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
-    let save_button = dialog.add_button(&tr("Save and sync"), gtk::ResponseType::Accept);
-    save_button.set_sensitive(false);
-    dialog.set_default_response(gtk::ResponseType::Accept);
-    let content = dialog.content_area();
-    content.set_spacing(10);
-    content.set_margin_top(18);
-    content.set_margin_bottom(18);
-    content.set_margin_start(20);
-    content.set_margin_end(20);
-    let description = gtk::Label::new(Some(&tr(
-        "The local library works without an account. To sync, enter your library ID and a Zotero key with read and write access.",
-    )));
-    description.set_xalign(0.0);
-    description.set_wrap(true);
-    content.append(&description);
-    let account = gtk::Box::new(gtk::Orientation::Horizontal, 8);
-    let hint = gtk::Label::new(Some(&tr("Don’t have a Zotero account?")));
-    hint.add_css_class("dim-label");
-    account.append(&hint);
-    let link = gtk::LinkButton::with_label(
-        "https://www.zotero.org/user/register/",
-        &tr("Create a Zotero account"),
-    );
-    account.append(&link);
-    content.append(&account);
-    let grid = gtk::Grid::builder()
-        .column_spacing(10)
-        .row_spacing(8)
-        .build();
-    let id_entry = gtk::Entry::new();
-    id_entry.set_placeholder_text(Some(&tr("Found at zotero.org/settings/keys")));
-    id_entry.set_hexpand(true);
-    let key_entry = gtk::PasswordEntry::new();
-    key_entry.set_placeholder_text(Some(&tr("Zotero key with write access")));
-    key_entry.set_show_peek_icon(true);
-    key_entry.set_hexpand(true);
-    grid.attach(&gtk::Label::new(Some(&tr("User ID"))), 0, 0, 1, 1);
-    grid.attach(&id_entry, 1, 0, 1, 1);
-    grid.attach(&gtk::Label::new(Some(&tr("API key"))), 0, 1, 1, 1);
-    grid.attach(&key_entry, 1, 1, 1, 1);
-    content.append(&grid);
-    let settings_for_response = Rc::new(RefCell::new(None::<ZoteroSettings>));
-    let state2 = state.clone();
-    let settings_for_save = settings_for_response.clone();
-    let id_entry_for_save = id_entry.clone();
-    dialog.connect_response(move |dialog, response| {
-        if response != gtk::ResponseType::Accept {
-            dialog.close();
-            return;
-        }
-        let Some(mut updated) = settings_for_save.borrow().clone() else {
-            show_toast(&state2, &tr("Zotero settings are still loading."));
-            return;
-        };
-        let user_id = id_entry_for_save.text().trim().to_owned();
-        let api_key = key_entry.text().trim().to_owned();
-        if user_id.is_empty() || api_key.is_empty() {
-            show_toast(&state2, &tr("Enter the ID and API key"));
-            return;
-        }
-        updated.user_id = user_id;
-        let (sender, receiver) = mpsc::channel();
-        std::thread::spawn(move || {
-            let result = updated
-                .save()
-                .map_err(|error| error.to_string())
-                .and_then(|_| crate::zotero::store_api_key(&api_key));
-            let _ = sender.send(result);
-        });
-        dialog.close();
-        state2.status.set_label(&tr("Saving Zotero settings…"));
-        poll_result(receiver, {
-            let state = state2.clone();
-            move |result| match result {
-                Ok(()) => {
-                    state.status.set_label(&tr("Ready"));
-                    sync_zotero(state);
-                }
-                Err(error) => {
-                    state.status.set_label(&tr("Ready"));
-                    show_toast(
-                        &state,
-                        &format!("{}: {error}", tr("Could not save the Zotero key")),
-                    );
-                }
-            }
-        });
-    });
-    dialog.present();
-
-    let (sender, receiver) = mpsc::channel();
-    std::thread::spawn(move || {
-        let _ = sender.send(ZoteroSettings::load().map_err(|error| error.to_string()));
-    });
-    let id_entry_for_load = id_entry.clone();
-    let save_button_for_load = save_button.clone();
-    let settings_for_load = settings_for_response;
-    let dialog_for_load = dialog.clone();
-    let state_for_load = state.clone();
-    poll_result(receiver, move |result| match result {
-        Ok(settings) => {
-            id_entry_for_load.set_text(&settings.user_id);
-            *settings_for_load.borrow_mut() = Some(settings);
-            save_button_for_load.set_sensitive(true);
-        }
-        Err(error) => {
-            show_toast(
-                &state_for_load,
-                &format!("{}: {error}", tr("Could not load Zotero settings")),
-            );
-            let retry = gtk::Button::with_label(&tr("Retry"));
-            retry.set_halign(gtk::Align::Start);
-            let retry_parent = dialog_for_load.content_area();
-            retry_parent.append(&retry);
-            let id_entry = id_entry_for_load.clone();
-            let save_button = save_button_for_load.clone();
-            let settings = settings_for_load.clone();
-            let dialog = dialog_for_load.clone();
-            let state = state_for_load.clone();
-            let retry_for_click = retry.clone();
-            retry.connect_clicked(move |_| {
-                retry_for_click.set_sensitive(false);
-                let (sender, receiver) = mpsc::channel();
-                std::thread::spawn(move || {
-                    let _ = sender.send(ZoteroSettings::load().map_err(|error| error.to_string()));
-                });
-                let id_entry = id_entry.clone();
-                let save_button = save_button.clone();
-                let settings = settings.clone();
-                let dialog = dialog.clone();
-                let state = state.clone();
-                let retry_for_result = retry_for_click.clone();
-                poll_result(receiver, move |result| match result {
-                    Ok(loaded) => {
-                        id_entry.set_text(&loaded.user_id);
-                        *settings.borrow_mut() = Some(loaded);
-                        save_button.set_sensitive(true);
-                        dialog.content_area().remove(&retry_for_result);
-                    }
-                    Err(error) => {
-                        retry_for_result.set_sensitive(true);
-                        show_toast(
-                            &state,
-                            &format!("{}: {error}", tr("Could not load Zotero settings")),
-                        );
-                    }
-                });
-            });
-        }
-    });
-}
-
 fn poll_result<T: Send + 'static>(receiver: mpsc::Receiver<T>, callback: impl FnOnce(T) + 'static) {
+    poll_result_with_disconnect(receiver, callback, || {});
+}
+
+fn poll_result_with_disconnect<T: Send + 'static>(
+    receiver: mpsc::Receiver<T>,
+    callback: impl FnOnce(T) + 'static,
+    on_disconnect: impl FnOnce() + 'static,
+) {
     let callback = Rc::new(RefCell::new(Some(callback)));
+    let on_disconnect = Rc::new(RefCell::new(Some(on_disconnect)));
     glib::timeout_add_local(Duration::from_millis(120), move || {
         match receiver.try_recv() {
             Ok(result) => {
@@ -5056,76 +7285,13 @@ fn poll_result<T: Send + 'static>(receiver: mpsc::Receiver<T>, callback: impl Fn
                 glib::ControlFlow::Break
             }
             Err(mpsc::TryRecvError::Empty) => glib::ControlFlow::Continue,
-            Err(mpsc::TryRecvError::Disconnected) => glib::ControlFlow::Break,
-        }
-    });
-}
-
-fn sync_zotero(state: Rc<State>) {
-    if !library_is_ready(&state) {
-        return;
-    }
-    state.library_busy.set(true);
-    state.sync_button.set_sensitive(false);
-    state.status.set_label(&tr("Syncing…"));
-    show_toast(&state, &tr("Syncing references…"));
-    let mut library = state.library.borrow().clone();
-    let (sender, receiver) = mpsc::channel();
-    std::thread::spawn(move || {
-        let result = crate::zotero::load_api_key().and_then(|key| {
-            let key = key.ok_or_else(|| tr("No Zotero API key is saved."))?;
-            let settings = ZoteroSettings::load().map_err(|error| error.to_string())?;
-            let mut client = crate::zotero::ZoteroClient::new(settings.user_id, key)?;
-            client.sync(&mut library)
-        });
-        let _ = sender.send((result, library));
-    });
-    poll_result(receiver, move |(result, updated)| {
-        state.library_busy.set(false);
-        state.sync_button.set_sensitive(true);
-        state.status.set_label(&tr("Ready"));
-        match result {
-            Ok(report) => {
-                *state.library.borrow_mut() = updated;
-                refresh_library(&state);
-                let count_message = |singular: &str, plural: &str, count: usize| {
-                    ngettext(singular, plural, count).replacen("%d", &count.to_string(), 1)
-                };
-                let mut messages = vec![
-                    count_message(
-                        "%d reference downloaded",
-                        "%d references downloaded",
-                        report.imported,
-                    ),
-                    count_message(
-                        "%d reference uploaded",
-                        "%d references uploaded",
-                        report.created,
-                    ),
-                    count_message(
-                        "%d reference updated locally",
-                        "%d references updated locally",
-                        report.updated_locally,
-                    ),
-                ];
-                if !report.conflicts.is_empty() {
-                    messages.push(count_message(
-                        "%d conflict kept locally",
-                        "%d conflicts kept locally",
-                        report.conflicts.len(),
-                    ));
+            Err(mpsc::TryRecvError::Disconnected) => {
+                let on_disconnect = on_disconnect.borrow_mut().take();
+                if let Some(on_disconnect) = on_disconnect {
+                    on_disconnect();
                 }
-                if report.failed > 0 {
-                    messages.push(count_message(
-                        "%d upload failed",
-                        "%d uploads failed",
-                        report.failed,
-                    ));
-                }
-                let message = messages.join(" · ");
-                show_toast(&state, &message);
+                glib::ControlFlow::Break
             }
-            Err(error) => show_toast(&state, &format!("{}: {error}", tr("Zotero sync failed"))),
         }
     });
 }
@@ -5138,6 +7304,7 @@ fn choose_pdf_export(state: Rc<State>) {
         Some(&tr("Export")),
         Some(&tr("Cancel")),
     );
+    set_downloads_folder(&dialog);
     dialog.set_current_name("document.pdf");
     let state2 = state.clone();
     dialog.connect_response(move |dialog, response| {
@@ -5189,7 +7356,7 @@ fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
                     }
                 }
                 Err(error) => {
-                    set_build_status_with_message(&state_for_result, "Error", Some(&error));
+                    set_build_status(&state_for_result, "Error");
                     show_toast(
                         &state_for_result,
                         &format!("{}: {error}", tr("Could not list the project folder")),
@@ -5202,8 +7369,7 @@ fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
         return;
     };
     state.main_tex.replace(Some(main.clone()));
-    set_build_status_with_message(state, "Building…", Some(&tr("Compilation is in progress.")));
-    let library = state.library.borrow().bibliography.clone();
+    set_build_status(state, "Building…");
     let active_source = if state.current_file.borrow().as_deref() == Some(main.as_path()) {
         Some(state.editor.text())
     } else {
@@ -5216,8 +7382,17 @@ fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
             Some(source) => Ok(source),
             None => std::fs::read_to_string(&main).map_err(|error| error.to_string()),
         };
-        let result =
-            source.and_then(|source| crate::build::compile_latex(&main, &source, &library));
+        let result = match source {
+            Ok(source) => match crate::build::find_missing_citations(&main, &source) {
+                Ok(missing) if !missing.is_empty() => {
+                    Err(CompileFailure::MissingCitations(missing))
+                }
+                Ok(_) => crate::build::compile_latex(&main)
+                    .map_err(CompileFailure::Other),
+                Err(error) => Err(CompileFailure::Other(error)),
+            },
+            Err(error) => Err(CompileFailure::Other(error)),
+        };
         let export_result = match (&result, export_in_worker) {
             (Ok(build), Some(destination)) => Some(
                 std::fs::copy(&build.pdf_path, destination)
@@ -5229,68 +7404,170 @@ fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
         let _ = sender.send((result, export_result));
     });
     let state = state.clone();
-    poll_result(receiver, move |(result, export_result)| match result {
-        Ok(build) => {
-            if build.added_references > 0 {
-                let message = ngettext(
-                    "%d local reference added to the temporary bibliography for this build",
-                    "%d local references added to the temporary bibliography for this build",
-                    build.added_references,
-                )
-                .replacen("%d", &build.added_references.to_string(), 1);
-                show_toast(&state, &message);
-            }
-            if build.conflicts > 0 {
-                let message = ngettext(
-                    "%d duplicate citation key was left unchanged",
-                    "%d duplicate citation keys were left unchanged",
-                    build.conflicts,
-                )
-                .replacen("%d", &build.conflicts.to_string(), 1);
-                show_toast(&state, &message);
-            }
-            if export_to.is_some() {
-                match export_result.unwrap_or_else(|| Err(tr("Could not export PDF"))) {
-                    Ok(()) => {
-                        set_build_status_with_message(&state, "Built", Some(&tr("PDF exported")));
-                        show_toast(&state, &tr("PDF exported"));
+    let disconnected_state = state.clone();
+    poll_result_with_disconnect(
+        receiver,
+        move |(result, export_result)| match result {
+            Ok(build) => {
+                if export_to.is_some() {
+                    match export_result.unwrap_or_else(|| Err(tr("Could not export PDF"))) {
+                        Ok(()) => {
+                            set_build_status(&state, "Built");
+                            show_toast(&state, &tr("PDF exported"));
+                        }
+                        Err(error) => {
+                            set_build_status(&state, "Error");
+                            show_toast(
+                                &state,
+                                &format!("{}: {error}", tr("Could not export PDF")),
+                            );
+                        }
                     }
-                    Err(error) => {
-                        set_build_status_with_message(&state, "Error", Some(&error));
-                        show_toast(&state, &format!("{}: {error}", tr("Could not export PDF")));
-                    }
-                }
-            } else {
-                match state.pdf_preview.open(&build.pdf_path) {
-                    Ok(()) => {
-                        set_build_status_with_message(
-                            &state,
-                            "Built",
-                            Some(&tr("Compilation finished")),
-                        );
-                        show_toast(&state, &tr("Compilation finished"));
-                    }
-                    Err(error) => {
-                        set_build_status_with_message(&state, "Error", Some(&error));
-                        state.pdf_preview.set_message(&tr("Could not open the PDF"));
-                        show_toast(
-                            &state,
-                            &format!("{}: {error}", tr("Could not open the compiled PDF")),
-                        );
-                        show_build_error(&state, &error, &tr("Could not open the PDF preview"));
+                } else {
+                    match state.pdf_preview.open(&build.pdf_path) {
+                        Ok(()) => {
+                            set_build_status(&state, "Built");
+                            show_toast(&state, &tr("Compilation finished"));
+                        }
+                        Err(_) => {
+                            let message = tr("Could not open the compiled PDF");
+                            set_build_status(&state, "Error");
+                            state.pdf_preview.set_message(&message);
+                            show_toast(&state, &message);
+                        }
                     }
                 }
             }
+            Err(CompileFailure::MissingCitations(citations)) => {
+                let summary = missing_citations_summary(&citations);
+                report_compile_failure(&state, &summary);
+                show_missing_citations(&state, &citations);
+            }
+            Err(CompileFailure::Other(error)) => {
+                let summary = compile_failure_summary(&error);
+                report_compile_failure(&state, &summary);
+            }
+        },
+        move || {
+            let message = tr("PDF generation failed: Compilation stopped unexpectedly.");
+            report_compile_failure(&disconnected_state, &message);
+        },
+    );
+}
+
+fn report_compile_failure(state: &Rc<State>, message: &str) {
+    set_build_failure(state, message);
+    state.pdf_preview.set_message(message);
+    show_toast(state, message);
+}
+
+fn missing_citations_summary(citations: &[crate::build::MissingCitation]) -> String {
+    format!(
+        "{}: {}",
+        tr("PDF generation failed"),
+        missing_citations_context(citations)
+    )
+}
+
+fn missing_citations_context(citations: &[crate::build::MissingCitation]) -> String {
+    const MAX_VISIBLE_LINES: usize = 8;
+    let mut lines = Vec::new();
+    for citation in citations {
+        if !lines.contains(&citation.line) {
+            lines.push(citation.line);
         }
-        Err(error) => {
-            set_build_status_with_message(&state, "Error", Some(&error));
-            show_toast(
-                &state,
-                &format!("{}: {error}", tr("Could not compile the document")),
+    }
+    if lines.len() == 1 {
+        tr("Citation on line %d has no bibliographic reference in the document.")
+            .replacen("%d", &lines[0].to_string(), 1)
+    } else {
+        let line_numbers = lines
+            .iter()
+            .take(MAX_VISIBLE_LINES)
+            .map(|line| line.to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let mut context = tr(
+            "Citations on lines %s have no bibliographic references in the document.",
+        )
+        .replacen("%s", &line_numbers, 1);
+        if lines.len() > MAX_VISIBLE_LINES {
+            context.push(' ');
+            context.push_str(
+                &tr("%d more lines have missing citations.")
+                    .replacen("%d", &(lines.len() - MAX_VISIBLE_LINES).to_string(), 1),
             );
-            show_build_error(&state, &error, &tr("Could not compile the document"));
         }
-    });
+        context
+    }
+}
+
+fn show_missing_citations(state: &Rc<State>, citations: &[crate::build::MissingCitation]) {
+    let dialog = gtk::Dialog::builder()
+        .title(&tr("PDF generation failed"))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(520)
+        .default_height(380)
+        .build();
+    dialog.add_button(&tr("Close"), gtk::ResponseType::Close);
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 10);
+    content.set_margin_top(12);
+    content.set_margin_bottom(12);
+    content.set_margin_start(12);
+    content.set_margin_end(12);
+
+    let explanation = gtk::Label::new(Some(&missing_citations_context(citations)));
+    explanation.set_xalign(0.0);
+    explanation.set_wrap(true);
+    content.append(&explanation);
+
+    const MAX_VISIBLE_CITATIONS: usize = 10;
+    const MAX_CITATION_KEY_CHARS: usize = 80;
+    let mut citation_lines = citations
+        .iter()
+        .take(MAX_VISIBLE_CITATIONS)
+        .map(|citation| {
+            let mut key_chars = citation.key.chars();
+            let mut key = key_chars
+                .by_ref()
+                .take(MAX_CITATION_KEY_CHARS)
+                .collect::<String>();
+            if key_chars.next().is_some() {
+                key.push('…');
+            }
+            tr("Line %d: %s")
+                .replacen("%d", &citation.line.to_string(), 1)
+                .replacen("%s", &key, 1)
+        })
+        .collect::<Vec<_>>();
+    if citations.len() > MAX_VISIBLE_CITATIONS {
+        citation_lines.push(
+            tr("%d additional citation problems are not shown.")
+                .replacen("%d", &(citations.len() - MAX_VISIBLE_CITATIONS).to_string(), 1),
+        );
+    }
+    let missing_keys = gtk::Label::new(Some(&citation_lines.join("\n")));
+    missing_keys.set_xalign(0.0);
+    missing_keys.set_yalign(0.0);
+    missing_keys.set_selectable(true);
+    missing_keys.add_css_class("monospace");
+    missing_keys.set_margin_top(6);
+    missing_keys.set_margin_bottom(6);
+    missing_keys.set_margin_start(8);
+    missing_keys.set_margin_end(8);
+    let scroll = gtk::ScrolledWindow::builder()
+        .hexpand(true)
+        .vexpand(true)
+        .min_content_height(100)
+        .child(&missing_keys)
+        .build();
+    content.append(&scroll);
+    dialog.content_area().append(&content);
+
+    dialog.connect_response(|dialog, _| dialog.close());
+    dialog.present();
 }
 
 fn show_no_main_document(state: &Rc<State>) {
@@ -5299,27 +7576,80 @@ fn show_no_main_document(state: &Rc<State>) {
     show_toast(state, &message);
 }
 
-fn show_build_error(state: &Rc<State>, message: &str, title: &str) {
-    state.pdf_preview.set_message(&tr("Check the build output"));
-    let dialog = gtk::MessageDialog::builder()
-        .transient_for(&state.window)
-        .modal(true)
-        .message_type(gtk::MessageType::Error)
-        .buttons(gtk::ButtonsType::Close)
-        .text(title)
-        .secondary_text(
-            message
-                .chars()
-                .rev()
-                .take(5000)
-                .collect::<Vec<_>>()
-                .into_iter()
-                .rev()
-                .collect::<String>(),
-        )
-        .build();
-    dialog.connect_response(|dialog, _| dialog.close());
-    dialog.present();
+fn missing_image_summary(message: &str) -> Option<String> {
+    let marker = "Unable to load picture or PDF file '";
+    let (image_filename, line_number) = message.lines().find_map(|line| {
+        let position = line.find(marker)?;
+        let filename = line[position + marker.len()..].split('\'').next()?.trim();
+        if filename.is_empty() {
+            return None;
+        }
+        let line_number = line[..position]
+            .trim()
+            .trim_end_matches(':')
+            .rsplit(':')
+            .next()
+            .and_then(|part| part.trim().parse::<usize>().ok());
+        Some((filename.to_owned(), line_number))
+    })?;
+    let line_number = line_number.or_else(|| {
+        message.lines().find_map(|line| {
+            let (before, after) = line.split_once(" not found on input line ")?;
+            let warning_filename = before
+                .rsplit_once("File ")?
+                .1
+                .trim()
+                .trim_matches(|character| matches!(character, '`' | '\'' | '"'));
+            if warning_filename != image_filename {
+                return None;
+            }
+            after
+                .trim_start()
+                .split(|character: char| !character.is_ascii_digit())
+                .next()?
+                .parse::<usize>()
+                .ok()
+        })
+    })?;
+
+    Some(
+        tr("PDF generation failed: Image on line %d was not found.")
+            .replacen("%d", &line_number.to_string(), 1),
+    )
+}
+
+fn compile_error_summary(message: &str) -> Option<String> {
+    let line = crate::build::compile_error_line(message)?;
+    Some(
+        tr("PDF generation failed: An error on line %d prevents compilation and PDF generation.")
+            .replacen("%d", &line.to_string(), 1),
+    )
+}
+
+fn compile_failure_summary(message: &str) -> String {
+    if message.starts_with("Compilation stopped after ") {
+        return tr("PDF generation failed: Compilation timed out.");
+    }
+
+    if let Some(summary) = missing_image_summary(message) {
+        return summary;
+    }
+    if let Some(summary) = compile_error_summary(message) {
+        return summary;
+    }
+
+    for known_message in [
+        "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live.",
+        "This document uses biblatex and needs Biber. Install Biber, latexmk, or Tectonic.",
+        "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic.",
+    ] {
+        let localized = tr(known_message);
+        if message == localized {
+            return localized;
+        }
+    }
+
+    tr("PDF generation failed: The document contains errors that prevent compilation.")
 }
 
 #[cfg(test)]

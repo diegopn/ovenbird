@@ -1,15 +1,16 @@
 use crate::bibtex::{parse_bibtex, serialize_bibtex, BibEntry, Bibliography};
+use crate::project::TextEncoding;
 use crate::storage::xdg_cache_home;
 use gtk::gio::prelude::FileExt;
 use regex::Regex;
 use sha2::{Digest, Sha256};
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::thread;
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant};
 
 const BUILD_TIMEOUT: Duration = Duration::from_secs(300);
 
@@ -31,24 +32,78 @@ impl LatexEngine {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TemporaryBibliography {
-    pub path: String,
-    pub content: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BibliographyPreparation {
-    pub files: Vec<TemporaryBibliography>,
-    pub added: usize,
-    pub conflicts: usize,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BuildResult {
     pub pdf_path: PathBuf,
     pub engine: LatexEngine,
-    pub added_references: usize,
-    pub conflicts: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MissingCitation {
+    pub key: String,
+    pub line: usize,
+}
+
+/// Extracts the source line from fatal LaTeX diagnostics without mistaking
+/// unrelated warnings (for example Fontconfig warnings) for a source error.
+pub fn compile_error_line(message: &str) -> Option<usize> {
+    let lines = message.lines().collect::<Vec<_>>();
+    for (index, line) in lines.iter().enumerate() {
+        let trimmed = line.trim_start();
+        if trimmed.to_ascii_lowercase().starts_with("error:") {
+            for (offset, _) in line.match_indices(':') {
+                let before = &line[..offset];
+                if !before.to_ascii_lowercase().ends_with(".tex") {
+                    continue;
+                }
+                let after = line[offset + 1..].trim_start();
+                let digits = after
+                    .chars()
+                    .take_while(char::is_ascii_digit)
+                    .collect::<String>();
+                if let Ok(number) = digits.parse::<usize>() {
+                    if number > 0 {
+                        return Some(number);
+                    }
+                }
+            }
+        }
+
+        if trimmed.starts_with('!') {
+            for following in lines.iter().skip(index + 1) {
+                let following = following.trim_start();
+                if following.starts_with('!') {
+                    break;
+                }
+                if let Some(line_number) = following.strip_prefix("l.") {
+                    let digits = line_number
+                        .chars()
+                        .take_while(char::is_ascii_digit)
+                        .collect::<String>();
+                    if let Ok(number) = digits.parse::<usize>() {
+                        if number > 0 {
+                            return Some(number);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+pub enum CitationBibliographyUpdate {
+    BibFile {
+        path: PathBuf,
+        content: String,
+        encoding: TextEncoding,
+    },
+    InlineTex {
+        content: String,
+        inserted_text: String,
+        insertion_offset: usize,
+        encoding: TextEncoding,
+    },
+    AlreadyPresent,
 }
 
 pub fn build_output_directory(source_path: &Path) -> PathBuf {
@@ -107,15 +162,15 @@ fn resource_path(value: &str) -> Option<String> {
     }) {
         return None;
     }
-    let with_extension = if normalized.to_ascii_lowercase().ends_with(".bib") {
-        normalized
-    } else {
-        format!("{normalized}.bib")
+    let with_extension = match path.extension().and_then(|extension| extension.to_str()) {
+        Some(extension) if extension.eq_ignore_ascii_case("bib") => normalized,
+        Some(_) => return None,
+        None => format!("{normalized}.bib"),
     };
     Some(with_extension)
 }
 
-fn bib_resources(source: &str) -> Vec<String> {
+pub fn bib_resources(source: &str) -> Vec<String> {
     let add_resource = Regex::new(r"(?s)\\addbibresource(?:\s*\[[^\]]*\])?\s*\{([^}]+)\}").unwrap();
     let bibliography = Regex::new(r"(?s)\\bibliography\s*\{([^}]+)\}").unwrap();
     let mut resources = add_resource
@@ -128,125 +183,447 @@ fn bib_resources(source: &str) -> Vec<String> {
     resources
 }
 
-fn without_zotero_fields(entry: &BibEntry) -> BibEntry {
-    let mut clean = entry.clone();
-    clean
-        .fields
-        .retain(|name, _| name != "zotero_key" && name != "zotero_version");
-    clean
-        .raw_fields
-        .retain(|name, _| name != "zotero_key" && name != "zotero_version");
-    clean
-}
-
-fn comparable_fields(entry: &BibEntry) -> BTreeMap<&str, &str> {
-    entry
-        .fields
-        .iter()
-        .filter(|(name, _)| name.as_str() != "zotero_key" && name.as_str() != "zotero_version")
-        .map(|(name, value)| (name.as_str(), value.as_str()))
-        .collect()
-}
-
-fn string_key(directive: &str) -> Option<String> {
-    let re = Regex::new(r"(?i)^\s*@string\s*[({]\s*([^=\s,]+)").unwrap();
-    re.captures(directive)
-        .map(|capture| capture[1].to_ascii_lowercase())
-}
-
-pub fn prepare_project_bibliography(
+pub fn prepare_citation_bibliography_update(
+    source_path: &Path,
     source: &str,
-    project_folder: &Path,
-    local: &Bibliography,
-) -> Result<BibliographyPreparation, String> {
-    if local.entries.is_empty() && local.directives.is_empty() {
-        return Ok(BibliographyPreparation {
-            files: Vec::new(),
-            added: 0,
-            conflicts: 0,
+    source_encoding: TextEncoding,
+    entry: &BibEntry,
+) -> Result<CitationBibliographyUpdate, String> {
+    if entry.key.trim().is_empty() {
+        return Err("The reference has no citation key.".to_owned());
+    }
+    let project_folder = source_path
+        .parent()
+        .ok_or("The document has no parent folder.")?;
+    let root_source = clean_tex_source(source);
+    let resources = bib_resources(&root_source);
+    if !resources.is_empty() {
+        let mut target = None;
+        for resource in resources {
+            let path = project_folder.join(&resource);
+            let (text, encoding) = match fs::read(&path) {
+                Ok(bytes) => {
+                    let (text, encoding) = crate::project::decode_text(&bytes);
+                    (text, encoding)
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => (
+                    String::new(),
+                    TextEncoding::Utf8,
+                ),
+                Err(error) => return Err(format!("Could not read {resource}: {error}")),
+            };
+            let bibliography = if text.is_empty() {
+                Bibliography {
+                    entries: Vec::new(),
+                    directives: Vec::new(),
+                }
+            } else {
+                parse_bibtex(&text)
+                    .map_err(|error| format!("Could not read {resource}: {error}"))?
+            };
+            if bibliography
+                .entries
+                .iter()
+                .any(|candidate| candidate.key.eq_ignore_ascii_case(&entry.key))
+            {
+                return Ok(CitationBibliographyUpdate::AlreadyPresent);
+            }
+            if target.is_none() {
+                target = Some((path, text, encoding));
+            }
+        }
+        let Some((path, original, encoding)) = target else {
+            return Err("No valid bibliography file is configured in the document.".to_owned());
+        };
+        let serialized_entry = serialize_bibtex(&Bibliography {
+            entries: vec![entry.clone()],
+            directives: Vec::new(),
+        });
+        let separator = if original.is_empty() {
+            ""
+        } else if original.ends_with('\n') {
+            "\n"
+        } else {
+            "\n\n"
+        };
+        return Ok(CitationBibliographyUpdate::BibFile {
+            path,
+            content: format!("{original}{separator}{serialized_entry}"),
+            encoding,
         });
     }
-    let mut seen = HashSet::new();
-    let mut output = Vec::new();
-    let mut added = 0;
-    let mut conflicts = 0;
-    for resource in bib_resources(source) {
-        if !seen.insert(resource.clone()) {
-            continue;
+
+    let style = crate::bibtex::reference_style_for_document(&root_source);
+    prepare_inline_bibliography_update(source, source_encoding, entry, style)
+}
+
+pub fn prepare_inline_bibliography_update(
+    source: &str,
+    source_encoding: TextEncoding,
+    entry: &BibEntry,
+    style: crate::bibtex::ReferenceStyle,
+) -> Result<CitationBibliographyUpdate, String> {
+    if entry.key.trim().is_empty() {
+        return Err("The reference has no citation key.".to_owned());
+    }
+    let root_source = clean_tex_source(source);
+    let bibitem = Regex::new(r"(?i)\\bibitem\*?(?:\s*\[[^\]]*\])?\s*\{([^{}]+)\}")
+        .unwrap();
+    if bibitem
+        .captures_iter(&root_source)
+        .any(|capture| capture[1].trim().eq_ignore_ascii_case(&entry.key))
+    {
+        return Ok(CitationBibliographyUpdate::AlreadyPresent);
+    }
+
+    let begin_marker = "\\begin{thebibliography}";
+    let end_marker = "\\end{thebibliography}";
+    let has_begin = root_source.contains(begin_marker);
+    let end_offset = last_active_command_offset(source, end_marker);
+    if has_begin != end_offset.is_some() {
+        return Err("The document has an incomplete bibliography environment.".to_owned());
+    }
+
+    let citation = escape_inline_latex_text(&crate::bibtex::format_reference_citation(entry, style));
+    let bibitem_text = format!("\\bibitem{{{}}} {citation}\n", entry.key);
+    let (byte_offset, inserted_text) = if let Some(offset) = end_offset {
+        (offset, bibitem_text)
+    } else {
+        let bibliography = format!(
+            "\\begin{{thebibliography}}{{00}}\n{bibitem_text}\\end{{thebibliography}}\n\n"
+        );
+        (
+            last_active_command_offset(source, "\\end{document}").unwrap_or(source.len()),
+            format!("\n{bibliography}"),
+        )
+    };
+    let content = format!(
+        "{}{}{}",
+        &source[..byte_offset],
+        inserted_text,
+        &source[byte_offset..]
+    );
+    Ok(CitationBibliographyUpdate::InlineTex {
+        content,
+        inserted_text,
+        insertion_offset: source[..byte_offset].chars().count(),
+        encoding: source_encoding,
+    })
+}
+
+fn last_active_command_offset(source: &str, command: &str) -> Option<usize> {
+    let mut line_offset = 0;
+    let mut last = None;
+    for line in source.split_inclusive('\n') {
+        let line_without_newline = line.strip_suffix('\n').unwrap_or(line);
+        let code = before_unescaped_comment(line_without_newline);
+        if let Some(offset) = code.rfind(command) {
+            last = Some(line_offset + offset);
         }
-        let relative = Path::new(&resource);
-        if relative
-            .components()
-            .any(|component| !matches!(component, Component::Normal(_)))
-        {
-            continue;
+        line_offset += line.len();
+    }
+    last
+}
+
+fn before_unescaped_comment(line: &str) -> &str {
+    let mut backslashes = 0;
+    for (offset, character) in line.char_indices() {
+        if character == '%' && backslashes % 2 == 0 {
+            return &line[..offset];
         }
-        let path = project_folder.join(relative);
-        let existing = match fs::read_to_string(&path) {
-            Ok(text) => parse_bibtex(&text)
-                .map_err(|error| format!("Could not read {}: {error}", resource))?,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Bibliography {
-                entries: Vec::new(),
-                directives: Vec::new(),
-            },
-            Err(error) => return Err(format!("Could not read {}: {error}", resource)),
-        };
-        let mut project_entries = existing.entries;
-        let mut key_index = project_entries
-            .iter()
-            .enumerate()
-            .map(|(index, entry)| (entry.key.to_ascii_lowercase(), index))
-            .collect::<HashMap<_, _>>();
-        for local_entry in &local.entries {
-            if let Some(index) = key_index.get(&local_entry.key.to_ascii_lowercase()) {
-                let existing_entry = &project_entries[*index];
-                if existing_entry.entry_type != local_entry.entry_type
-                    || comparable_fields(existing_entry) != comparable_fields(local_entry)
-                {
-                    conflicts += 1;
-                }
-                continue;
-            }
-            let clean = without_zotero_fields(local_entry);
-            key_index.insert(clean.key.to_ascii_lowercase(), project_entries.len());
-            project_entries.push(clean);
-            added += 1;
-        }
-        let mut directives = existing.directives;
-        let mut string_keys = directives
-            .iter()
-            .filter_map(|line| string_key(line))
-            .collect::<HashSet<_>>();
-        for directive in &local.directives {
-            let key = string_key(directive);
-            if key.as_ref().is_some_and(|key| string_keys.contains(key)) {
-                continue;
-            }
-            if !directives.contains(directive) {
-                directives.push(directive.clone());
-            }
-            if let Some(key) = key {
-                string_keys.insert(key);
-            }
-        }
-        let updated = Bibliography {
-            entries: project_entries,
-            directives,
-        };
-        let original_content = fs::read_to_string(&path).unwrap_or_default();
-        let content = serialize_bibtex(&updated);
-        if content != original_content {
-            output.push(TemporaryBibliography {
-                path: resource,
-                content,
-            });
+        if character == '\\' {
+            backslashes += 1;
+        } else {
+            backslashes = 0;
         }
     }
-    Ok(BibliographyPreparation {
-        files: output,
-        added,
-        conflicts,
-    })
+    line
+}
+
+fn escape_inline_latex_text(value: &str) -> String {
+    let mut output = String::with_capacity(value.len());
+    let mut backslashes = 0;
+    for character in value.chars() {
+        let already_escaped = backslashes % 2 == 1;
+        match character {
+            '#' | '$' | '%' | '&' | '_' if !already_escaped => {
+                output.push('\\');
+                output.push(character);
+            }
+            '^' if !already_escaped => output.push_str("\\textasciicircum{}"),
+            '~' if !already_escaped => output.push_str("\\textasciitilde{}"),
+            _ => output.push(character),
+        }
+        if character == '\\' {
+            backslashes += 1;
+        } else {
+            backslashes = 0;
+        }
+    }
+    output
+}
+
+pub fn find_missing_citations(
+    source_path: &Path,
+    source: &str,
+) -> Result<Vec<MissingCitation>, String> {
+    let root_source = clean_tex_source(source);
+    let sources = project_tex_sources(source_path, &root_source);
+    let mut cited = HashMap::new();
+    let citation = Regex::new(
+        r"(?i)\\([A-Za-z@]*cite[A-Za-z@]*\*?)(?:\s*\[[^\]]*\]|\s*\{[^{}]*\})+",
+    )
+    .unwrap();
+    let citation_options = Regex::new(r"\[[^\]]*\]").unwrap();
+    let citation_keys = Regex::new(r"\{([^{}]*)\}").unwrap();
+    let bibitem = Regex::new(r"(?i)\\bibitem\*?(?:\s*\[[^\]]*\])?\s*\{([^{}]+)\}")
+        .unwrap();
+    let mut available = HashMap::new();
+
+    for (_, text) in &sources {
+        for capture in citation.captures_iter(text) {
+            let is_multi_citation = capture[1].to_ascii_lowercase().ends_with("cites");
+            let citation_without_options = citation_options.replace_all(&capture[0], "");
+            let line = text[..capture.get(0).unwrap().start()]
+                .bytes()
+                .filter(|byte| *byte == b'\n')
+                .count()
+                + 1;
+            for (index, key_capture) in citation_keys
+                .captures_iter(&citation_without_options)
+                .enumerate()
+            {
+                if index > 0 && !is_multi_citation {
+                    break;
+                }
+                for key in key_capture[1].split(',').map(str::trim).filter(|key| {
+                    !key.is_empty() && *key != "*" && !key.contains('\\')
+                }) {
+                    cited
+                        .entry(key.to_ascii_lowercase())
+                        .or_insert_with(|| MissingCitation {
+                            key: key.to_owned(),
+                            line,
+                        });
+                }
+            }
+        }
+        available.extend(bibitem.captures_iter(text).filter_map(|capture| {
+            let key = capture[1].trim();
+            (!key.is_empty()).then(|| (key.to_ascii_lowercase(), key.to_owned()))
+        }));
+    }
+
+    let project_folder = source_path
+        .parent()
+        .ok_or("The document has no parent folder.")?;
+    // The main document determines which .bib resources are part of this build.
+    let resources = declared_bibliography_paths(std::slice::from_ref(&root_source), project_folder);
+    for (path, display_path) in resources {
+        match fs::read_to_string(&path) {
+            Ok(text) => {
+                let bibliography = parse_bibtex(&text).map_err(|error| {
+                    format!("Could not read configured bibliography {display_path}: {error}")
+                })?;
+                available.extend(bibliography.entries.into_iter().map(|entry| {
+                    let normalized = entry.key.to_ascii_lowercase();
+                    (normalized, entry.key)
+                }));
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => {
+                return Err(format!(
+                    "Could not read configured bibliography {display_path}: {error}"
+                ));
+            }
+        }
+    }
+
+    let mut missing = cited
+        .into_iter()
+        .filter_map(|(normalized, citation)| {
+            (!available.contains_key(&normalized)).then_some(citation)
+        })
+        .collect::<Vec<_>>();
+    missing.sort_by(|left, right| {
+        left.line
+            .cmp(&right.line)
+            .then_with(|| left.key.cmp(&right.key))
+    });
+    Ok(missing)
+}
+
+fn declared_bibliography_paths(sources: &[String], project_folder: &Path) -> Vec<(PathBuf, String)> {
+    let add_resource = Regex::new(r"(?s)\\addbibresource(?:\s*\[[^\]]*\])?\s*\{([^}]+)\}")
+        .unwrap();
+    let bibliography = Regex::new(r"(?s)\\bibliography\s*\{([^}]+)\}").unwrap();
+    let mut paths = Vec::new();
+    let mut seen = HashSet::new();
+    for source in sources {
+        let names = add_resource
+            .captures_iter(source)
+            .map(|capture| capture[1].trim().to_owned())
+            .chain(
+                bibliography
+                    .captures_iter(source)
+                    .flat_map(|capture| {
+                        capture[1]
+                            .split(',')
+                            .map(|name| name.trim().to_owned())
+                            .collect::<Vec<_>>()
+                    }),
+            );
+        for name in names {
+            let Some((path, display_path)) = bibliography_path(&name, project_folder) else {
+                continue;
+            };
+            let identity = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            if seen.insert(identity) {
+                paths.push((path, display_path));
+            }
+        }
+    }
+    paths
+}
+
+fn bibliography_path(name: &str, project_folder: &Path) -> Option<(PathBuf, String)> {
+    let name = name.trim();
+    if name.is_empty() || name.starts_with('~') || name.contains('\\') || name.contains('$') {
+        return None;
+    }
+    let relative = PathBuf::from(resource_path(name)?);
+    let display_path = relative.to_string_lossy().into_owned();
+    let path = if relative.is_absolute() {
+        relative
+    } else {
+        project_folder.join(relative)
+    };
+    Some((path, display_path))
+}
+
+fn project_tex_sources(source_path: &Path, root_source: &str) -> Vec<(PathBuf, String)> {
+    let include = Regex::new(r"\\(?:input|include|subfile)\s*(?:\{([^{}]+)\}|([^\s{}]+))")
+        .unwrap();
+    let mut pending = vec![(source_path.to_path_buf(), root_source.to_owned())];
+    let mut seen = HashSet::new();
+    let mut sources = Vec::new();
+    while let Some((path, source)) = pending.pop() {
+        let identity = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+        if !seen.insert(identity) {
+            continue;
+        }
+        let cleaned = clean_tex_source(&source);
+        for capture in include.captures_iter(&cleaned) {
+            let Some(name) = capture.get(1).or_else(|| capture.get(2)).map(|name| name.as_str())
+            else {
+                continue;
+            };
+            let name = name.trim();
+            if name.is_empty() || name.contains('\\') || name.contains('$') {
+                continue;
+            }
+            let mut included = PathBuf::from(name);
+            if !included.is_absolute() {
+                included = path.parent().unwrap_or(Path::new(".")).join(included);
+            }
+            if !included.is_file() && included.extension().is_none() {
+                included.set_extension("tex");
+            }
+            if let Ok(contents) = fs::read_to_string(&included) {
+                pending.push((included, contents));
+            }
+        }
+        sources.push((path, cleaned));
+    }
+    sources
+}
+
+fn clean_tex_source(source: &str) -> String {
+    let mut uncommented = String::new();
+    for line in source.lines() {
+        let mut backslashes = 0;
+        for character in line.chars() {
+            if character == '%' && backslashes % 2 == 0 {
+                break;
+            }
+            uncommented.push(character);
+            if character == '\\' {
+                backslashes += 1;
+            } else {
+                backslashes = 0;
+            }
+        }
+        uncommented.push('\n');
+    }
+
+    let mut cleaned = uncommented;
+    for environment in [
+        "verbatim",
+        "verbatim*",
+        "Verbatim",
+        "Verbatim*",
+        "lstlisting",
+        "minted",
+        "comment",
+    ] {
+        let start_marker = format!("\\begin{{{environment}}}");
+        let end_marker = format!("\\end{{{environment}}}");
+        while let Some(start) = cleaned.find(&start_marker) {
+            let content_start = start + start_marker.len();
+            let Some(end_offset) = cleaned[content_start..].find(&end_marker) else {
+                cleaned.truncate(start);
+                break;
+            };
+            let end = content_start + end_offset + end_marker.len();
+            let replacement = cleaned[start..end]
+                .chars()
+                .map(|character| if character == '\n' { '\n' } else { ' ' })
+                .collect::<String>();
+            cleaned.replace_range(start..end, &replacement);
+        }
+    }
+    strip_inline_verb(&cleaned)
+}
+
+fn strip_inline_verb(source: &str) -> String {
+    let mut cleaned = String::new();
+    let mut cursor = 0;
+    while let Some(offset) = source[cursor..].find("\\verb") {
+        let start = cursor + offset;
+        let preceding_slashes = source[..start]
+            .chars()
+            .rev()
+            .take_while(|character| *character == '\\')
+            .count();
+        let command_end = start + "\\verb".len();
+        let follows_command = source[command_end..]
+            .chars()
+            .next()
+            .is_some_and(|character| character.is_ascii_alphabetic() || character == '@');
+        if preceding_slashes % 2 == 1 || follows_command {
+            cleaned.push_str(&source[cursor..command_end]);
+            cursor = command_end;
+            continue;
+        }
+        let delimiter_start = if source[command_end..].starts_with('*') {
+            command_end + 1
+        } else {
+            command_end
+        };
+        let Some(delimiter) = source[delimiter_start..].chars().next() else {
+            cleaned.push_str(&source[cursor..]);
+            return cleaned;
+        };
+        let content_start = delimiter_start + delimiter.len_utf8();
+        let Some(end_offset) = source[content_start..].find(delimiter) else {
+            cleaned.push_str(&source[cursor..start]);
+            return cleaned;
+        };
+        cleaned.push_str(&source[cursor..start]);
+        cursor = content_start + end_offset + delimiter.len_utf8();
+    }
+    cleaned.push_str(&source[cursor..]);
+    cleaned
 }
 
 fn run_process(
@@ -295,42 +672,18 @@ fn run_process(
     if status.success() {
         Ok(())
     } else {
-        let message = if error.is_empty() { output } else { error };
-        Err(String::from_utf8_lossy(&message).trim().to_owned())
+        let mut message = String::from_utf8_lossy(&output).into_owned();
+        if !error.is_empty() {
+            if !message.is_empty() && !message.ends_with('\n') {
+                message.push('\n');
+            }
+            message.push_str(&String::from_utf8_lossy(&error));
+        }
+        Err(message.trim().to_owned())
     }
 }
 
-fn write_temporary_bibliographies(
-    directory: &Path,
-    bibliographies: &[TemporaryBibliography],
-) -> Result<(), String> {
-    for bibliography in bibliographies {
-        let relative = Path::new(&bibliography.path);
-        if relative.is_absolute()
-            || bibliography.path.starts_with('~')
-            || relative.components().any(|part| {
-                matches!(
-                    part,
-                    Component::ParentDir | Component::RootDir | Component::Prefix(_)
-                )
-            })
-        {
-            return Err("A bibliography path must be relative to the project.".to_owned());
-        }
-        let path = directory.join(relative);
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-        }
-        fs::write(path, bibliography.content.as_bytes()).map_err(|error| error.to_string())?;
-    }
-    Ok(())
-}
-
-pub fn compile_latex(
-    source_path: &Path,
-    source: &str,
-    local_library: &Bibliography,
-) -> Result<BuildResult, String> {
+pub fn compile_latex(source_path: &Path) -> Result<BuildResult, String> {
     let (engine, executable) = find_latex_engine().ok_or_else(|| {
         crate::i18n::gettext("No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live.")
     })?;
@@ -340,7 +693,6 @@ pub fn compile_latex(
     let project_folder = source_path
         .parent()
         .ok_or("The document has no parent folder.")?;
-    let prepared = prepare_project_bibliography(source, project_folder, local_library)?;
     let build_directory = build_output_directory(source_path);
     fs::create_dir_all(&build_directory)
         .map_err(|error| format!("Could not prepare the build folder: {error}"))?;
@@ -353,38 +705,17 @@ pub fn compile_latex(
         .and_then(|name| name.to_str())
         .ok_or("The file name is invalid.")?;
     let expected_pdf = build_directory.join(format!("{job_name}.pdf"));
-    let mut temporary_directory = None;
-    if !prepared.files.is_empty() {
-        let stamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        let path = build_directory.join(format!(".ovenbird-bib-{}-{stamp}", std::process::id()));
-        fs::create_dir(&path).map_err(|error| error.to_string())?;
-        if let Err(error) = write_temporary_bibliographies(&path, &prepared.files) {
-            let _ = fs::remove_dir_all(&path);
-            return Err(error);
-        }
-        temporary_directory = Some(path);
-    }
-    let result = compile_with_engine(
+    compile_with_engine(
         engine,
         &executable,
         source_path,
         &build_directory,
         &expected_pdf,
-        temporary_directory.as_deref(),
         project_folder,
-    );
-    if let Some(path) = temporary_directory {
-        let _ = fs::remove_dir_all(path);
-    }
-    result?;
+    )?;
     Ok(BuildResult {
         pdf_path: expected_pdf,
         engine,
-        added_references: prepared.added,
-        conflicts: prepared.conflicts,
     })
 }
 
@@ -394,14 +725,10 @@ fn compile_with_engine(
     source_path: &Path,
     build_directory: &Path,
     expected_pdf: &Path,
-    temporary_directory: Option<&Path>,
     project_folder: &Path,
 ) -> Result<(), String> {
     let existing = std::env::var("BIBINPUTS").unwrap_or_default();
     let mut search = Vec::new();
-    if let Some(path) = temporary_directory {
-        search.push(path.to_string_lossy().into_owned());
-    }
     search.push(project_folder.to_string_lossy().into_owned());
     if !existing.is_empty() {
         search.push(existing);
@@ -506,4 +833,29 @@ pub fn external_pdf_viewer(path: &Path) -> Result<(), String> {
         None::<&gtk::gio::AppLaunchContext>,
     )
     .map_err(|error| error.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{compile_error_line, run_process};
+    use std::collections::HashMap;
+    use std::path::Path;
+
+    #[test]
+    fn process_error_keeps_source_line_when_stderr_also_has_output() {
+        let args = [
+            "-c".to_owned(),
+            "printf '%s\\n' '! Undefined control sequence.' 'l.17 \\\\unknown'; printf '%s\\n' 'Fontconfig warning from stderr' >&2; exit 1".to_owned(),
+        ];
+        let output = run_process(
+            Path::new("/bin/sh"),
+            &args,
+            &std::env::temp_dir(),
+            &HashMap::new(),
+        )
+        .expect_err("the test process exits with an error");
+
+        assert!(output.contains("Fontconfig warning from stderr"));
+        assert_eq!(compile_error_line(&output), Some(17));
+    }
 }

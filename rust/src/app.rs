@@ -39,7 +39,7 @@ fn use_existing_window_or_create<W>(
 
 pub fn run() -> glib::ExitCode {
     let application = adw::Application::builder()
-        .application_id("org.ovenbird.Ovenbird")
+        .application_id("io.github.diegopn.ovenbird")
         .flags(gio::ApplicationFlags::HANDLES_OPEN)
         .build();
     application.connect_activate(|application| {

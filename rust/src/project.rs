@@ -162,9 +162,7 @@ pub fn entries(root: &Path) -> std::io::Result<Vec<ProjectEntry>> {
 }
 
 fn visit(folder: &Path, depth: usize, output: &mut Vec<ProjectEntry>) -> std::io::Result<()> {
-    let mut children = fs::read_dir(folder)?
-        .filter_map(Result::ok)
-        .collect::<Vec<_>>();
+    let mut children = fs::read_dir(folder)?.collect::<std::io::Result<Vec<_>>>()?;
     children.retain(|entry| !entry.file_name().to_string_lossy().starts_with('.'));
     children.sort_by(|left, right| {
         let left_dir = left.file_type().map(|kind| kind.is_dir()).unwrap_or(false);
