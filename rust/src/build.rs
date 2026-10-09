@@ -206,10 +206,9 @@ pub fn prepare_citation_bibliography_update(
                     let (text, encoding) = crate::project::decode_text(&bytes);
                     (text, encoding)
                 }
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => (
-                    String::new(),
-                    TextEncoding::Utf8,
-                ),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    (String::new(), TextEncoding::Utf8)
+                }
                 Err(error) => return Err(format!("Could not read {resource}: {error}")),
             };
             let bibliography = if text.is_empty() {
@@ -267,8 +266,7 @@ pub fn prepare_inline_bibliography_update(
         return Err("The reference has no citation key.".to_owned());
     }
     let root_source = clean_tex_source(source);
-    let bibitem = Regex::new(r"(?i)\\bibitem\*?(?:\s*\[[^\]]*\])?\s*\{([^{}]+)\}")
-        .unwrap();
+    let bibitem = Regex::new(r"(?i)\\bibitem\*?(?:\s*\[[^\]]*\])?\s*\{([^{}]+)\}").unwrap();
     if bibitem
         .captures_iter(&root_source)
         .any(|capture| capture[1].trim().eq_ignore_ascii_case(&entry.key))
@@ -284,14 +282,14 @@ pub fn prepare_inline_bibliography_update(
         return Err("The document has an incomplete bibliography environment.".to_owned());
     }
 
-    let citation = escape_inline_latex_text(&crate::bibtex::format_reference_citation(entry, style));
+    let citation =
+        escape_inline_latex_text(&crate::bibtex::format_reference_citation(entry, style));
     let bibitem_text = format!("\\bibitem{{{}}} {citation}\n", entry.key);
     let (byte_offset, inserted_text) = if let Some(offset) = end_offset {
         (offset, bibitem_text)
     } else {
-        let bibliography = format!(
-            "\\begin{{thebibliography}}{{00}}\n{bibitem_text}\\end{{thebibliography}}\n\n"
-        );
+        let bibliography =
+            format!("\\begin{{thebibliography}}{{00}}\n{bibitem_text}\\end{{thebibliography}}\n\n");
         (
             last_active_command_offset(source, "\\end{document}").unwrap_or(source.len()),
             format!("\n{bibliography}"),
@@ -370,14 +368,11 @@ pub fn find_missing_citations(
     let root_source = clean_tex_source(source);
     let sources = project_tex_sources(source_path, &root_source);
     let mut cited = HashMap::new();
-    let citation = Regex::new(
-        r"(?i)\\([A-Za-z@]*cite[A-Za-z@]*\*?)(?:\s*\[[^\]]*\]|\s*\{[^{}]*\})+",
-    )
-    .unwrap();
+    let citation =
+        Regex::new(r"(?i)\\([A-Za-z@]*cite[A-Za-z@]*\*?)(?:\s*\[[^\]]*\]|\s*\{[^{}]*\})+").unwrap();
     let citation_options = Regex::new(r"\[[^\]]*\]").unwrap();
     let citation_keys = Regex::new(r"\{([^{}]*)\}").unwrap();
-    let bibitem = Regex::new(r"(?i)\\bibitem\*?(?:\s*\[[^\]]*\])?\s*\{([^{}]+)\}")
-        .unwrap();
+    let bibitem = Regex::new(r"(?i)\\bibitem\*?(?:\s*\[[^\]]*\])?\s*\{([^{}]+)\}").unwrap();
     let mut available = HashMap::new();
 
     for (_, text) in &sources {
@@ -396,9 +391,11 @@ pub fn find_missing_citations(
                 if index > 0 && !is_multi_citation {
                     break;
                 }
-                for key in key_capture[1].split(',').map(str::trim).filter(|key| {
-                    !key.is_empty() && *key != "*" && !key.contains('\\')
-                }) {
+                for key in key_capture[1]
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|key| !key.is_empty() && *key != "*" && !key.contains('\\'))
+                {
                     cited
                         .entry(key.to_ascii_lowercase())
                         .or_insert_with(|| MissingCitation {
@@ -453,9 +450,11 @@ pub fn find_missing_citations(
     Ok(missing)
 }
 
-fn declared_bibliography_paths(sources: &[String], project_folder: &Path) -> Vec<(PathBuf, String)> {
-    let add_resource = Regex::new(r"(?s)\\addbibresource(?:\s*\[[^\]]*\])?\s*\{([^}]+)\}")
-        .unwrap();
+fn declared_bibliography_paths(
+    sources: &[String],
+    project_folder: &Path,
+) -> Vec<(PathBuf, String)> {
+    let add_resource = Regex::new(r"(?s)\\addbibresource(?:\s*\[[^\]]*\])?\s*\{([^}]+)\}").unwrap();
     let bibliography = Regex::new(r"(?s)\\bibliography\s*\{([^}]+)\}").unwrap();
     let mut paths = Vec::new();
     let mut seen = HashSet::new();
@@ -463,16 +462,12 @@ fn declared_bibliography_paths(sources: &[String], project_folder: &Path) -> Vec
         let names = add_resource
             .captures_iter(source)
             .map(|capture| capture[1].trim().to_owned())
-            .chain(
-                bibliography
-                    .captures_iter(source)
-                    .flat_map(|capture| {
-                        capture[1]
-                            .split(',')
-                            .map(|name| name.trim().to_owned())
-                            .collect::<Vec<_>>()
-                    }),
-            );
+            .chain(bibliography.captures_iter(source).flat_map(|capture| {
+                capture[1]
+                    .split(',')
+                    .map(|name| name.trim().to_owned())
+                    .collect::<Vec<_>>()
+            }));
         for name in names {
             let Some((path, display_path)) = bibliography_path(&name, project_folder) else {
                 continue;
@@ -502,8 +497,7 @@ fn bibliography_path(name: &str, project_folder: &Path) -> Option<(PathBuf, Stri
 }
 
 fn project_tex_sources(source_path: &Path, root_source: &str) -> Vec<(PathBuf, String)> {
-    let include = Regex::new(r"\\(?:input|include|subfile)\s*(?:\{([^{}]+)\}|([^\s{}]+))")
-        .unwrap();
+    let include = Regex::new(r"\\(?:input|include|subfile)\s*(?:\{([^{}]+)\}|([^\s{}]+))").unwrap();
     let mut pending = vec![(source_path.to_path_buf(), root_source.to_owned())];
     let mut seen = HashSet::new();
     let mut sources = Vec::new();
@@ -514,7 +508,10 @@ fn project_tex_sources(source_path: &Path, root_source: &str) -> Vec<(PathBuf, S
         }
         let cleaned = clean_tex_source(&source);
         for capture in include.captures_iter(&cleaned) {
-            let Some(name) = capture.get(1).or_else(|| capture.get(2)).map(|name| name.as_str())
+            let Some(name) = capture
+                .get(1)
+                .or_else(|| capture.get(2))
+                .map(|name| name.as_str())
             else {
                 continue;
             };

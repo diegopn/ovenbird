@@ -76,7 +76,10 @@ fn renaming_an_author_updates_bibtex_author_fields() {
 
     library.rename_author("Doe, Jane", "Doe, Janet").unwrap();
 
-    assert_eq!(library.find("paper").unwrap().get("author"), "Doe, Janet and Smith, Alex");
+    assert_eq!(
+        library.find("paper").unwrap().get("author"),
+        "Doe, Janet and Smith, Alex"
+    );
 }
 
 #[test]
@@ -112,7 +115,10 @@ fn latex_compiler_diagnostics_report_the_source_line() {
         crate::build::compile_error_line("! Undefined control sequence.\nl.42 \\\\unknown"),
         Some(42)
     );
-    assert_eq!(crate::build::compile_error_line("Fontconfig warning only"), None);
+    assert_eq!(
+        crate::build::compile_error_line("Fontconfig warning only"),
+        None
+    );
 }
 
 #[test]

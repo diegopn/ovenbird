@@ -1,3 +1,7 @@
+// shortcut: The existing dialogs and portal-backed file choosers use GTK 4
+// compatibility APIs; remove this exception when those dialogs are migrated.
+#![allow(deprecated)]
+
 use adw::prelude::*;
 use gtk::gio;
 use gtk::{gdk, glib};
@@ -122,13 +126,13 @@ struct BuildStatusWidgets {
     icon: gtk::Image,
     details_popover: gtk::Popover,
     details_file: gtk::Label,
-    details_engine: gtk::Label,
     details_last: gtk::Label,
     details_failure: gtk::Label,
 }
 
 struct SidebarWidgets {
     root: gtk::Box,
+    #[cfg(test)]
     brand: gtk::CenterBox,
     file_list: gtk::Box,
     file_tree: gtk::ListView,
@@ -601,7 +605,11 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     references_title.add_css_class("dim-label");
     references_panel.append(&references_title);
     for (icon, label, action) in [
-        ("view-list-symbolic", "View all references", "win.show-references"),
+        (
+            "view-list-symbolic",
+            "View all references",
+            "win.show-references",
+        ),
         ("bookmark-new-symbolic", "Tags", "win.show-tags"),
         ("system-users-symbolic", "Authors", "win.show-authors"),
     ] {
@@ -617,6 +625,7 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
 
     SidebarWidgets {
         root: sidebar,
+        #[cfg(test)]
         brand,
         file_list,
         file_tree,
@@ -872,9 +881,7 @@ fn build_new_item_menu() -> gtk::Popover {
     popover
 }
 
-fn build_editor_page(
-    editor: &LatexEditor,
-) -> (
+type EditorPageWidgets = (
     gtk::Box,
     gtk::Box,
     crate::pdf_preview::PdfPreview,
@@ -890,7 +897,9 @@ fn build_editor_page(
     gtk::ToggleButton,
     gtk::Button,
     gtk::Button,
-) {
+);
+
+fn build_editor_page(editor: &LatexEditor) -> EditorPageWidgets {
     let editor_panel = gtk::Box::new(gtk::Orientation::Vertical, 0);
     editor_panel.add_css_class("ovenbird-code-panel");
     let top = gtk::Box::new(gtk::Orientation::Horizontal, 6);
@@ -1277,12 +1286,8 @@ fn build_library_page() -> LibraryPageWidgets {
     search.set_placeholder_text(Some(&tr("Search references…")));
     search.set_hexpand(true);
     search_and_sort.append(&search);
-    let sort_by = gtk::DropDown::from_strings(&[
-        &tr("Title"),
-        &tr("Author"),
-        &tr("Year"),
-        &tr("Tag"),
-    ]);
+    let sort_by =
+        gtk::DropDown::from_strings(&[&tr("Title"), &tr("Author"), &tr("Year"), &tr("Tag")]);
     sort_by.set_tooltip_text(Some(&tr("Sort by")));
     sort_by.set_selected(0);
     search_and_sort.append(&sort_by);
@@ -1549,12 +1554,9 @@ fn build_status_widgets(status: gtk::Label) -> BuildStatusWidgets {
         })
         .unwrap_or_else(|| tr("Not found"));
     details_engine.set_label(&engine_name);
-    for (row, (caption, value)) in [
-        ("Compiler", &details_engine),
-        ("Last build", &details_last),
-    ]
-    .into_iter()
-    .enumerate()
+    for (row, (caption, value)) in [("Compiler", &details_engine), ("Last build", &details_last)]
+        .into_iter()
+        .enumerate()
     {
         let label = gtk::Label::new(Some(&tr(caption)));
         label.set_xalign(1.0);
@@ -1583,7 +1585,6 @@ fn build_status_widgets(status: gtk::Label) -> BuildStatusWidgets {
         icon,
         details_popover,
         details_file,
-        details_engine,
         details_last,
         details_failure,
     }
@@ -2028,7 +2029,11 @@ fn connect_actions(state: &Rc<State>) {
         insert_label_or_note(&s, "ref")
     });
     install_action(state, "insert-citation", show_citation_picker);
-    install_action(state, "insert-bibtex-reference", show_bibtex_reference_picker);
+    install_action(
+        state,
+        "insert-bibtex-reference",
+        show_bibtex_reference_picker,
+    );
     let compile_action = gio::SimpleAction::new("compile", None);
     let weak = Rc::downgrade(state);
     compile_action.connect_activate(move |_, _| {
@@ -2173,7 +2178,11 @@ fn current_file_kind(state: &Rc<State>) -> Option<ProjectFileKind> {
 
 fn show_page(state: &Rc<State>, page: &str) {
     state.page_stack.set_visible_child_name(page);
-    let sidebar_page = if page == "editor" { "editor" } else { "references" };
+    let sidebar_page = if page == "editor" {
+        "editor"
+    } else {
+        "references"
+    };
     state.sidebar_pages.set_visible_child_name(sidebar_page);
     state.editor_tab_button.set_active(page == "editor");
     state.references_tab_button.set_active(page != "editor");
@@ -4591,8 +4600,7 @@ fn show_reference_picker(state: Rc<State>, target: ReferencePickerTarget) {
 
         let citation_radio = gtk::CheckButton::with_label(&tr("Citation"));
         citation_radio.set_active(true);
-        let bibliography_radio =
-            gtk::CheckButton::with_label(&tr("Bibliographic reference"));
+        let bibliography_radio = gtk::CheckButton::with_label(&tr("Bibliographic reference"));
         bibliography_radio.set_group(Some(&citation_radio));
         choice_row.append(&citation_radio);
         choice_row.append(&bibliography_radio);
@@ -4725,11 +4733,7 @@ fn show_reference_picker(state: Rc<State>, target: ReferencePickerTarget) {
                                     .as_ref()
                                     .map(|selector| reference_style_from_index(selector.selected()))
                                     .unwrap_or(bibtex::ReferenceStyle::Abnt);
-                                insert_latex_bibliography_reference(
-                                    &state2,
-                                    &entry_value,
-                                    style,
-                                )
+                                insert_latex_bibliography_reference(&state2, &entry_value, style)
                             }
                         },
                         ReferencePickerTarget::Bibtex => {
@@ -4900,7 +4904,9 @@ fn insert_bibtex_reference(state: &Rc<State>, entry: &BibEntry) -> Result<(), St
         .clone()
         .ok_or_else(|| tr("Open a BibTeX file before adding a bibliographic reference."))?;
     if project::file_kind(&current_file) != ProjectFileKind::Bibtex {
-        return Err(tr("Open a BibTeX file before adding a bibliographic reference."));
+        return Err(tr(
+            "Open a BibTeX file before adding a bibliographic reference.",
+        ));
     }
     let source = state.editor.text();
     let bibliography = bibtex::parse_bibtex(&source).map_err(|error| error.to_string())?;
@@ -4912,7 +4918,11 @@ fn insert_bibtex_reference(state: &Rc<State>, entry: &BibEntry) -> Result<(), St
         return Err(tr("This reference is already in the BibTeX file."));
     }
 
-    let line_ending = if source.contains("\r\n") { "\r\n" } else { "\n" };
+    let line_ending = if source.contains("\r\n") {
+        "\r\n"
+    } else {
+        "\n"
+    };
     let serialized = bibtex::serialize_bibtex(&bibtex::Bibliography {
         entries: vec![entry.clone()],
         directives: Vec::new(),
@@ -5182,12 +5192,7 @@ fn refresh_library(state: &Rc<State>) {
             let state_copy = state.clone();
             delete.connect_clicked(move |_| {
                 let parent: &gtk::Window = state_copy.window.upcast_ref();
-                request_reference_deletion(
-                    &state_copy,
-                    parent,
-                    entry_copy.clone(),
-                    || {},
-                );
+                request_reference_deletion(&state_copy, parent, entry_copy.clone(), || {});
             });
             row.append(&delete);
             state.library_list.append(&row);
@@ -5220,7 +5225,9 @@ fn refresh_tags(state: &Rc<State>) {
 
     let tags = state.library.borrow().tags.clone();
     if tags.is_empty() {
-        let empty = gtk::Label::new(Some(&tr("No tags yet. Add a tag to organize your references.")));
+        let empty = gtk::Label::new(Some(&tr(
+            "No tags yet. Add a tag to organize your references.",
+        )));
         empty.set_xalign(0.0);
         empty.set_margin_top(18);
         empty.add_css_class("dim-label");
@@ -5323,7 +5330,11 @@ fn refresh_authors(state: &Rc<State>) {
             primary
         };
         primary
-            .then_with(|| left.full_name.to_lowercase().cmp(&right.full_name.to_lowercase()))
+            .then_with(|| {
+                left.full_name
+                    .to_lowercase()
+                    .cmp(&right.full_name.to_lowercase())
+            })
             .then_with(|| {
                 left.citation_name
                     .to_lowercase()
@@ -5355,9 +5366,8 @@ fn refresh_authors(state: &Rc<State>) {
         full_name.set_xalign(0.0);
         full_name.set_ellipsize(gtk::pango::EllipsizeMode::End);
         labels.append(&full_name);
-        let citation_name = gtk::Label::new(Some(&bibtex::display_bibtex_text(
-            &author.citation_name,
-        )));
+        let citation_name =
+            gtk::Label::new(Some(&bibtex::display_bibtex_text(&author.citation_name)));
         citation_name.set_xalign(0.0);
         citation_name.set_ellipsize(gtk::pango::EllipsizeMode::End);
         citation_name.add_css_class("dim-label");
@@ -5628,7 +5638,11 @@ fn show_author_details(state: &Rc<State>, citation_name: &str) {
     content.set_margin_bottom(16);
     content.set_margin_start(18);
     content.set_margin_end(18);
-    content.append(&author_detail_row(state, &tr("Full name"), &profile.full_name));
+    content.append(&author_detail_row(
+        state,
+        &tr("Full name"),
+        &profile.full_name,
+    ));
     content.append(&author_detail_row(
         state,
         &tr("Name used in references"),
@@ -5718,7 +5732,10 @@ fn request_author_deletion(state: &Rc<State>, author: &str) {
         .default_height(420)
         .build();
     dialog.add_button(&tr("Cancel"), gtk::ResponseType::Cancel);
-    let delete = dialog.add_button(&tr("Delete author and references"), gtk::ResponseType::Accept);
+    let delete = dialog.add_button(
+        &tr("Delete author and references"),
+        gtk::ResponseType::Accept,
+    );
     delete.add_css_class("destructive-action");
 
     let content = gtk::Box::new(gtk::Orientation::Vertical, 10);
@@ -5780,7 +5797,11 @@ fn edit_tag(state: &Rc<State>, previous: Option<String>) {
         return;
     }
     let dialog = gtk::Dialog::builder()
-        .title(tr(if previous.is_some() { "Edit tag" } else { "Add tag" }))
+        .title(tr(if previous.is_some() {
+            "Edit tag"
+        } else {
+            "Add tag"
+        }))
         .transient_for(&state.window)
         .modal(true)
         .default_width(420)
@@ -5834,8 +5855,7 @@ fn request_tag_deletion(state: &Rc<State>, tag: &str) {
     if !library_is_ready(state) {
         return;
     }
-    let message = tr("Remove tag ‘%s’ from the list and all references?")
-        .replacen("%s", tag, 1);
+    let message = tr("Remove tag ‘%s’ from the list and all references?").replacen("%s", tag, 1);
     let parent: &gtk::Window = state.window.upcast_ref();
     let tag = tag.to_owned();
     confirm_destructive_action(
@@ -5905,7 +5925,11 @@ fn show_reference_details(state: &Rc<State>, entry: BibEntry) {
         &tr("Reference type"),
         &bibtex::reference_type_label(&entry.entry_type),
     ));
-    fields.append(&reference_detail_row(state, &tr("Citation key"), &entry.key));
+    fields.append(&reference_detail_row(
+        state,
+        &tr("Citation key"),
+        &entry.key,
+    ));
     for (name, value) in &entry.fields {
         if value.trim().is_empty() {
             continue;
@@ -6153,14 +6177,11 @@ fn add_tag_selection(
     true
 }
 
-fn refresh_reference_tag_chips(
-    chips: &gtk::FlowBox,
-    selected: &Rc<RefCell<Vec<String>>>,
-) {
+fn refresh_reference_tag_chips(chips: &gtk::FlowBox, selected: &Rc<RefCell<Vec<String>>>) {
     while let Some(child) = chips.first_child() {
         chips.remove(&child);
     }
-    for tag in selected.borrow().iter().cloned() {
+    for tag in selected.borrow().iter() {
         let chip = gtk::Button::with_label(&format!("{tag}  ×"));
         chip.add_css_class("pill");
         chip.add_css_class("reference-tag-chip");
@@ -6223,8 +6244,7 @@ fn refresh_reference_tag_picker(
                     selected_tags.push(tag_for_toggle.clone());
                 }
             } else {
-                selected_tags
-                    .retain(|selected| !selected.eq_ignore_ascii_case(&tag_for_toggle));
+                selected_tags.retain(|selected| !selected.eq_ignore_ascii_case(&tag_for_toggle));
             }
             drop(selected_tags);
             refresh_reference_tag_chips(&chips, &selected);
@@ -6274,10 +6294,7 @@ fn add_author_selection(
     true
 }
 
-fn refresh_reference_author_list(
-    selected_list: &gtk::Box,
-    selected: &Rc<RefCell<Vec<String>>>,
-) {
+fn refresh_reference_author_list(selected_list: &gtk::Box, selected: &Rc<RefCell<Vec<String>>>) {
     while let Some(child) = selected_list.first_child() {
         selected_list.remove(&child);
     }
@@ -6396,8 +6413,7 @@ fn refresh_reference_author_picker(
                     selected_authors.push(author_for_toggle.clone());
                 }
             } else {
-                selected_authors
-                    .retain(|selected| author_selection_identity(selected) != identity);
+                selected_authors.retain(|selected| author_selection_identity(selected) != identity);
             }
             drop(selected_authors);
             refresh_reference_author_list(&selected_list, &selected);
@@ -6447,6 +6463,7 @@ fn reference_tags(entry: &BibEntry) -> Vec<String> {
         .collect()
 }
 
+#[cfg(test)]
 fn reference_matches_filters(
     entry: &BibEntry,
     author: Option<&str>,
@@ -6466,16 +6483,14 @@ fn reference_matches_filters_with_type(
 ) -> bool {
     let author_matches = author.is_none_or(|selected| {
         let selected_identity = author_selection_identity(selected);
-        reference_authors(entry)
-            .iter()
-            .any(|candidate| {
-                let candidate_identity = author_selection_identity(candidate);
-                candidate_identity == selected_identity
-                    || author_profiles.iter().any(|profile| {
-                        author_selection_identity(&profile.citation_name) == candidate_identity
-                            && author_selection_identity(&profile.full_name) == selected_identity
-                    })
-            })
+        reference_authors(entry).iter().any(|candidate| {
+            let candidate_identity = author_selection_identity(candidate);
+            candidate_identity == selected_identity
+                || author_profiles.iter().any(|profile| {
+                    author_selection_identity(&profile.citation_name) == candidate_identity
+                        && author_selection_identity(&profile.full_name) == selected_identity
+                })
+        })
     });
     let year_matches = year.is_none_or(|selected| {
         reference_year(entry).is_some_and(|candidate| candidate.eq_ignore_ascii_case(selected))
@@ -6512,7 +6527,11 @@ fn sort_reference_entries(entries: &mut [BibEntry], sort_by: u32, descending: bo
             primary
         };
         primary
-            .then_with(|| reference_title(left).to_lowercase().cmp(&reference_title(right).to_lowercase()))
+            .then_with(|| {
+                reference_title(left)
+                    .to_lowercase()
+                    .cmp(&reference_title(right).to_lowercase())
+            })
             .then_with(|| left.key.to_lowercase().cmp(&right.key.to_lowercase()))
     });
 }
@@ -7122,12 +7141,9 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
             if let Some(entry) = previous.as_ref() {
                 let parent: &gtk::Window = dialog.upcast_ref();
                 let edit_dialog = dialog.clone();
-                request_reference_deletion(
-                    &state2,
-                    parent,
-                    entry.clone(),
-                    move || edit_dialog.close(),
-                );
+                request_reference_deletion(&state2, parent, entry.clone(), move || {
+                    edit_dialog.close()
+                });
             } else {
                 dialog.close();
             }
@@ -7387,8 +7403,7 @@ fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
                 Ok(missing) if !missing.is_empty() => {
                     Err(CompileFailure::MissingCitations(missing))
                 }
-                Ok(_) => crate::build::compile_latex(&main)
-                    .map_err(CompileFailure::Other),
+                Ok(_) => crate::build::compile_latex(&main).map_err(CompileFailure::Other),
                 Err(error) => Err(CompileFailure::Other(error)),
             },
             Err(error) => Err(CompileFailure::Other(error)),
@@ -7417,10 +7432,7 @@ fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
                         }
                         Err(error) => {
                             set_build_status(&state, "Error");
-                            show_toast(
-                                &state,
-                                &format!("{}: {error}", tr("Could not export PDF")),
-                            );
+                            show_toast(&state, &format!("{}: {error}", tr("Could not export PDF")));
                         }
                     }
                 } else {
@@ -7478,8 +7490,11 @@ fn missing_citations_context(citations: &[crate::build::MissingCitation]) -> Str
         }
     }
     if lines.len() == 1 {
-        tr("Citation on line %d has no bibliographic reference in the document.")
-            .replacen("%d", &lines[0].to_string(), 1)
+        tr("Citation on line %d has no bibliographic reference in the document.").replacen(
+            "%d",
+            &lines[0].to_string(),
+            1,
+        )
     } else {
         let line_numbers = lines
             .iter()
@@ -7493,10 +7508,11 @@ fn missing_citations_context(citations: &[crate::build::MissingCitation]) -> Str
         .replacen("%s", &line_numbers, 1);
         if lines.len() > MAX_VISIBLE_LINES {
             context.push(' ');
-            context.push_str(
-                &tr("%d more lines have missing citations.")
-                    .replacen("%d", &(lines.len() - MAX_VISIBLE_LINES).to_string(), 1),
-            );
+            context.push_str(&tr("%d more lines have missing citations.").replacen(
+                "%d",
+                &(lines.len() - MAX_VISIBLE_LINES).to_string(),
+                1,
+            ));
         }
         context
     }
@@ -7504,7 +7520,7 @@ fn missing_citations_context(citations: &[crate::build::MissingCitation]) -> Str
 
 fn show_missing_citations(state: &Rc<State>, citations: &[crate::build::MissingCitation]) {
     let dialog = gtk::Dialog::builder()
-        .title(&tr("PDF generation failed"))
+        .title(tr("PDF generation failed"))
         .transient_for(&state.window)
         .modal(true)
         .default_width(520)
@@ -7544,8 +7560,11 @@ fn show_missing_citations(state: &Rc<State>, citations: &[crate::build::MissingC
         .collect::<Vec<_>>();
     if citations.len() > MAX_VISIBLE_CITATIONS {
         citation_lines.push(
-            tr("%d additional citation problems are not shown.")
-                .replacen("%d", &(citations.len() - MAX_VISIBLE_CITATIONS).to_string(), 1),
+            tr("%d additional citation problems are not shown.").replacen(
+                "%d",
+                &(citations.len() - MAX_VISIBLE_CITATIONS).to_string(),
+                1,
+            ),
         );
     }
     let missing_keys = gtk::Label::new(Some(&citation_lines.join("\n")));
@@ -7613,8 +7632,11 @@ fn missing_image_summary(message: &str) -> Option<String> {
     })?;
 
     Some(
-        tr("PDF generation failed: Image on line %d was not found.")
-            .replacen("%d", &line_number.to_string(), 1),
+        tr("PDF generation failed: Image on line %d was not found.").replacen(
+            "%d",
+            &line_number.to_string(),
+            1,
+        ),
     )
 }
 

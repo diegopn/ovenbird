@@ -13,7 +13,7 @@ unsafe extern "C" {
 
 fn install_css() {
     let provider = gtk::CssProvider::new();
-    provider.load_from_data(include_str!("../../data/ovenbird.css"));
+    provider.load_from_string(include_str!("../../data/ovenbird.css"));
     if let Some(display) = gtk::gdk::Display::default() {
         unsafe {
             gtk_style_context_add_provider_for_display(

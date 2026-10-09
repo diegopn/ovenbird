@@ -377,12 +377,11 @@ fn parse_inline(source: &str, marks: &[String], tokens: &mut Vec<Token>) {
                 "nocite",
             ]
             .contains(&name.as_str())
+                && !required.is_empty()
             {
-                if !required.is_empty() {
-                    tokens.push(Token::Raw(source[position..finish].to_owned()));
-                    position = finish;
-                    continue;
-                }
+                tokens.push(Token::Raw(source[position..finish].to_owned()));
+                position = finish;
+                continue;
             }
             if finish > after_command {
                 tokens.push(Token::Raw(source[position..finish].to_owned()));
@@ -401,8 +400,7 @@ fn parse_inline(source: &str, marks: &[String], tokens: &mut Vec<Token>) {
             .unwrap_or(source.len());
         let plain = &source[position..next];
         let mut chunk_start = 0;
-        let mut iterator = plain.match_indices("\n\n").peekable();
-        while let Some((offset, delimiter)) = iterator.next() {
+        for (offset, delimiter) in plain.match_indices("\n\n") {
             if offset > chunk_start {
                 push_text(tokens, &plain[chunk_start..offset], marks);
             }

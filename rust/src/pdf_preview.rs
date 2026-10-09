@@ -171,8 +171,7 @@ fn update_visible_page(
     let visible_page = layouts
         .iter()
         .find(|layout| {
-            layout.height > 0.0
-                && probe_y <= layout.top + layout.height + PAGE_GAP / 2.0
+            layout.height > 0.0 && probe_y <= layout.top + layout.height + PAGE_GAP / 2.0
         })
         .or_else(|| layouts.last());
     if let Some(layout) = visible_page {
@@ -181,6 +180,12 @@ fn update_visible_page(
         page_label.set_label(&format!("{} / {page_count}", index + 1));
         previous.set_sensitive(index > 0);
         next.set_sensitive(index + 1 < page_count);
+    }
+}
+
+impl Default for PdfPreview {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -276,7 +281,7 @@ impl PdfPreview {
                     .map(|(index, (page_width, page_height))| {
                         let (display_width, display_height, scale) =
                             if *page_width > 0.0 && *page_height > 0.0 {
-                                let scale = (available_width / page_width).min(1.0).max(0.1) * zoom;
+                                let scale = (available_width / page_width).clamp(0.1, 1.0) * zoom;
                                 (page_width * scale, page_height * scale, scale)
                             } else {
                                 (0.0, 0.0, 0.0)
@@ -296,9 +301,10 @@ impl PdfPreview {
                 *page_layouts.borrow_mut() = layouts;
                 area.set_content_height(content_height);
 
-                let (_, clip_top, _, clip_bottom) = context
-                    .clip_extents()
-                    .unwrap_or((0.0, 0.0, width as f64, height as f64));
+                let (_, clip_top, _, clip_bottom) =
+                    context
+                        .clip_extents()
+                        .unwrap_or((0.0, 0.0, width as f64, height as f64));
                 for layout in page_layouts.borrow().iter().copied() {
                     if layout.height <= 0.0
                         || layout.top + layout.height < clip_top
@@ -524,7 +530,7 @@ impl PdfPreview {
             self.scroll.vadjustment().set_value(0.0);
             self.drawing.queue_resize();
             self.drawing.queue_draw();
-            return Ok(());
+            Ok(())
         }
 
         #[cfg(not(feature = "poppler-preview"))]

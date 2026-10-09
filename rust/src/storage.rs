@@ -70,10 +70,7 @@ impl AuthorProfile {
     }
 
     pub fn from_full_name(full_name: &str) -> Self {
-        let full_name = full_name
-            .split_whitespace()
-            .collect::<Vec<_>>()
-            .join(" ");
+        let full_name = full_name.split_whitespace().collect::<Vec<_>>().join(" ");
         let parts = full_name.split_whitespace().collect::<Vec<_>>();
         let citation_name = if parts.len() < 2 {
             full_name.clone()
@@ -99,8 +96,22 @@ impl AuthorProfile {
 fn is_surname_particle(word: &str) -> bool {
     matches!(
         word.to_lowercase().as_str(),
-        "da" | "das" | "de" | "del" | "della" | "den" | "der" | "di" | "do" | "dos"
-            | "du" | "la" | "le" | "ten" | "ter" | "van" | "von"
+        "da" | "das"
+            | "de"
+            | "del"
+            | "della"
+            | "den"
+            | "der"
+            | "di"
+            | "do"
+            | "dos"
+            | "du"
+            | "la"
+            | "le"
+            | "ten"
+            | "ter"
+            | "van"
+            | "von"
     )
 }
 
@@ -160,8 +171,9 @@ impl LocalLibrary {
         };
         let profiles_path = directory.join("author_profiles.json");
         let profiles = match fs::read(&profiles_path) {
-            Ok(bytes) => serde_json::from_slice::<Vec<AuthorProfile>>(&bytes)
-                .map_err(io::Error::other)?,
+            Ok(bytes) => {
+                serde_json::from_slice::<Vec<AuthorProfile>>(&bytes).map_err(io::Error::other)?
+            }
             Err(error) if error.kind() == io::ErrorKind::NotFound => Vec::new(),
             Err(error) => return Err(error),
         };
@@ -180,8 +192,8 @@ impl LocalLibrary {
         for entry in &self.bibliography.entries {
             tags.extend(split_tags(entry.get("tags")));
         }
-        let mut encoded_tags = serde_json::to_vec_pretty(&unique_tags(tags))
-            .map_err(io::Error::other)?;
+        let mut encoded_tags =
+            serde_json::to_vec_pretty(&unique_tags(tags)).map_err(io::Error::other)?;
         encoded_tags.push(b'\n');
         atomic_write(&self.directory.join("tags.json"), &encoded_tags)?;
         let mut authors = self
@@ -192,8 +204,8 @@ impl LocalLibrary {
         for entry in &self.bibliography.entries {
             authors.extend(crate::bibtex::split_bibtex_names(entry.get("author")));
         }
-        let mut encoded_authors = serde_json::to_vec_pretty(&unique_authors(authors))
-            .map_err(io::Error::other)?;
+        let mut encoded_authors =
+            serde_json::to_vec_pretty(&unique_authors(authors)).map_err(io::Error::other)?;
         encoded_authors.push(b'\n');
         atomic_write(&self.directory.join("authors.json"), &encoded_authors)?;
         let mut encoded_profiles =
@@ -259,9 +271,14 @@ impl LocalLibrary {
             return Err("The author no longer exists.".to_owned());
         };
         let updated_identity = author_identity(&updated.citation_name);
-        if self.authors.iter().enumerate().any(|(other_index, author)| {
-            other_index != index && author_identity(&author.citation_name) == updated_identity
-        }) {
+        if self
+            .authors
+            .iter()
+            .enumerate()
+            .any(|(other_index, author)| {
+                other_index != index && author_identity(&author.citation_name) == updated_identity
+            })
+        {
             return Err("That author already exists.".to_owned());
         }
 
@@ -356,9 +373,12 @@ impl LocalLibrary {
         else {
             return Err("The tag no longer exists.".to_owned());
         };
-        if self.tags.iter().enumerate().any(|(other_index, tag)| {
-            other_index != index && tag.eq_ignore_ascii_case(updated)
-        }) {
+        if self
+            .tags
+            .iter()
+            .enumerate()
+            .any(|(other_index, tag)| other_index != index && tag.eq_ignore_ascii_case(updated))
+        {
             return Err("That tag already exists.".to_owned());
         }
         let previous = self.tags[index].clone();
@@ -693,7 +713,10 @@ mod author_profile_tests {
             .find(|author| author.citation_name == "{Open Research Group}")
             .unwrap();
         assert_eq!(group.full_name, "Open Research Group");
-        assert_eq!(bibliography.entries[0].get("author"), "Alves, Vinícius and {Open Research Group}");
+        assert_eq!(
+            bibliography.entries[0].get("author"),
+            "Alves, Vinícius and {Open Research Group}"
+        );
     }
 
     #[test]
@@ -707,9 +730,7 @@ mod author_profile_tests {
         updated.orcid = "0000-0002-1825-0097".to_owned();
         updated.email = "janet@example.org".to_owned();
         updated.institution = "Example University".to_owned();
-        library
-            .update_author_profile("Doe, Jane", updated)
-            .unwrap();
+        library.update_author_profile("Doe, Jane", updated).unwrap();
 
         let author = library
             .authors
@@ -720,7 +741,10 @@ mod author_profile_tests {
         assert_eq!(author.orcid, "0000-0002-1825-0097");
         assert_eq!(author.email, "janet@example.org");
         assert_eq!(author.institution, "Example University");
-        assert_eq!(library.find("paper").unwrap().get("author"), "Doe, Janet and Smith, Alex");
+        assert_eq!(
+            library.find("paper").unwrap().get("author"),
+            "Doe, Janet and Smith, Alex"
+        );
     }
 }
 

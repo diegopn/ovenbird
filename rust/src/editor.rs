@@ -545,6 +545,12 @@ fn tokens_before_offset(tokens: &[Token], offset: usize) -> Vec<Token> {
     prefix
 }
 
+impl Default for LatexEditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LatexEditor {
     pub fn new() -> Self {
         let root = gtk::Box::new(gtk::Orientation::Vertical, 0);
@@ -972,7 +978,7 @@ impl LatexEditor {
         let Some((start, end)) = buffer.selection_bounds() else {
             let insert = buffer.iter_at_mark(&buffer.get_insert());
             let start = insert;
-            let end = start.clone();
+            let end = start;
             self.apply_insertion(&buffer, &start, &end, insertion, group);
             return;
         };
@@ -988,8 +994,8 @@ impl LatexEditor {
         group: &str,
     ) {
         let base = start.offset().max(0) as usize;
-        let mut start = start.clone();
-        let mut end = end.clone();
+        let mut start = *start;
+        let mut end = *end;
         self.runtime.borrow_mut().synchronizing = true;
         buffer.delete(&mut start, &mut end);
         let mut insert_at = buffer.iter_at_offset(base as i32);
@@ -1093,10 +1099,10 @@ impl LatexEditor {
         let buffer = self.active_buffer();
         if self.mode() == EditorMode::Visual {
             let selection = buffer.selection_bounds();
-            let (start, end) = selection.clone().unwrap_or_else(|| {
+            let (start, end) = selection.unwrap_or_else(|| {
                 let mut start = buffer.iter_at_mark(&buffer.get_insert());
                 start.set_line_offset(0);
-                let mut end = start.clone();
+                let mut end = start;
                 end.forward_to_line_end();
                 (start, end)
             });
@@ -1243,7 +1249,7 @@ impl LatexEditor {
         let selection_offsets = selection
             .as_ref()
             .map(|(start, end)| (start.offset().max(0) as usize, end.offset().max(0) as usize));
-        let search_start = explicit_start.unwrap_or_else(|| match selection_offsets {
+        let search_start = explicit_start.unwrap_or(match selection_offsets {
             Some((_, end)) if forward => end,
             Some((start, _)) => start,
             None => cursor,
@@ -1289,7 +1295,7 @@ impl LatexEditor {
         self.runtime.borrow_mut().synchronizing = true;
         for offset in line_starts.into_iter().rev() {
             let start = buffer.iter_at_offset(offset as i32);
-            let mut line_end = start.clone();
+            let mut line_end = start;
             line_end.forward_to_line_end();
             let line = buffer.text(&start, &line_end, true).to_string();
             let Some(transformed) = indent_line_text(&line, increase) else {

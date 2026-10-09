@@ -164,7 +164,10 @@ fn decode_tex_command(characters: &[char], index: &mut usize) -> String {
 }
 
 fn read_tex_display_argument(characters: &[char], index: &mut usize) -> Option<String> {
-    while characters.get(*index).is_some_and(|character| character.is_whitespace()) {
+    while characters
+        .get(*index)
+        .is_some_and(|character| character.is_whitespace())
+    {
         *index += 1;
     }
     match characters.get(*index).copied()? {
@@ -199,32 +202,100 @@ fn apply_tex_accent(value: &str, accent: char) -> String {
     };
     let rest = characters.collect::<String>();
     let composed = match (base, accent) {
-        ('A', '´') => 'Á', ('E', '´') => 'É', ('I', '´') => 'Í', ('O', '´') => 'Ó',
-        ('U', '´') => 'Ú', ('Y', '´') => 'Ý', ('C', '´') => 'Ć', ('N', '´') => 'Ń',
-        ('a', '´') => 'á', ('e', '´') => 'é', ('i', '´') => 'í', ('o', '´') => 'ó',
-        ('u', '´') => 'ú', ('y', '´') => 'ý', ('c', '´') => 'ć', ('n', '´') => 'ń',
-        ('A', '`') => 'À', ('E', '`') => 'È', ('I', '`') => 'Ì', ('O', '`') => 'Ò',
-        ('U', '`') => 'Ù', ('a', '`') => 'à', ('e', '`') => 'è', ('i', '`') => 'ì',
-        ('o', '`') => 'ò', ('u', '`') => 'ù',
-        ('A', '^') => 'Â', ('E', '^') => 'Ê', ('I', '^') => 'Î', ('O', '^') => 'Ô',
-        ('U', '^') => 'Û', ('a', '^') => 'â', ('e', '^') => 'ê', ('i', '^') => 'î',
-        ('o', '^') => 'ô', ('u', '^') => 'û',
-        ('A', '~') => 'Ã', ('N', '~') => 'Ñ', ('O', '~') => 'Õ', ('a', '~') => 'ã',
-        ('n', '~') => 'ñ', ('o', '~') => 'õ',
-        ('A', '¨') => 'Ä', ('E', '¨') => 'Ë', ('I', '¨') => 'Ï', ('O', '¨') => 'Ö',
-        ('U', '¨') => 'Ü', ('Y', '¨') => 'Ÿ', ('a', '¨') => 'ä', ('e', '¨') => 'ë',
-        ('i', '¨') => 'ï', ('o', '¨') => 'ö', ('u', '¨') => 'ü', ('y', '¨') => 'ÿ',
-        ('C', '¸') => 'Ç', ('S', '¸') => 'Ş', ('T', '¸') => 'Ţ', ('c', '¸') => 'ç',
-        ('s', '¸') => 'ş', ('t', '¸') => 'ţ',
-        ('A', 'ˇ') => 'Ǎ', ('C', 'ˇ') => 'Č', ('D', 'ˇ') => 'Ď', ('E', 'ˇ') => 'Ě',
-        ('L', 'ˇ') => 'Ľ', ('N', 'ˇ') => 'Ň', ('R', 'ˇ') => 'Ř', ('S', 'ˇ') => 'Š',
-        ('T', 'ˇ') => 'Ť', ('Z', 'ˇ') => 'Ž', ('a', 'ˇ') => 'ǎ', ('c', 'ˇ') => 'č',
-        ('d', 'ˇ') => 'ď', ('e', 'ˇ') => 'ě', ('l', 'ˇ') => 'ľ', ('n', 'ˇ') => 'ň',
-        ('r', 'ˇ') => 'ř', ('s', 'ˇ') => 'š', ('t', 'ˇ') => 'ť', ('z', 'ˇ') => 'ž',
-        ('A', '˘') => 'Ă', ('G', '˘') => 'Ğ', ('U', '˘') => 'Ŭ', ('a', '˘') => 'ă',
-        ('g', '˘') => 'ğ', ('u', '˘') => 'ŭ',
-        ('O', '˝') => 'Ő', ('U', '˝') => 'Ű', ('o', '˝') => 'ő', ('u', '˝') => 'ű',
-        ('A', '˚') => 'Å', ('U', '˚') => 'Ů', ('a', '˚') => 'å', ('u', '˚') => 'ů',
+        ('A', '´') => 'Á',
+        ('E', '´') => 'É',
+        ('I', '´') => 'Í',
+        ('O', '´') => 'Ó',
+        ('U', '´') => 'Ú',
+        ('Y', '´') => 'Ý',
+        ('C', '´') => 'Ć',
+        ('N', '´') => 'Ń',
+        ('a', '´') => 'á',
+        ('e', '´') => 'é',
+        ('i', '´') => 'í',
+        ('o', '´') => 'ó',
+        ('u', '´') => 'ú',
+        ('y', '´') => 'ý',
+        ('c', '´') => 'ć',
+        ('n', '´') => 'ń',
+        ('A', '`') => 'À',
+        ('E', '`') => 'È',
+        ('I', '`') => 'Ì',
+        ('O', '`') => 'Ò',
+        ('U', '`') => 'Ù',
+        ('a', '`') => 'à',
+        ('e', '`') => 'è',
+        ('i', '`') => 'ì',
+        ('o', '`') => 'ò',
+        ('u', '`') => 'ù',
+        ('A', '^') => 'Â',
+        ('E', '^') => 'Ê',
+        ('I', '^') => 'Î',
+        ('O', '^') => 'Ô',
+        ('U', '^') => 'Û',
+        ('a', '^') => 'â',
+        ('e', '^') => 'ê',
+        ('i', '^') => 'î',
+        ('o', '^') => 'ô',
+        ('u', '^') => 'û',
+        ('A', '~') => 'Ã',
+        ('N', '~') => 'Ñ',
+        ('O', '~') => 'Õ',
+        ('a', '~') => 'ã',
+        ('n', '~') => 'ñ',
+        ('o', '~') => 'õ',
+        ('A', '¨') => 'Ä',
+        ('E', '¨') => 'Ë',
+        ('I', '¨') => 'Ï',
+        ('O', '¨') => 'Ö',
+        ('U', '¨') => 'Ü',
+        ('Y', '¨') => 'Ÿ',
+        ('a', '¨') => 'ä',
+        ('e', '¨') => 'ë',
+        ('i', '¨') => 'ï',
+        ('o', '¨') => 'ö',
+        ('u', '¨') => 'ü',
+        ('y', '¨') => 'ÿ',
+        ('C', '¸') => 'Ç',
+        ('S', '¸') => 'Ş',
+        ('T', '¸') => 'Ţ',
+        ('c', '¸') => 'ç',
+        ('s', '¸') => 'ş',
+        ('t', '¸') => 'ţ',
+        ('A', 'ˇ') => 'Ǎ',
+        ('C', 'ˇ') => 'Č',
+        ('D', 'ˇ') => 'Ď',
+        ('E', 'ˇ') => 'Ě',
+        ('L', 'ˇ') => 'Ľ',
+        ('N', 'ˇ') => 'Ň',
+        ('R', 'ˇ') => 'Ř',
+        ('S', 'ˇ') => 'Š',
+        ('T', 'ˇ') => 'Ť',
+        ('Z', 'ˇ') => 'Ž',
+        ('a', 'ˇ') => 'ǎ',
+        ('c', 'ˇ') => 'č',
+        ('d', 'ˇ') => 'ď',
+        ('e', 'ˇ') => 'ě',
+        ('l', 'ˇ') => 'ľ',
+        ('n', 'ˇ') => 'ň',
+        ('r', 'ˇ') => 'ř',
+        ('s', 'ˇ') => 'š',
+        ('t', 'ˇ') => 'ť',
+        ('z', 'ˇ') => 'ž',
+        ('A', '˘') => 'Ă',
+        ('G', '˘') => 'Ğ',
+        ('U', '˘') => 'Ŭ',
+        ('a', '˘') => 'ă',
+        ('g', '˘') => 'ğ',
+        ('u', '˘') => 'ŭ',
+        ('O', '˝') => 'Ő',
+        ('U', '˝') => 'Ű',
+        ('o', '˝') => 'ő',
+        ('u', '˝') => 'ű',
+        ('A', '˚') => 'Å',
+        ('U', '˚') => 'Ů',
+        ('a', '˚') => 'å',
+        ('u', '˚') => 'ů',
         _ => '\0',
     };
     let mut output = String::new();
@@ -233,9 +304,18 @@ fn apply_tex_accent(value: &str, accent: char) -> String {
     } else {
         output.push(base);
         output.push(match accent {
-            '´' => '\u{0301}', '`' => '\u{0300}', '^' => '\u{0302}', '~' => '\u{0303}',
-            '¨' => '\u{0308}', '¯' => '\u{0304}', '˙' => '\u{0307}', '¸' => '\u{0327}',
-            'ˇ' => '\u{030c}', '˘' => '\u{0306}', '˝' => '\u{030b}', '˚' => '\u{030a}',
+            '´' => '\u{0301}',
+            '`' => '\u{0300}',
+            '^' => '\u{0302}',
+            '~' => '\u{0303}',
+            '¨' => '\u{0308}',
+            '¯' => '\u{0304}',
+            '˙' => '\u{0307}',
+            '¸' => '\u{0327}',
+            'ˇ' => '\u{030c}',
+            '˘' => '\u{0306}',
+            '˝' => '\u{030b}',
+            '˚' => '\u{030a}',
             _ => accent,
         });
     }
@@ -654,11 +734,7 @@ fn expression_value(
                 if !escaped && ch == '"' {
                     break;
                 }
-                if !escaped && ch == '\\' {
-                    escaped = true;
-                } else {
-                    escaped = false;
-                }
+                escaped = !escaped && ch == '\\';
                 position += ch.len_utf8();
             }
             chunks.push(raw[start..position].to_owned());
@@ -974,10 +1050,8 @@ pub enum ReferenceStyle {
 
 pub fn reference_style_for_document(source: &str) -> ReferenceStyle {
     let source = source.to_ascii_lowercase();
-    let class_pattern = Regex::new(r"(?i)\\documentclass(?:\s*\[[^\]]*\])?\s*\{([^}]+)\}")
-        .unwrap();
-    let bibliography_pattern =
-        Regex::new(r"(?i)\\bibliographystyle\s*\{([^}]+)\}").unwrap();
+    let class_pattern = Regex::new(r"(?i)\\documentclass(?:\s*\[[^\]]*\])?\s*\{([^}]+)\}").unwrap();
+    let bibliography_pattern = Regex::new(r"(?i)\\bibliographystyle\s*\{([^}]+)\}").unwrap();
     let option_style_pattern = Regex::new(r"(?i)\bstyle\s*=\s*([a-z0-9-]+)").unwrap();
     let classes = class_pattern
         .captures_iter(&source)
@@ -1103,7 +1177,11 @@ pub fn format_reference_citation(entry: &BibEntry, style: ReferenceStyle) -> Str
         return entry.key.clone();
     }
 
-    let citation = parts.join(if style == ReferenceStyle::Ieee { ", " } else { ". " });
+    let citation = parts.join(if style == ReferenceStyle::Ieee {
+        ", "
+    } else {
+        ". "
+    });
     if style != ReferenceStyle::Abnt && has_url {
         citation
     } else {
@@ -1540,7 +1618,10 @@ fn format_author_name(name: &str, style: ReferenceStyle) -> String {
         while family_start > 0 && is_surname_particle(words[family_start - 1]) {
             family_start -= 1;
         }
-        (words[..family_start].join(" "), words[family_start..].join(" "))
+        (
+            words[..family_start].join(" "),
+            words[family_start..].join(" "),
+        )
     };
     match style {
         ReferenceStyle::Abnt => format!(
@@ -1564,13 +1645,9 @@ fn format_author_name(name: &str, style: ReferenceStyle) -> String {
                 format!("{family}, {given}")
             }
         }
-        ReferenceStyle::Vancouver => format!(
-            "{} {}",
-            family,
-            initials(&given).replace('.', "")
-        )
-        .trim()
-        .to_owned(),
+        ReferenceStyle::Vancouver => format!("{} {}", family, initials(&given).replace('.', ""))
+            .trim()
+            .to_owned(),
         ReferenceStyle::ChicagoAuthorDate => format!("{}, {}", family, given),
     }
 }
@@ -1604,8 +1681,18 @@ pub fn split_bibtex_names(value: &str) -> Vec<String> {
 fn is_surname_particle(word: &str) -> bool {
     matches!(
         word.to_ascii_lowercase().as_str(),
-        "da" | "das" | "de" | "del" | "della" | "di" | "do" | "dos" | "du" | "la"
-            | "le" | "van" | "von"
+        "da" | "das"
+            | "de"
+            | "del"
+            | "della"
+            | "di"
+            | "do"
+            | "dos"
+            | "du"
+            | "la"
+            | "le"
+            | "van"
+            | "von"
     )
 }
 
