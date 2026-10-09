@@ -3,6 +3,7 @@
   "runtime": "org.gnome.Platform",
   "runtime-version": "51",
   "sdk": "org.gnome.Sdk",
+  "separate-locales": false,
   "sdk-extensions": ["org.freedesktop.Sdk.Extension.rust-stable"],
   "command": "ovenbird",
   "build-options": {
@@ -85,7 +86,30 @@
       "sources": [
         {
           "type": "dir",
-          "path": "."
+          "path": ".",
+          "skip": [
+            ".agents",
+            ".aws",
+            ".codex",
+            ".flatpak",
+            ".flatpak-build",
+            ".flatpak-builder",
+            ".git",
+            ".meson-build",
+            ".tooling",
+            "_build",
+            "_flatpak-build",
+            "build",
+            "build-check",
+            "docs",
+            "rust-build",
+            "rust-build-native",
+            "rust-flatpak-current",
+            "rust-flatpak-verify",
+            "rust-flatpak-verify-state",
+            "rust-meson-tests-current",
+            "target"
+          ]
         }
       ]
     }
