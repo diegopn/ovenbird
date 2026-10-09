@@ -1,0 +1,10 @@
+# Public ring 0.17.14 Poly1305 test vectors in previously tracked Cargo sources.
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/aead/poly1305_test.txt:generic-api-key:3
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/aead/poly1305_test.txt:generic-api-key:7
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/aead/poly1305_test.txt:generic-api-key:14
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/aead/poly1305_test.txt:generic-api-key:33
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/aead/poly1305_test.txt:generic-api-key:150
+
+# Example OpenSSL file names in ring's RsaKeyPair documentation, not API keys.
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/rsa/keypair.rs:generic-api-key:73
+61359124cda319f61ebb67872ea2e5ad0a3fc89d:cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/src/rsa/keypair.rs:generic-api-key:81

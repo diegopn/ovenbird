@@ -9,13 +9,19 @@ pub struct ApplicationMenuItem {
 pub const ABOUT_DEDICATION: &str =
     "Dedicated to my wife, Karina, who always encourages me to go further.";
 
-pub const ABOUT_LINKS: &[(&str, &str)] = &[
-    ("Personal website", "https://diegopn.github.io/"),
-    ("Project repository", "https://github.com/diegopn/ovenbird"),
-    (
-        "Project website",
-        "https://diegopn.github.io/ovenbird-site/",
-    ),
+pub const ABOUT_LINK_GROUPS: &[&[(&str, &str)]] = &[
+    &[(
+        "Report an issue",
+        "https://github.com/diegopn/ovenbird/issues",
+    )],
+    &[
+        ("Project repository", "https://github.com/diegopn/ovenbird"),
+        (
+            "Project website",
+            "https://diegopn.github.io/ovenbird-site/",
+        ),
+    ],
+    &[("Project creator's website", "https://diegopn.github.io/")],
 ];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

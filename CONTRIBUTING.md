@@ -25,6 +25,36 @@ GitHub Actions runs the same quality checks on pushes and pull requests. Meson i
 
 For a local Flatpak build, use the GNOME SDK and Rust extension described in the README. Keep native and Flatpak build directories separate.
 
+## Security checks
+
+The Security workflow runs on pushes to `main`, pull requests targeting `main`,
+weekly, and manually from the Actions tab. It uses three independent checks:
+
+- `cargo-audit` checks `Cargo.lock` against the RustSec advisory database.
+- Gitleaks scans Git history for exposed credentials, with secret values redacted.
+  `.gitleaksignore` lists seven reviewed false positives from public `ring` test
+  vectors and documentation in previously tracked Cargo sources. Each exception
+  identifies a specific commit, file, rule, and line; new findings remain visible.
+- CodeQL analyzes Rust with the `security-extended` query suite and publishes
+  findings to the repository's Security tab. Its build mode is `none`; the Rust
+  quality workflow remains responsible for compiling and testing the application.
+
+These checks require no paid account or additional API secrets for this public,
+personally owned repository. Actions are pinned to commit hashes. Dependabot
+checks Cargo dependencies and GitHub Actions weekly and proposes updates as pull
+requests; updates are not merged automatically.
+
+When a dependency update changes `Cargo.lock`, refresh the checked-in
+`cargo-cache/registry/index` and `cargo-cache/registry/cache` for the new locked
+dependencies before merging. Dependabot does not refresh this cache. Keep the
+Meson build offline and run the usual quality checks against the updated cache.
+Do not ignore advisories or secret findings just to make a check pass. A leaked
+credential must be revoked or rotated, even if it has been removed from the code.
+
+The dependency audit covers Rust crates, not system GTK/Poppler libraries or
+installed LaTeX engines. These checks complement focused tests for document
+parsing, file access, and compiler execution.
+
 ## Pull requests
 
 - Explain the user-visible change and how to reproduce or review it.

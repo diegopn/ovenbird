@@ -384,9 +384,10 @@ fn tr_dynamic(message: &str) -> String {
         "Dedicated to my wife, Karina, who always encourages me to go further." => {
             tr("Dedicated to my wife, Karina, who always encourages me to go further.")
         }
-        "Personal website" => tr("Personal website"),
+        "Report an issue" => tr("Report an issue"),
         "Project repository" => tr("Project repository"),
         "Project website" => tr("Project website"),
+        "Project creator's website" => tr("Project creator's website"),
         "New LaTeX document" => tr("New LaTeX document"),
         "New bibliography (.bib)" => tr("New bibliography (.bib)"),
         "New style file (.sty)" => tr("New style file (.sty)"),
@@ -741,23 +742,27 @@ fn show_about_dialog(state: &Rc<State>) {
     dedication.set_margin_bottom(6);
     content.append(&dedication);
 
-    let links = gtk::ListBox::new();
-    links.set_selection_mode(gtk::SelectionMode::None);
-    links.add_css_class("boxed-list");
-    for &(label, url) in crate::application_menu::ABOUT_LINKS {
-        let link = gtk::LinkButton::with_label(url, &tr_dynamic(label));
-        link.add_css_class("flat");
-        link.add_css_class("ovenbird-about-link");
-        let row = gtk::Box::new(gtk::Orientation::Horizontal, 12);
-        let label = gtk::Label::new(Some(&tr_dynamic(label)));
-        label.set_xalign(0.0);
-        label.set_hexpand(true);
-        row.append(&label);
-        row.append(&gtk::Image::from_icon_name("adw-external-link-symbolic"));
-        link.set_child(Some(&row));
-        links.append(&link);
+    let link_groups = gtk::Box::new(gtk::Orientation::Vertical, 16);
+    for group in crate::application_menu::ABOUT_LINK_GROUPS {
+        let links = gtk::ListBox::new();
+        links.set_selection_mode(gtk::SelectionMode::None);
+        links.add_css_class("boxed-list");
+        for &(label, url) in *group {
+            let link = gtk::LinkButton::with_label(url, &tr_dynamic(label));
+            link.add_css_class("flat");
+            link.add_css_class("ovenbird-about-link");
+            let row = gtk::Box::new(gtk::Orientation::Horizontal, 12);
+            let label = gtk::Label::new(Some(&tr_dynamic(label)));
+            label.set_xalign(0.0);
+            label.set_hexpand(true);
+            row.append(&label);
+            row.append(&gtk::Image::from_icon_name("adw-external-link-symbolic"));
+            link.set_child(Some(&row));
+            links.append(&link);
+        }
+        link_groups.append(&links);
     }
-    content.append(&links);
+    content.append(&link_groups);
 
     let scroll = gtk::ScrolledWindow::builder()
         .hscrollbar_policy(gtk::PolicyType::Never)

@@ -340,8 +340,8 @@ msgstr ""
 msgid "Dedicated to my wife, Karina, who always encourages me to go further."
 msgstr ""
 
-#: rust/src/window.rs:383
-msgid "Personal website"
+#: rust/src/window.rs
+msgid "Report an issue"
 msgstr ""
 
 #: rust/src/window.rs:384
@@ -350,6 +350,10 @@ msgstr ""
 
 #: rust/src/window.rs:385
 msgid "Project website"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Project creator's website"
 msgstr ""
 
 #: rust/src/window.rs:234

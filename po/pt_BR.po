@@ -335,9 +335,9 @@ msgstr "Criado por Diego Pereira do Nascimento"
 msgid "Dedicated to my wife, Karina, who always encourages me to go further."
 msgstr "Dedicado à minha esposa Karina, que sempre me incentiva a ir além."
 
-#: rust/src/window.rs:383
-msgid "Personal website"
-msgstr "Página pessoal"
+#: rust/src/window.rs
+msgid "Report an issue"
+msgstr "Relatar um problema"
 
 #: rust/src/window.rs:384
 msgid "Project repository"
@@ -346,6 +346,10 @@ msgstr "Repositório do projeto"
 #: rust/src/window.rs:385
 msgid "Project website"
 msgstr "Site do projeto"
+
+#: rust/src/window.rs
+msgid "Project creator's website"
+msgstr "Site do criador do projeto"
 
 #: rust/src/window.rs:234
 msgid "WORKSPACE"
