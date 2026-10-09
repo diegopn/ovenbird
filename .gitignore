@@ -14,11 +14,7 @@
 /target/
 /settings
 /jsconfig.json
-/docs/*
-!/docs/audit-corrections.md
-!/docs/superpowers/
-!/docs/superpowers/plans/
-!/docs/superpowers/plans/2026-10-08-ovenbird-release-test-plan.md
+/docs/
 /cargo-cache/registry/src/*
 !/cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/
 /cargo-cache/registry/src/index.crates.io-1949cf8c6b5b557f/*
