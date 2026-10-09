@@ -12,7 +12,7 @@ meson compile -C build
 meson test -C build --print-errorlogs
 ```
 
-The repository pins Rust 1.92.0 in `rust-toolchain.toml`; rustup selects it when working in this directory. The pinned toolchain includes `rustfmt` and Clippy. Before submitting Rust changes, run:
+The repository pins Rust 1.92.0 in `rust-toolchain.toml`; rustup selects it when working in this directory. The pinned toolchain includes `rustfmt` and Clippy. Keep `dtolnay/rust-toolchain` in GitHub Actions aligned with this version; Dependabot skips it because its action reference also selects the Rust version. Before submitting Rust changes, run:
 
 ```sh
 cargo fmt --all -- --check

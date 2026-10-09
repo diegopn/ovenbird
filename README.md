@@ -22,7 +22,7 @@ Visual mode supports a conservative subset of LaTeX. Unknown commands and enviro
 Install the native build dependencies:
 
 ```sh
-sudo dnf install gcc rust cargo pkgconf-pkg-config meson ninja-build gettext-devel gtk4-devel libadwaita-devel gtksourceview5-devel libpanel-devel unzip
+sudo dnf install gcc rust cargo pkgconf-pkg-config meson ninja-build gettext-devel gtk4-devel libadwaita-devel gtksourceview5-devel libpanel-devel desktop-file-utils unzip
 ```
 
 Poppler-GLib is optional and enables embedded PDF preview:
