@@ -1,6 +1,6 @@
 # Contributing
 
-Ovenbird is in early development. Small, focused changes are easiest to review. Before opening an issue or pull request, check the project status and build instructions in the [README](README.md).
+Small, focused changes are easiest to review. Before opening an issue or pull request, check the build instructions in the [README](README.md).
 
 ## Development setup
 
