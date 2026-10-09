@@ -19,8 +19,6 @@ updates:
       cronjob: '0 9 1 */2 *'
       timezone: America/Sao_Paulo
     open-pull-requests-limit: 3
-    ignore:
-      - dependency-name: dtolnay/rust-toolchain
     groups:
       github-actions:
         patterns: ['*']
