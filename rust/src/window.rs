@@ -160,6 +160,14 @@ struct ReferenceFilterOptions {
     kinds: Vec<String>,
 }
 
+struct ReferenceFilterSelection<'a> {
+    author: Option<&'a str>,
+    year: Option<&'a str>,
+    tag: Option<&'a str>,
+    kind: Option<&'a str>,
+    author_profiles: &'a [AuthorProfile],
+}
+
 struct LibraryPageWidgets {
     page: gtk::Box,
     list: gtk::ListView,
@@ -748,10 +756,9 @@ fn show_preferences_dialog(state: &Rc<State>) {
     default_folder_title.set_xalign(0.0);
     default_folder_title.add_css_class("heading");
     content.append(&default_folder_title);
-    let default_folder_description =
-        gtk::Label::new(Some(&tr(
-            "Dialogs start in Downloads unless you choose another folder.",
-        )));
+    let default_folder_description = gtk::Label::new(Some(&tr(
+        "Dialogs start in Downloads unless you choose another folder.",
+    )));
     default_folder_description.set_xalign(0.0);
     default_folder_description.add_css_class("dim-label");
     content.append(&default_folder_description);
@@ -3357,12 +3364,17 @@ fn reference_list_entry(item: &gtk::ListItem) -> Option<BibEntry> {
 }
 
 fn bind_reference_list_item(item: &gtk::ListItem) {
-    let Some(list_item) = item.item().and_then(|item| item.downcast::<glib::BoxedAnyObject>().ok())
+    let Some(list_item) = item
+        .item()
+        .and_then(|item| item.downcast::<glib::BoxedAnyObject>().ok())
     else {
         return;
     };
     let list_item = list_item.borrow::<ReferenceListItem>();
-    let Some(stack) = item.child().and_then(|child| child.downcast::<gtk::Stack>().ok()) else {
+    let Some(stack) = item
+        .child()
+        .and_then(|child| child.downcast::<gtk::Stack>().ok())
+    else {
         return;
     };
 
@@ -5645,14 +5657,17 @@ fn refresh_library(state: &Rc<State>) {
     let year_filter = selected_reference_filter(&state.reference_filters.year);
     let tag_filter = selected_reference_filter(&state.reference_filters.tag);
     let kind_filter = selected_reference_filter(&state.reference_filters.kind);
+    let filters = ReferenceFilterSelection {
+        author: author_filter.as_deref(),
+        year: year_filter.as_deref(),
+        tag: tag_filter.as_deref(),
+        kind: kind_filter.as_deref(),
+        author_profiles: &library.authors,
+    };
     let entries = filtered_reference_entries(
         &library.bibliography.entries,
         &term,
-        author_filter.as_deref(),
-        year_filter.as_deref(),
-        tag_filter.as_deref(),
-        kind_filter.as_deref(),
-        &library.authors,
+        &filters,
         state.reference_sort.selected(),
         state.reference_sort_descending.is_active(),
     );
@@ -5670,10 +5685,7 @@ fn refresh_library(state: &Rc<State>) {
 }
 
 fn set_reference_list_message(model: &gio::ListStore, text: String, retry: bool) {
-    let message = glib::BoxedAnyObject::new(ReferenceListItem::Message {
-        text,
-        retry,
-    });
+    let message = glib::BoxedAnyObject::new(ReferenceListItem::Message { text, retry });
     model.splice(0, model.n_items(), &[message]);
 }
 
@@ -6964,37 +6976,40 @@ fn reference_matches_filters(
     year: Option<&str>,
     tag: Option<&str>,
 ) -> bool {
-    reference_matches_filters_with_type(entry, author, year, tag, None, &[])
+    let filters = ReferenceFilterSelection {
+        author,
+        year,
+        tag,
+        kind: None,
+        author_profiles: &[],
+    };
+    reference_matches_filters_with_type(entry, &filters)
 }
 
 fn reference_matches_filters_with_type(
     entry: &BibEntry,
-    author: Option<&str>,
-    year: Option<&str>,
-    tag: Option<&str>,
-    kind: Option<&str>,
-    author_profiles: &[AuthorProfile],
+    filters: &ReferenceFilterSelection<'_>,
 ) -> bool {
-    let author_matches = author.is_none_or(|selected| {
+    let author_matches = filters.author.is_none_or(|selected| {
         let selected_identity = author_selection_identity(selected);
         reference_authors(entry).iter().any(|candidate| {
             let candidate_identity = author_selection_identity(candidate);
             candidate_identity == selected_identity
-                || author_profiles.iter().any(|profile| {
+                || filters.author_profiles.iter().any(|profile| {
                     author_selection_identity(&profile.citation_name) == candidate_identity
                         && author_selection_identity(&profile.full_name) == selected_identity
                 })
         })
     });
-    let year_matches = year.is_none_or(|selected| {
+    let year_matches = filters.year.is_none_or(|selected| {
         reference_year(entry).is_some_and(|candidate| candidate.eq_ignore_ascii_case(selected))
     });
-    let tag_matches = tag.is_none_or(|selected| {
+    let tag_matches = filters.tag.is_none_or(|selected| {
         reference_tags(entry)
             .iter()
             .any(|candidate| candidate.eq_ignore_ascii_case(selected))
     });
-    let kind_matches = kind.is_none_or(|selected| {
+    let kind_matches = filters.kind.is_none_or(|selected| {
         bibtex::reference_type_label(&entry.entry_type).eq_ignore_ascii_case(selected)
     });
     author_matches && year_matches && tag_matches && kind_matches
@@ -7003,27 +7018,14 @@ fn reference_matches_filters_with_type(
 fn filtered_reference_entries(
     entries: &[BibEntry],
     search: &str,
-    author: Option<&str>,
-    year: Option<&str>,
-    tag: Option<&str>,
-    kind: Option<&str>,
-    author_profiles: &[AuthorProfile],
+    filters: &ReferenceFilterSelection<'_>,
     sort_by: u32,
     descending: bool,
 ) -> Vec<BibEntry> {
     let mut entries = entries
         .iter()
         .filter(|entry| bibtex::entry_matches_search(entry, search))
-        .filter(|entry| {
-            reference_matches_filters_with_type(
-                entry,
-                author,
-                year,
-                tag,
-                kind,
-                author_profiles,
-            )
-        })
+        .filter(|entry| reference_matches_filters_with_type(entry, filters))
         .cloned()
         .collect::<Vec<_>>();
     sort_reference_entries(&mut entries, sort_by, descending);
@@ -7158,7 +7160,7 @@ fn set_reference_filter_options(dropdown: &gtk::DropDown, all_label: &str, value
 mod reference_filter_tests {
     use super::{
         filtered_reference_entries, reference_filter_values, reference_matches_filters,
-        replace_reference_list_entries, ReferenceListItem,
+        replace_reference_list_entries, ReferenceFilterSelection, ReferenceListItem,
     };
     use crate::bibtex::BibEntry;
     use gtk::gio::prelude::*;
@@ -7241,6 +7243,13 @@ mod reference_filter_tests {
         wrong_tag.set("year", "2024");
         wrong_tag.set("keywords", "science");
 
+        let filters = ReferenceFilterSelection {
+            author: Some("Doe, Jane"),
+            year: Some("2024"),
+            tag: Some("writing"),
+            kind: None,
+            author_profiles: &[],
+        };
         let actual = filtered_reference_entries(
             &[
                 wrong_year,
@@ -7250,17 +7259,16 @@ mod reference_filter_tests {
                 wrong_author,
             ],
             "search",
-            Some("Doe, Jane"),
-            Some("2024"),
-            Some("writing"),
-            None,
-            &[],
+            &filters,
             0,
             false,
         );
 
         assert_eq!(
-            actual.iter().map(|entry| entry.key.as_str()).collect::<Vec<_>>(),
+            actual
+                .iter()
+                .map(|entry| entry.key.as_str())
+                .collect::<Vec<_>>(),
             ["doe2024computing", "doe2024search"]
         );
     }
@@ -7306,10 +7314,8 @@ mod file_dialog_folder_tests {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let path = std::env::temp_dir().join(format!(
-            "ovenbird-{label}-{}-{nonce}",
-            std::process::id()
-        ));
+        let path =
+            std::env::temp_dir().join(format!("ovenbird-{label}-{}-{nonce}", std::process::id()));
         std::fs::create_dir(&path).unwrap();
         path
     }
@@ -8399,8 +8405,7 @@ mod sidebar_tests {
 
         let editor = crate::editor::LatexEditor::new();
         let (editor_panel, editor_page, ..) = super::build_editor_page(&editor);
-        let sidebar =
-            super::build_sidebar(super::StartupView::Editor);
+        let sidebar = super::build_sidebar(super::StartupView::Editor);
 
         assert!(
             sidebar.brand.parent().is_some(),

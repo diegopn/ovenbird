@@ -897,12 +897,14 @@ mod tests {
 
     #[test]
     fn app_settings_default_file_dialog_folder_is_optional_and_persists() {
-        let older_settings: AppSettings = serde_json::from_str(r#"{"startupView":"editor"}"#)
-            .unwrap();
+        let older_settings: AppSettings =
+            serde_json::from_str(r#"{"startupView":"editor"}"#).unwrap();
         assert_eq!(older_settings.default_folder_uri, None);
 
-        let mut settings = AppSettings::default();
-        settings.default_folder_uri = Some("file:///home/alice/Documents".to_owned());
+        let settings = AppSettings {
+            default_folder_uri: Some("file:///home/alice/Documents".to_owned()),
+            ..AppSettings::default()
+        };
         let serialized = serde_json::to_value(settings).unwrap();
         assert_eq!(
             serialized["defaultFolderUri"],
