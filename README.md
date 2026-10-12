@@ -1,3 +1,7 @@
+<p>
+  <img src="data/io.github.diegopn.ovenbird.svg" alt="Ovenbird icon" width="96" height="96">
+</p>
+
 # Ovenbird
 
 Ovenbird is a native GNOME workspace for writing LaTeX documents and managing a local BibTeX library. It is written in Rust with GTK 4, Libadwaita, and GtkSourceView. Project documents remain ordinary files; Ovenbird does not convert them to a proprietary format.
