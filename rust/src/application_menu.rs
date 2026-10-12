@@ -92,12 +92,20 @@ pub const APPLICATION_MENU_GROUPS: &[&[ApplicationMenuItem]] = &[
             shortcut: "Ctrl+Q",
         },
     ],
-    &[ApplicationMenuItem {
-        icon: "help-about-symbolic",
-        label: "About Ovenbird",
-        action: "win.about",
-        shortcut: "",
-    }],
+    &[
+        ApplicationMenuItem {
+            icon: "preferences-system-symbolic",
+            label: "Preferences",
+            action: "win.show-preferences",
+            shortcut: "",
+        },
+        ApplicationMenuItem {
+            icon: "help-about-symbolic",
+            label: "About Ovenbird",
+            action: "win.about",
+            shortcut: "",
+        },
+    ],
 ];
 
 pub const THEME_MENU_CHOICES: &[ApplicationMenuItem] = &[
@@ -175,6 +183,17 @@ mod tests {
         assert!(!items
             .iter()
             .any(|item| matches!(item.label, "Find in document" | "Local library")));
+
+        let preferences = items
+            .iter()
+            .position(|item| item.action == "win.show-preferences")
+            .unwrap();
+        let about = items
+            .iter()
+            .position(|item| item.action == "win.about")
+            .unwrap();
+        assert_eq!(items[preferences].label, "Preferences");
+        assert!(preferences < about);
     }
 
     #[test]

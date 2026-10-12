@@ -1457,6 +1457,50 @@ msgid "Open project"
 msgstr "Abrir projeto"
 
 #: rust/src/window.rs
+msgid "Open at startup"
+msgstr "Abrir ao iniciar"
+
+#: rust/src/window.rs rust/src/application_menu.rs
+msgid "Preferences"
+msgstr "Preferências"
+
+#: rust/src/window.rs
+msgid "Default folder for file dialogs"
+msgstr "Pasta padrão dos diálogos de arquivos"
+
+#: rust/src/window.rs
+msgid "Dialogs start in Downloads unless you choose another folder."
+msgstr "Os diálogos começam em Downloads, a menos que você escolha outra pasta."
+
+#: rust/src/window.rs
+msgid "Choose folder…"
+msgstr "Escolher pasta…"
+
+#: rust/src/window.rs
+msgid "Choose default folder"
+msgstr "Escolha a pasta padrão"
+
+#: rust/src/window.rs
+msgid "Reset"
+msgstr "Redefinir"
+
+#: rust/src/window.rs
+msgid "Restore the system default folder"
+msgstr "Restaurar a pasta padrão do sistema"
+
+#: rust/src/window.rs
+msgid "No starting folder available"
+msgstr "Nenhuma pasta inicial disponível"
+
+#: rust/src/window.rs
+msgid "Reopen last project at startup"
+msgstr "Reabrir o último projeto ao iniciar"
+
+#: rust/src/window.rs
+msgid "The last project folder could not be restored."
+msgstr "Não foi possível reabrir a pasta do último projeto."
+
+#: rust/src/window.rs
 msgid "Close project"
 msgstr "Fechar projeto"
 
