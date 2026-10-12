@@ -210,7 +210,7 @@ fn application_menu_keeps_project_lifecycle_without_export_pdf() {
             vec!["win.new-project", "win.open-project"],
             vec!["win.open-document", "win.close-project"],
             vec!["win.shortcuts", "win.quit"],
-            vec!["win.about"],
+            vec!["win.show-preferences", "win.about"],
         ]
     );
     assert!(!groups

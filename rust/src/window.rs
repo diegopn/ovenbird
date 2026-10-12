@@ -19,7 +19,7 @@ use crate::editor::LatexEditor;
 use crate::history::EditorMode;
 use crate::i18n::ngettext;
 use crate::project::{self, ProjectEntryKind, ProjectFileKind};
-use crate::storage::{AppSettings, AuthorProfile, LocalLibrary};
+use crate::storage::{AppSettings, AuthorProfile, LocalLibrary, StartupView};
 
 const MAIN_HEADER_HEIGHT: i32 = 48;
 
@@ -50,11 +50,14 @@ struct State {
     project_open_id: Cell<u64>,
     save_in_progress: Cell<bool>,
     close_confirmed: Cell<bool>,
+    startup_restore_cancelled: Cell<bool>,
+    startup_view: StartupView,
     file_list: gtk::Box,
     file_tree: gtk::ListView,
     file_tree_selection: gtk::SingleSelection,
     project_files_scroll: gtk::Adjustment,
-    library_list: gtk::Box,
+    library_list: gtk::ListView,
+    library_list_model: gio::ListStore,
     tags_list: gtk::Box,
     tag_search: gtk::SearchEntry,
     tag_sort: gtk::DropDown,
@@ -159,7 +162,8 @@ struct ReferenceFilterOptions {
 
 struct LibraryPageWidgets {
     page: gtk::Box,
-    list: gtk::Box,
+    list: gtk::ListView,
+    list_model: gio::ListStore,
     search: gtk::SearchEntry,
     sort_by: gtk::DropDown,
     sort_descending: gtk::ToggleButton,
@@ -185,6 +189,12 @@ struct TagsPageWidgets {
 }
 
 #[derive(Clone)]
+enum ReferenceListItem {
+    Entry(BibEntry),
+    Message { text: String, retry: bool },
+}
+
+#[derive(Clone)]
 struct ProjectTreeNode {
     entry: project::ProjectEntry,
     children: Option<gio::ListStore>,
@@ -201,6 +211,7 @@ impl OvenbirdWindow {
             .resizable(true)
             .build();
         let theme_preference = load_theme_preference();
+        let startup_view = load_startup_view_preference();
         apply_theme_preference(theme_preference);
         let editor = Rc::new(LatexEditor::new());
         let library = LocalLibrary::empty();
@@ -231,7 +242,7 @@ impl OvenbirdWindow {
         let library_page = build_library_page();
         let tags_page = build_tags_manager_content();
         let authors_page = build_authors_manager_content();
-        let sidebar_widgets = build_sidebar(theme_preference);
+        let sidebar_widgets = build_sidebar(startup_view);
         let page_stack = gtk::Stack::builder()
             .hexpand(true)
             .vexpand(true)
@@ -241,7 +252,7 @@ impl OvenbirdWindow {
         page_stack.add_named(&library_page.page, Some("references"));
         page_stack.add_named(&tags_page.page, Some("tags"));
         page_stack.add_named(&authors_page.page, Some("authors"));
-        page_stack.set_visible_child_name("editor");
+        page_stack.set_visible_child_name(startup_page_name(startup_view));
         let toolbar_view = adw::ToolbarView::new();
         toolbar_view.set_hexpand(true);
         toolbar_view.set_vexpand(true);
@@ -259,7 +270,10 @@ impl OvenbirdWindow {
         toast.set_child(Some(&layout));
         window.set_content(Some(&toast));
 
-        let title = gtk::Label::new(Some(&tr("LaTeX editor")));
+        let title = gtk::Label::new(Some(&tr(match startup_view {
+            StartupView::Editor => "LaTeX editor",
+            StartupView::References => "References",
+        })));
         title.add_css_class("ovenbird-header-title");
         let status = gtk::Label::new(Some(&crate::i18n::gettext("Ready")));
         status.add_css_class("ovenbird-header-status");
@@ -286,6 +300,8 @@ impl OvenbirdWindow {
             project_open_id: Cell::new(0),
             save_in_progress: Cell::new(false),
             close_confirmed: Cell::new(false),
+            startup_restore_cancelled: Cell::new(false),
+            startup_view,
             file_list: sidebar_widgets.file_list,
             file_tree: sidebar_widgets.file_tree,
             file_tree_selection: sidebar_widgets.file_tree_selection,
@@ -294,6 +310,7 @@ impl OvenbirdWindow {
             reference_sort: library_page.sort_by,
             reference_sort_descending: library_page.sort_descending,
             library_list: library_page.list,
+            library_list_model: library_page.list_model,
             tags_list: tags_page.list,
             tag_search: tags_page.search,
             tag_sort: tags_page.sort_by,
@@ -345,6 +362,7 @@ impl OvenbirdWindow {
         authors_page
             .add
             .connect_clicked(move |_| edit_author(&state_for_add_author, None));
+        setup_reference_list_view(&state);
         setup_project_file_view(&state);
         build_header(&state);
         connect_navigation(&state);
@@ -355,6 +373,7 @@ impl OvenbirdWindow {
         refresh_project_files(&state);
         refresh_library(&state);
         load_library_async(&state);
+        schedule_last_project_restore(&state);
         Self { window }
     }
 
@@ -491,7 +510,7 @@ fn labeled_content(icon: &str, label: &str) -> gtk::Box {
     row
 }
 
-fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
+fn build_sidebar(startup_view: StartupView) -> SidebarWidgets {
     let sidebar = gtk::Box::new(gtk::Orientation::Vertical, 0);
     sidebar.set_size_request(340, -1);
     sidebar.set_hexpand(false);
@@ -515,7 +534,7 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     menu.set_tooltip_text(Some(&tr("Main menu")));
     menu.add_css_class("flat");
     menu.add_css_class("ovenbird-main-menu-button");
-    menu.set_popover(Some(&build_main_menu(theme_preference)));
+    menu.set_popover(Some(&build_main_menu()));
     brand.set_center_widget(Some(&name));
     brand.set_end_widget(Some(&menu));
     sidebar.append(&brand);
@@ -526,12 +545,13 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     tabs.add_css_class("ovenbird-sidebar-tabs");
     let editor_tab = sidebar_tab_button("document-edit-symbolic", "LaTeX editor");
     editor_tab.set_action_name(Some("win.show-editor"));
-    editor_tab.set_active(true);
+    editor_tab.set_active(startup_view == StartupView::Editor);
     editor_tab.set_hexpand(true);
     editor_tab.set_halign(gtk::Align::Fill);
     editor_tab.add_css_class("flat");
     let references_tab = sidebar_tab_button("view-list-symbolic", "References");
     references_tab.set_group(Some(&editor_tab));
+    references_tab.set_active(startup_view == StartupView::References);
     references_tab.set_action_name(Some("win.show-references"));
     references_tab.set_hexpand(true);
     references_tab.set_halign(gtk::Align::Fill);
@@ -621,7 +641,7 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
         references_panel.append(&item);
     }
     pages.add_named(&references_panel, Some("references"));
-    pages.set_visible_child_name("editor");
+    pages.set_visible_child_name(startup_page_name(startup_view));
     sidebar.append(&pages);
 
     SidebarWidgets {
@@ -638,15 +658,13 @@ fn build_sidebar(theme_preference: ThemePreference) -> SidebarWidgets {
     }
 }
 
-fn build_main_menu(theme_preference: ThemePreference) -> gtk::Popover {
+fn build_main_menu() -> gtk::Popover {
     let popover = gtk::Popover::new();
     let content = gtk::Box::new(gtk::Orientation::Vertical, 2);
     content.set_margin_top(6);
     content.set_margin_bottom(6);
     content.set_margin_start(6);
     content.set_margin_end(6);
-    content.append(&build_theme_choices(theme_preference));
-    content.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
     let append_item = |icon: &str, label: &str, action: &str, shortcut: &str| {
         let item = gtk::Button::new();
         let row = gtk::Box::new(gtk::Orientation::Horizontal, 10);
@@ -683,6 +701,123 @@ fn build_main_menu(theme_preference: ThemePreference) -> gtk::Popover {
     popover
 }
 
+fn show_preferences_dialog(state: &Rc<State>) {
+    let dialog = gtk::Dialog::builder()
+        .title(tr("Preferences"))
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(560)
+        .build();
+    dialog.add_button(&tr("Close"), gtk::ResponseType::Close);
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 12);
+    content.set_margin_top(18);
+    content.set_margin_bottom(18);
+    content.set_margin_start(20);
+    content.set_margin_end(20);
+    content.append(&build_theme_choices(load_theme_preference()));
+    content.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+
+    let startup_view_options = [tr("LaTeX editor"), tr("References")];
+    let startup_view_labels = startup_view_options
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<_>>();
+    let startup_view_dropdown = gtk::DropDown::from_strings(&startup_view_labels);
+    startup_view_dropdown.set_selected(startup_view_menu_index(load_startup_view_preference()));
+    startup_view_dropdown.connect_selected_notify(|dropdown| {
+        save_startup_view_preference(startup_view_from_menu_index(dropdown.selected()));
+    });
+    let startup_view_row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let startup_view_label = gtk::Label::new(Some(&tr("Open at startup")));
+    startup_view_label.set_xalign(0.0);
+    startup_view_label.set_hexpand(true);
+    startup_view_row.append(&startup_view_label);
+    startup_view_row.append(&startup_view_dropdown);
+    content.append(&startup_view_row);
+
+    let reopen_last_project = gtk::CheckButton::with_label(&tr("Reopen last project at startup"));
+    reopen_last_project.set_active(load_reopen_last_project_preference());
+    reopen_last_project.connect_toggled(|button| {
+        save_reopen_last_project_preference(button.is_active());
+    });
+    content.append(&reopen_last_project);
+    content.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+
+    let default_folder_title = gtk::Label::new(Some(&tr("Default folder for file dialogs")));
+    default_folder_title.set_xalign(0.0);
+    default_folder_title.add_css_class("heading");
+    content.append(&default_folder_title);
+    let default_folder_description =
+        gtk::Label::new(Some(&tr(
+            "Dialogs start in Downloads unless you choose another folder.",
+        )));
+    default_folder_description.set_xalign(0.0);
+    default_folder_description.add_css_class("dim-label");
+    content.append(&default_folder_description);
+
+    let default_folder_row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+    let default_folder_label = gtk::Label::new(Some(&default_folder_display_text()));
+    default_folder_label.set_xalign(0.0);
+    default_folder_label.set_hexpand(true);
+    default_folder_label.set_selectable(true);
+    default_folder_label.set_ellipsize(gtk::pango::EllipsizeMode::Middle);
+    default_folder_row.append(&default_folder_label);
+
+    let reset_folder = gtk::Button::with_label(&tr("Reset"));
+    reset_folder.set_tooltip_text(Some(&tr("Restore the system default folder")));
+    reset_folder.add_css_class("flat");
+    reset_folder.set_visible(has_custom_file_dialog_folder());
+
+    let choose_folder = gtk::Button::with_label(&tr("Choose folder…"));
+    let folder_label_for_choice = default_folder_label.clone();
+    let reset_folder_for_choice = reset_folder.clone();
+    let state_for_choice = state.clone();
+    choose_folder.connect_clicked(move |_| {
+        let folder_label = folder_label_for_choice.clone();
+        let reset_folder = reset_folder_for_choice.clone();
+        choose_file(
+            &state_for_choice,
+            gtk::FileChooserAction::SelectFolder,
+            "Choose default folder",
+            "Open",
+            None,
+            move |state, folder| {
+                if let Err(error) = save_default_file_dialog_folder(Some(&folder)) {
+                    show_toast(&state, &error.to_string());
+                    return;
+                }
+                folder_label.set_text(&folder.display().to_string());
+                reset_folder.set_visible(true);
+            },
+        );
+    });
+    default_folder_row.append(&choose_folder);
+    let folder_label_for_reset = default_folder_label.clone();
+    let reset_folder_for_reset = reset_folder.clone();
+    let state_for_reset = state.clone();
+    reset_folder.connect_clicked(move |_| {
+        if let Err(error) = save_default_file_dialog_folder(None) {
+            show_toast(&state_for_reset, &error.to_string());
+            return;
+        }
+        folder_label_for_reset.set_text(&default_folder_display_text());
+        reset_folder_for_reset.set_visible(false);
+    });
+    default_folder_row.append(&reset_folder);
+    content.append(&default_folder_row);
+
+    dialog.content_area().append(&content);
+    dialog.connect_response(|dialog, _| dialog.close());
+    dialog.present();
+}
+
+fn default_folder_display_text() -> String {
+    default_file_dialog_folder()
+        .map(|folder| folder.display().to_string())
+        .unwrap_or_else(|| tr("No starting folder available"))
+}
+
 fn load_theme_preference() -> ThemePreference {
     AppSettings::load()
         .ok()
@@ -696,6 +831,166 @@ fn load_theme_preference() -> ThemePreference {
         .as_deref()
         .map(|value| ThemePreference::from_setting(Some(value)))
         .unwrap_or(ThemePreference::System)
+}
+
+fn load_reopen_last_project_preference() -> bool {
+    AppSettings::load()
+        .map(|settings| settings.reopen_last_project_on_startup)
+        .unwrap_or(true)
+}
+
+fn load_startup_view_preference() -> StartupView {
+    AppSettings::load()
+        .map(|settings| settings.startup_view)
+        .unwrap_or_default()
+}
+
+fn save_startup_view_preference(startup_view: StartupView) {
+    if let Err(error) = update_app_settings(|settings| {
+        settings.startup_view = startup_view;
+    }) {
+        eprintln!("Could not save startup preference: {error}");
+    }
+}
+
+fn save_default_file_dialog_folder(folder: Option<&Path>) -> std::io::Result<()> {
+    let folder_uri = folder.map(|folder| gio::File::for_path(folder).uri().to_string());
+    update_app_settings(|settings| settings.default_folder_uri = folder_uri)
+}
+
+fn has_custom_file_dialog_folder() -> bool {
+    AppSettings::load()
+        .ok()
+        .is_some_and(|settings| settings.default_folder_uri.is_some())
+}
+
+fn default_file_dialog_folder() -> Option<PathBuf> {
+    let settings = AppSettings::load().unwrap_or_default();
+    preferred_file_dialog_folder(settings.default_folder_uri.as_deref(), downloads_folder())
+}
+
+fn preferred_file_dialog_folder(
+    configured_uri: Option<&str>,
+    downloads_folder: Option<PathBuf>,
+) -> Option<PathBuf> {
+    let configured = configured_uri
+        .and_then(|uri| gio::File::for_uri(uri).path())
+        .filter(|folder| folder.is_dir());
+    configured.or_else(|| downloads_folder.filter(|folder| folder.is_dir()))
+}
+
+fn downloads_folder() -> Option<PathBuf> {
+    let fallback = glib::home_dir().join("Downloads");
+    glib::user_special_dir(glib::UserDirectory::Downloads)
+        .filter(|path| path.is_dir())
+        .or_else(|| fallback.is_dir().then_some(fallback))
+}
+
+fn startup_page_name(startup_view: StartupView) -> &'static str {
+    match startup_view {
+        StartupView::Editor => "editor",
+        StartupView::References => "references",
+    }
+}
+
+fn startup_view_menu_index(startup_view: StartupView) -> u32 {
+    match startup_view {
+        StartupView::Editor => 0,
+        StartupView::References => 1,
+    }
+}
+
+fn startup_view_from_menu_index(index: u32) -> StartupView {
+    match index {
+        1 => StartupView::References,
+        _ => StartupView::Editor,
+    }
+}
+
+#[cfg(test)]
+mod startup_view_tests {
+    use super::{startup_page_name, startup_view_from_menu_index, startup_view_menu_index};
+    use crate::storage::StartupView;
+
+    #[test]
+    fn startup_view_uses_the_matching_page_and_menu_choice() {
+        for (view, page, index) in [
+            (StartupView::Editor, "editor", 0),
+            (StartupView::References, "references", 1),
+        ] {
+            assert_eq!(startup_page_name(view), page);
+            assert_eq!(startup_view_menu_index(view), index);
+            assert_eq!(startup_view_from_menu_index(index), view);
+        }
+        assert_eq!(startup_view_from_menu_index(u32::MAX), StartupView::Editor);
+    }
+}
+
+fn update_app_settings(update: impl FnOnce(&mut AppSettings)) -> std::io::Result<()> {
+    let mut settings = match AppSettings::load() {
+        Ok(settings) => settings,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => AppSettings::default(),
+        Err(error) => return Err(error),
+    };
+    update(&mut settings);
+    settings.save()
+}
+
+fn save_reopen_last_project_preference(enabled: bool) {
+    if let Err(error) = update_app_settings(|settings| {
+        settings.reopen_last_project_on_startup = enabled;
+    }) {
+        eprintln!("Could not save startup preference: {error}");
+    }
+}
+
+fn remember_last_project_folder(folder: &Path) {
+    let uri = gio::File::for_path(folder).uri().to_string();
+    if let Err(error) = update_app_settings(|settings| settings.last_project_uri = Some(uri)) {
+        eprintln!("Could not save the last project folder: {error}");
+    }
+}
+
+fn schedule_last_project_restore(state: &Rc<State>) {
+    let state = Rc::downgrade(state);
+    glib::idle_add_local_once(move || {
+        let Some(state) = state.upgrade() else {
+            return;
+        };
+        if state.startup_restore_cancelled.get() {
+            return;
+        }
+
+        let settings = match AppSettings::load() {
+            Ok(settings) => settings,
+            Err(error) => {
+                eprintln!("Could not load startup settings: {error}");
+                return;
+            }
+        };
+        if !settings.reopen_last_project_on_startup {
+            return;
+        }
+        let Some(uri) = settings.last_project_uri else {
+            return;
+        };
+        let Some(folder) = gio::File::for_uri(&uri).path() else {
+            show_toast(
+                &state,
+                &tr("The last project folder could not be restored."),
+            );
+            return;
+        };
+        if std::fs::read_dir(&folder).is_err() {
+            show_toast(
+                &state,
+                &tr("The last project folder could not be restored."),
+            );
+            return;
+        }
+
+        open_project(&state, &folder, true, state.startup_view);
+    });
 }
 
 fn show_about_dialog(state: &Rc<State>) {
@@ -783,19 +1078,12 @@ fn apply_theme_preference(preference: ThemePreference) {
 }
 
 fn save_theme_preference(preference: ThemePreference) {
-    let mut settings = match AppSettings::load() {
-        Ok(settings) => settings,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => AppSettings::default(),
-        Err(error) => {
-            eprintln!("Could not load appearance settings: {error}");
-            return;
-        }
-    };
-    settings.extra.insert(
-        "colorScheme".to_owned(),
-        serde_json::Value::String(preference.setting_value().to_owned()),
-    );
-    if let Err(error) = settings.save() {
+    if let Err(error) = update_app_settings(|settings| {
+        settings.extra.insert(
+            "colorScheme".to_owned(),
+            serde_json::Value::String(preference.setting_value().to_owned()),
+        );
+    }) {
         eprintln!("Could not save appearance preference: {error}");
     }
 }
@@ -1144,27 +1432,27 @@ fn heading_menu() -> gtk::Popover {
             "win.heading-normal",
         ),
         (
-            "format-text-heading-symbolic",
+            "format-text-rich-symbolic",
             "Section",
             "win.heading-section",
         ),
         (
-            "format-text-heading-symbolic",
+            "format-text-rich-symbolic",
             "Subsection",
             "win.heading-subsection",
         ),
         (
-            "format-text-heading-symbolic",
+            "format-text-rich-symbolic",
             "Subsubsection",
             "win.heading-subsubsection",
         ),
         (
-            "format-text-heading-symbolic",
+            "format-text-rich-symbolic",
             "Paragraph",
             "win.heading-paragraph",
         ),
         (
-            "format-text-heading-symbolic",
+            "format-text-rich-symbolic",
             "Subparagraph",
             "win.heading-subparagraph",
         ),
@@ -1172,8 +1460,8 @@ fn heading_menu() -> gtk::Popover {
 }
 fn math_menu() -> gtk::Popover {
     menu_with_actions(&[
-        ("insert-math-symbolic", "Inline math", "win.math-inline"),
-        ("insert-math-symbolic", "Display math", "win.math-display"),
+        ("", "Inline math", "win.math-inline"),
+        ("", "Display math", "win.math-display"),
     ])
 }
 fn symbol_menu() -> gtk::Popover {
@@ -1312,8 +1600,14 @@ fn build_library_page() -> LibraryPageWidgets {
         filter_bar.append(dropdown);
     }
     page.append(&filter_bar);
-    let list = gtk::Box::new(gtk::Orientation::Vertical, 3);
+    let list_model = gio::ListStore::new::<glib::BoxedAnyObject>();
+    let list_selection = gtk::NoSelection::new(Some(list_model.clone()));
+    let list = gtk::ListView::new(Some(list_selection), None::<gtk::ListItemFactory>);
+    list.add_css_class("ovenbird-reference-list");
+    list.set_show_separators(true);
     list.set_margin_end(30);
+    list.set_vexpand(true);
+    list.set_hexpand(true);
     let scroll = gtk::ScrolledWindow::builder()
         .vexpand(true)
         .hexpand(true)
@@ -1323,6 +1617,7 @@ fn build_library_page() -> LibraryPageWidgets {
     LibraryPageWidgets {
         page,
         list,
+        list_model,
         search,
         sort_by,
         sort_descending,
@@ -1879,6 +2174,7 @@ fn connect_actions(state: &Rc<State>) {
     install_action(state, "show-references", |s| show_page(&s, "references"));
     install_action(state, "show-tags", |s| show_page(&s, "tags"));
     install_action(state, "show-authors", |s| show_page(&s, "authors"));
+    install_action(state, "show-preferences", |s| show_preferences_dialog(&s));
     install_action(state, "add-tag", |s| edit_tag(&s, None));
     install_action(state, "add-author", |s| edit_author(&s, None));
     install_action(state, "find-document", toggle_search);
@@ -1903,6 +2199,7 @@ fn connect_actions(state: &Rc<State>) {
         let Some(state) = weak.upgrade() else {
             return;
         };
+        state.startup_restore_cancelled.set(true);
         let Some(path) = parameter.and_then(|value| value.get::<String>()) else {
             return;
         };
@@ -2352,7 +2649,7 @@ fn choose_file(
         Some(&tr_dynamic(accept)),
         Some(&tr("Cancel")),
     );
-    set_downloads_folder(&dialog);
+    set_default_file_dialog_folder(&dialog);
     if let Some(name) = default_name {
         dialog.set_current_name(name);
     }
@@ -2377,12 +2674,8 @@ fn choose_file(
     dialog.show();
 }
 
-fn set_downloads_folder(dialog: &impl gtk::prelude::FileChooserExtManual) {
-    let fallback = glib::home_dir().join("Downloads");
-    let folder = glib::user_special_dir(glib::UserDirectory::Downloads)
-        .filter(|path| path.is_dir())
-        .or_else(|| fallback.is_dir().then_some(fallback));
-    if let Some(folder) = folder {
+fn set_default_file_dialog_folder(dialog: &impl gtk::prelude::FileChooserExtManual) {
+    if let Some(folder) = default_file_dialog_folder() {
         let _ = dialog.set_current_folder(Some(&gio::File::for_path(folder)));
     }
 }
@@ -2408,7 +2701,9 @@ fn choose_project_folder(state: Rc<State>) {
         "Open",
         None,
         |state, path| {
-            with_discard_confirmation(&state, move |state| open_project(&state, &path));
+            with_discard_confirmation(&state, move |state| {
+                open_project(&state, &path, false, state.startup_view)
+            });
         },
     );
 }
@@ -2521,6 +2816,15 @@ fn confirm_destructive_action(
 }
 
 fn open_document(state: &Rc<State>, path: &Path, root: Option<PathBuf>) {
+    open_document_with_page(state, path, root, None);
+}
+
+fn open_document_with_page(
+    state: &Rc<State>,
+    path: &Path,
+    root: Option<PathBuf>,
+    page_after_open: Option<&'static str>,
+) {
     let path = path.to_path_buf();
     let root = root.or_else(|| path.parent().map(Path::to_path_buf));
     let kind = project::file_kind(&path);
@@ -2561,7 +2865,7 @@ fn open_document(state: &Rc<State>, path: &Path, root: Option<PathBuf>) {
         set_build_status(state, "Ready");
         refresh_project_files(state);
         update_title(state, false);
-        show_page(state, "editor");
+        show_page(state, page_after_open.unwrap_or("editor"));
         return;
     }
 
@@ -2598,7 +2902,7 @@ fn open_document(state: &Rc<State>, path: &Path, root: Option<PathBuf>) {
                 state.editor.focus();
                 refresh_project_files(&state);
                 update_title(&state, false);
-                show_page(&state, "editor");
+                show_page(&state, page_after_open.unwrap_or("editor"));
             }
             Err(error) => {
                 state.status.set_label(&tr("Ready"));
@@ -2685,7 +2989,7 @@ fn find_project_main_async(
     });
 }
 
-fn open_project(state: &Rc<State>, folder: &Path) {
+fn open_project(state: &Rc<State>, folder: &Path, restoring: bool, startup_view: StartupView) {
     let folder = folder.to_path_buf();
     set_project_root(state, Some(folder.clone()));
     *state.project_target.borrow_mut() = Some(folder.clone());
@@ -2712,13 +3016,22 @@ fn open_project(state: &Rc<State>, folder: &Path) {
         }
         state.status.set_label(&tr("Ready"));
         let documents = match result {
-            Ok(documents) => documents,
+            Ok(documents) => {
+                remember_last_project_folder(&folder);
+                documents
+            }
             Err(error) => {
+                if restoring {
+                    set_project_root(&state, None);
+                    state.project_target.borrow_mut().take();
+                    state.main_tex.borrow_mut().take();
+                    refresh_project_files(&state);
+                }
                 show_toast(
                     &state,
                     &format!("{}: {error}", tr("Could not list the project folder")),
                 );
-                Vec::new()
+                return;
             }
         };
         let root_main = folder.join("main.tex");
@@ -2740,18 +3053,24 @@ fn open_project(state: &Rc<State>, folder: &Path) {
             })
             .or_else(|| (documents.len() == 1).then(|| documents[0].clone()));
         *state.main_tex.borrow_mut() = main.clone();
+        let page_after_open = restoring.then(|| startup_page_name(startup_view));
         if let Some(main) = main {
-            open_document(&state, &main, Some(folder));
+            open_document_with_page(&state, &main, Some(folder), page_after_open);
         } else if documents.len() > 1 {
-            choose_main_document(&state, &folder, documents);
+            choose_main_document(&state, &folder, documents, page_after_open);
         } else {
-            show_page(&state, "editor");
+            show_page(&state, page_after_open.unwrap_or("editor"));
             show_toast(&state, &tr("This project has no .tex document yet."));
         }
     });
 }
 
-fn choose_main_document(state: &Rc<State>, folder: &Path, documents: Vec<PathBuf>) {
+fn choose_main_document(
+    state: &Rc<State>,
+    folder: &Path,
+    documents: Vec<PathBuf>,
+    page_after_open: Option<&'static str>,
+) {
     let dialog = gtk::Dialog::builder()
         .title(tr("Choose main document"))
         .transient_for(&state.window)
@@ -2807,7 +3126,7 @@ fn choose_main_document(state: &Rc<State>, folder: &Path, documents: Vec<PathBuf
         };
         dialog.close();
         if let Some(document) = selected {
-            open_document(&state, &document, Some(folder.clone()));
+            open_document_with_page(&state, &document, Some(folder.clone()), page_after_open);
         }
     });
     dialog.present();
@@ -2905,6 +3224,243 @@ fn save_document_to_path(state: Rc<State>, path: PathBuf, after: Option<SaveCall
             Err(error) => show_toast(&state, &error),
         }
     });
+}
+
+fn setup_reference_list_view(state: &Rc<State>) {
+    let factory = gtk::SignalListItemFactory::new();
+    let state_for_setup = Rc::downgrade(state);
+    factory.connect_setup(move |_, object| {
+        let Some(item) = object.downcast_ref::<gtk::ListItem>() else {
+            return;
+        };
+        let row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+        row.set_margin_top(4);
+        row.set_margin_bottom(4);
+
+        let details = gtk::Box::new(gtk::Orientation::Vertical, 3);
+        let title = gtk::Label::new(None);
+        title.set_xalign(0.0);
+        title.add_css_class("heading");
+        details.append(&title);
+        let subtitle = gtk::Label::new(None);
+        subtitle.set_xalign(0.0);
+        subtitle.add_css_class("dim-label");
+        details.append(&subtitle);
+        details.set_hexpand(true);
+        let summary = gtk::Box::new(gtk::Orientation::Horizontal, 12);
+        summary.set_hexpand(true);
+        summary.append(&details);
+        let key = gtk::Label::new(None);
+        key.add_css_class("dim-label");
+        summary.append(&key);
+
+        let open_details = gtk::Button::new();
+        open_details.set_has_frame(false);
+        open_details.add_css_class("flat");
+        open_details.set_hexpand(true);
+        open_details.set_halign(gtk::Align::Fill);
+        open_details.set_child(Some(&summary));
+        open_details.set_tooltip_text(Some(&tr("Show reference details")));
+        let item_for_details = item.downgrade();
+        let state_for_details = state_for_setup.clone();
+        open_details.connect_clicked(move |_| {
+            let Some(state) = state_for_details.upgrade() else {
+                return;
+            };
+            let Some(item) = item_for_details.upgrade() else {
+                return;
+            };
+            let Some(entry) = reference_list_entry(&item) else {
+                return;
+            };
+            show_reference_details(&state, entry);
+        });
+        row.append(&open_details);
+
+        let edit = button("document-edit-symbolic", &tr("Edit reference"));
+        let item_for_edit = item.downgrade();
+        let state_for_edit = state_for_setup.clone();
+        edit.connect_clicked(move |_| {
+            let Some(state) = state_for_edit.upgrade() else {
+                return;
+            };
+            let Some(item) = item_for_edit.upgrade() else {
+                return;
+            };
+            let Some(entry) = reference_list_entry(&item) else {
+                return;
+            };
+            edit_reference(&state, Some(entry));
+        });
+        row.append(&edit);
+
+        let delete = button("user-trash-symbolic", &tr("Delete reference"));
+        delete.add_css_class("destructive-action");
+        let item_for_delete = item.downgrade();
+        let state_for_delete = state_for_setup.clone();
+        delete.connect_clicked(move |_| {
+            let Some(state) = state_for_delete.upgrade() else {
+                return;
+            };
+            let Some(item) = item_for_delete.upgrade() else {
+                return;
+            };
+            let Some(entry) = reference_list_entry(&item) else {
+                return;
+            };
+            let parent: &gtk::Window = state.window.upcast_ref();
+            request_reference_deletion(&state, parent, entry, || {});
+        });
+        row.append(&delete);
+
+        let message_page = gtk::Box::new(gtk::Orientation::Vertical, 8);
+        message_page.set_margin_top(24);
+        message_page.set_margin_bottom(24);
+        let message = gtk::Label::new(None);
+        message.set_xalign(0.0);
+        message.set_wrap(true);
+        message.add_css_class("dim-label");
+        message_page.append(&message);
+        let retry = gtk::Button::with_label(&tr("Retry"));
+        retry.set_halign(gtk::Align::Start);
+        let state_for_retry = state_for_setup.clone();
+        retry.connect_clicked(move |_| {
+            if let Some(state) = state_for_retry.upgrade() {
+                load_library_async(&state);
+            }
+        });
+        message_page.append(&retry);
+
+        let stack = gtk::Stack::new();
+        stack.set_transition_type(gtk::StackTransitionType::None);
+        stack.add_named(&row, Some("entry"));
+        stack.add_named(&message_page, Some("message"));
+        item.set_child(Some(&stack));
+    });
+
+    factory.connect_bind(|_, object| {
+        let Some(item) = object.downcast_ref::<gtk::ListItem>() else {
+            return;
+        };
+        bind_reference_list_item(item);
+    });
+    state.library_list.set_factory(Some(&factory));
+}
+
+fn reference_list_entry(item: &gtk::ListItem) -> Option<BibEntry> {
+    let item = item.item()?.downcast::<glib::BoxedAnyObject>().ok()?;
+    let row = item.borrow::<ReferenceListItem>();
+    match &*row {
+        ReferenceListItem::Entry(entry) => Some(entry.clone()),
+        ReferenceListItem::Message { .. } => None,
+    }
+}
+
+fn bind_reference_list_item(item: &gtk::ListItem) {
+    let Some(list_item) = item.item().and_then(|item| item.downcast::<glib::BoxedAnyObject>().ok())
+    else {
+        return;
+    };
+    let list_item = list_item.borrow::<ReferenceListItem>();
+    let Some(stack) = item.child().and_then(|child| child.downcast::<gtk::Stack>().ok()) else {
+        return;
+    };
+
+    match &*list_item {
+        ReferenceListItem::Message { text, retry } => {
+            let Some(message_page) = stack
+                .child_by_name("message")
+                .and_then(|child| child.downcast::<gtk::Box>().ok())
+            else {
+                return;
+            };
+            let Some(message) = message_page
+                .first_child()
+                .and_then(|child| child.downcast::<gtk::Label>().ok())
+            else {
+                return;
+            };
+            let Some(retry_button) = message
+                .next_sibling()
+                .and_then(|child| child.downcast::<gtk::Button>().ok())
+            else {
+                return;
+            };
+            message.set_text(text);
+            retry_button.set_visible(*retry);
+            stack.set_visible_child_name("message");
+        }
+        ReferenceListItem::Entry(entry) => {
+            let Some(row) = stack
+                .child_by_name("entry")
+                .and_then(|child| child.downcast::<gtk::Box>().ok())
+            else {
+                return;
+            };
+            let Some(open_details) = row
+                .first_child()
+                .and_then(|child| child.downcast::<gtk::Button>().ok())
+            else {
+                return;
+            };
+            let Some(summary) = open_details
+                .child()
+                .and_then(|child| child.downcast::<gtk::Box>().ok())
+            else {
+                return;
+            };
+            let Some(details) = summary
+                .first_child()
+                .and_then(|child| child.downcast::<gtk::Box>().ok())
+            else {
+                return;
+            };
+            let Some(title_label) = details
+                .first_child()
+                .and_then(|child| child.downcast::<gtk::Label>().ok())
+            else {
+                return;
+            };
+            let Some(subtitle_label) = title_label
+                .next_sibling()
+                .and_then(|child| child.downcast::<gtk::Label>().ok())
+            else {
+                return;
+            };
+            let Some(key_label) = details
+                .next_sibling()
+                .and_then(|child| child.downcast::<gtk::Label>().ok())
+            else {
+                return;
+            };
+
+            let title = if entry.get("title").is_empty() {
+                bibtex::display_bibtex_text(&entry.key)
+            } else {
+                bibtex::display_bibtex_text(entry.get("title"))
+            };
+            let author_field = if entry.get("author").is_empty() {
+                entry.get("editor")
+            } else {
+                entry.get("author")
+            };
+            let author = bibtex::display_bibtex_names(author_field).join(" · ");
+            let subtitle = format!(
+                "{}{}{}",
+                author,
+                if entry.get("year").is_empty() {
+                    ""
+                } else {
+                    " · "
+                },
+                entry.get("year")
+            );
+            title_label.set_text(&title);
+            subtitle_label.set_text(&subtitle);
+            key_label.set_text(&entry.key);
+            stack.set_visible_child_name("entry");
+        }
+    }
 }
 
 fn setup_project_file_view(state: &Rc<State>) {
@@ -3962,7 +4518,7 @@ fn finish_project_file_removal(state: &Rc<State>, path: &Path, success_message: 
             .borrow_mut()
             .retain(|folder| !project::path_contains(path, folder));
         if main_removed {
-            open_project(state, &root);
+            open_project(state, &root, false, state.startup_view);
         } else if current_removed {
             if let Some(main) = state.main_tex.borrow().clone() {
                 open_document(state, &main, Some(root));
@@ -4331,7 +4887,7 @@ fn choose_image(state: Rc<State>) {
         filter.add_pattern(pattern);
     }
     dialog.add_filter(&filter);
-    set_downloads_folder(&dialog);
+    set_default_file_dialog_folder(&dialog);
     let state_for_choice = state.clone();
     dialog.connect_response(move |dialog, response| {
         if response != gtk::ResponseType::Accept {
@@ -4588,6 +5144,8 @@ fn show_reference_picker(state: Rc<State>, target: ReferencePickerTarget) {
     let dialog_content = dialog.content_area();
     dialog_content.set_spacing(8);
     let list = gtk::Box::new(gtk::Orientation::Vertical, 2);
+    list.set_margin_start(10);
+    list.set_margin_end(10);
     let query = gtk::SearchEntry::new();
     query.set_placeholder_text(Some(&tr("Search references…")));
     query.set_margin_top(10);
@@ -5037,31 +5595,19 @@ fn library_is_ready(state: &Rc<State>) -> bool {
 }
 
 fn refresh_library(state: &Rc<State>) {
-    while let Some(child) = state.library_list.first_child() {
-        state.library_list.remove(&child);
-    }
     if !state.library_ready.get() {
         if let Some(error) = state.library_load_error.borrow().as_ref() {
-            let failed = gtk::Label::new(Some(&format!(
-                "{}: {error}",
-                tr("Could not load the local library")
-            )));
-            failed.set_wrap(true);
-            failed.set_margin_top(24);
-            failed.set_margin_bottom(8);
-            failed.add_css_class("dim-label");
-            state.library_list.append(&failed);
-            let retry = gtk::Button::with_label(&tr("Retry"));
-            retry.set_halign(gtk::Align::Start);
-            let state_for_retry = state.clone();
-            retry.connect_clicked(move |_| load_library_async(&state_for_retry));
-            state.library_list.append(&retry);
+            set_reference_list_message(
+                &state.library_list_model,
+                format!("{}: {error}", tr("Could not load the local library")),
+                true,
+            );
         } else {
-            let loading = gtk::Label::new(Some(&tr("Loading local library…")));
-            loading.set_margin_top(24);
-            loading.set_margin_bottom(24);
-            loading.add_css_class("dim-label");
-            state.library_list.append(&loading);
+            set_reference_list_message(
+                &state.library_list_model,
+                tr("Loading local library…"),
+                false,
+            );
         }
         update_primary_action(state);
         return;
@@ -5099,25 +5645,14 @@ fn refresh_library(state: &Rc<State>) {
     let year_filter = selected_reference_filter(&state.reference_filters.year);
     let tag_filter = selected_reference_filter(&state.reference_filters.tag);
     let kind_filter = selected_reference_filter(&state.reference_filters.kind);
-    let mut entries = library
-        .bibliography
-        .entries
-        .iter()
-        .filter(|entry| bibtex::entry_matches_search(entry, &term))
-        .filter(|entry| {
-            reference_matches_filters_with_type(
-                entry,
-                author_filter.as_deref(),
-                year_filter.as_deref(),
-                tag_filter.as_deref(),
-                kind_filter.as_deref(),
-                &library.authors,
-            )
-        })
-        .cloned()
-        .collect::<Vec<_>>();
-    sort_reference_entries(
-        &mut entries,
+    let entries = filtered_reference_entries(
+        &library.bibliography.entries,
+        &term,
+        author_filter.as_deref(),
+        year_filter.as_deref(),
+        tag_filter.as_deref(),
+        kind_filter.as_deref(),
+        &library.authors,
         state.reference_sort.selected(),
         state.reference_sort_descending.is_active(),
     );
@@ -5127,88 +5662,27 @@ fn refresh_library(state: &Rc<State>) {
         } else {
             tr("No references match the current search and filters.")
         };
-        let empty = gtk::Label::new(Some(&message));
-        empty.set_wrap(true);
-        empty.set_margin_top(24);
-        empty.set_margin_bottom(24);
-        empty.add_css_class("dim-label");
-        state.library_list.append(&empty);
+        set_reference_list_message(&state.library_list_model, message, false);
     } else {
-        for entry in entries {
-            let row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
-            row.set_margin_top(4);
-            row.set_margin_bottom(4);
-            let title = if entry.get("title").is_empty() {
-                bibtex::display_bibtex_text(&entry.key)
-            } else {
-                bibtex::display_bibtex_text(entry.get("title"))
-            };
-            let author_field = if entry.get("author").is_empty() {
-                entry.get("editor")
-            } else {
-                entry.get("author")
-            };
-            let author = bibtex::display_bibtex_names(author_field).join(" · ");
-            let subtitle = format!(
-                "{}{}{}",
-                author,
-                if entry.get("year").is_empty() {
-                    ""
-                } else {
-                    " · "
-                },
-                entry.get("year")
-            );
-            let details = gtk::Box::new(gtk::Orientation::Vertical, 3);
-            let title_label = gtk::Label::new(Some(&title));
-            title_label.set_xalign(0.0);
-            title_label.add_css_class("heading");
-            details.append(&title_label);
-            let subtitle_label = gtk::Label::new(Some(&subtitle));
-            subtitle_label.set_xalign(0.0);
-            subtitle_label.add_css_class("dim-label");
-            details.append(&subtitle_label);
-            details.set_hexpand(true);
-            let summary = gtk::Box::new(gtk::Orientation::Horizontal, 12);
-            summary.set_hexpand(true);
-            summary.append(&details);
-            let key = gtk::Label::new(Some(&entry.key));
-            key.add_css_class("dim-label");
-            summary.append(&key);
-            let open_details = gtk::Button::new();
-            open_details.set_has_frame(false);
-            open_details.add_css_class("flat");
-            open_details.set_hexpand(true);
-            open_details.set_halign(gtk::Align::Fill);
-            open_details.set_child(Some(&summary));
-            open_details.set_tooltip_text(Some(&tr("Show reference details")));
-            let entry_copy = entry.clone();
-            let state_copy = state.clone();
-            open_details.connect_clicked(move |_| {
-                show_reference_details(&state_copy, entry_copy.clone());
-            });
-            row.append(&open_details);
-            let edit = button("document-edit-symbolic", &tr("Edit reference"));
-            let entry_copy = entry.clone();
-            let state_copy = state.clone();
-            edit.connect_clicked(move |_| edit_reference(&state_copy, Some(entry_copy.clone())));
-            row.append(&edit);
-            let delete = button("user-trash-symbolic", &tr("Delete reference"));
-            delete.add_css_class("destructive-action");
-            let entry_copy = entry.clone();
-            let state_copy = state.clone();
-            delete.connect_clicked(move |_| {
-                let parent: &gtk::Window = state_copy.window.upcast_ref();
-                request_reference_deletion(&state_copy, parent, entry_copy.clone(), || {});
-            });
-            row.append(&delete);
-            state.library_list.append(&row);
-            state
-                .library_list
-                .append(&gtk::Separator::new(gtk::Orientation::Horizontal));
-        }
+        replace_reference_list_entries(&state.library_list_model, entries);
     }
     update_primary_action(state);
+}
+
+fn set_reference_list_message(model: &gio::ListStore, text: String, retry: bool) {
+    let message = glib::BoxedAnyObject::new(ReferenceListItem::Message {
+        text,
+        retry,
+    });
+    model.splice(0, model.n_items(), &[message]);
+}
+
+fn replace_reference_list_entries(model: &gio::ListStore, entries: Vec<BibEntry>) {
+    let rows = entries
+        .into_iter()
+        .map(|entry| glib::BoxedAnyObject::new(ReferenceListItem::Entry(entry)))
+        .collect::<Vec<_>>();
+    model.splice(0, model.n_items(), &rows);
 }
 
 fn refresh_tags(state: &Rc<State>) {
@@ -6526,6 +7000,36 @@ fn reference_matches_filters_with_type(
     author_matches && year_matches && tag_matches && kind_matches
 }
 
+fn filtered_reference_entries(
+    entries: &[BibEntry],
+    search: &str,
+    author: Option<&str>,
+    year: Option<&str>,
+    tag: Option<&str>,
+    kind: Option<&str>,
+    author_profiles: &[AuthorProfile],
+    sort_by: u32,
+    descending: bool,
+) -> Vec<BibEntry> {
+    let mut entries = entries
+        .iter()
+        .filter(|entry| bibtex::entry_matches_search(entry, search))
+        .filter(|entry| {
+            reference_matches_filters_with_type(
+                entry,
+                author,
+                year,
+                tag,
+                kind,
+                author_profiles,
+            )
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+    sort_reference_entries(&mut entries, sort_by, descending);
+    entries
+}
+
 fn sort_reference_entries(entries: &mut [BibEntry], sort_by: u32, descending: bool) {
     entries.sort_by(|left, right| {
         let primary = match sort_by {
@@ -6652,8 +7156,12 @@ fn set_reference_filter_options(dropdown: &gtk::DropDown, all_label: &str, value
 
 #[cfg(test)]
 mod reference_filter_tests {
-    use super::{reference_filter_values, reference_matches_filters};
+    use super::{
+        filtered_reference_entries, reference_filter_values, reference_matches_filters,
+        replace_reference_list_entries, ReferenceListItem,
+    };
     use crate::bibtex::BibEntry;
+    use gtk::gio::prelude::*;
 
     #[test]
     fn author_year_and_tag_filters_match_bibtex_entries() {
@@ -6699,6 +7207,141 @@ mod reference_filter_tests {
         assert_eq!(filters.authors, ["Ann, B", "Zed, A"]);
         assert_eq!(filters.years, ["2023", "2024"]);
         assert_eq!(filters.tags, ["history", "science", "writing"]);
+    }
+
+    #[test]
+    fn reference_search_filters_and_sorting_keep_the_same_matching_entries() {
+        let mut matching = BibEntry::new("article", "doe2024search");
+        matching.set("title", "Search systems in science");
+        matching.set("author", "Doe, Jane");
+        matching.set("year", "2024");
+        matching.set("keywords", "science, writing");
+
+        let mut matching_for_computing = BibEntry::new("article", "doe2024computing");
+        matching_for_computing.set("title", "Search systems for computing");
+        matching_for_computing.set("author", "Doe, Jane");
+        matching_for_computing.set("year", "2024");
+        matching_for_computing.set("keywords", "science, writing");
+
+        let mut wrong_author = BibEntry::new("article", "roe2024search");
+        wrong_author.set("title", "Search networks");
+        wrong_author.set("author", "Roe, Jane");
+        wrong_author.set("year", "2024");
+        wrong_author.set("keywords", "science, writing");
+
+        let mut wrong_year = BibEntry::new("article", "doe2023search");
+        wrong_year.set("title", "Search systems");
+        wrong_year.set("author", "Doe, Jane");
+        wrong_year.set("year", "2023");
+        wrong_year.set("keywords", "science, writing");
+
+        let mut wrong_tag = BibEntry::new("article", "doe2024other");
+        wrong_tag.set("title", "Search systems in science");
+        wrong_tag.set("author", "Doe, Jane");
+        wrong_tag.set("year", "2024");
+        wrong_tag.set("keywords", "science");
+
+        let actual = filtered_reference_entries(
+            &[
+                wrong_year,
+                matching,
+                wrong_tag,
+                matching_for_computing,
+                wrong_author,
+            ],
+            "search",
+            Some("Doe, Jane"),
+            Some("2024"),
+            Some("writing"),
+            None,
+            &[],
+            0,
+            false,
+        );
+
+        assert_eq!(
+            actual.iter().map(|entry| entry.key.as_str()).collect::<Vec<_>>(),
+            ["doe2024computing", "doe2024search"]
+        );
+    }
+
+    #[test]
+    fn reference_list_model_keeps_all_ten_thousand_entries_in_order() {
+        let model = gtk::gio::ListStore::new::<gtk::glib::BoxedAnyObject>();
+        let change_count = std::rc::Rc::new(std::cell::Cell::new(0));
+        let change_count_for_signal = change_count.clone();
+        model.connect_items_changed(move |_, _, _, _| {
+            change_count_for_signal.set(change_count_for_signal.get() + 1);
+        });
+        let entries = (0..10_000)
+            .map(|index| BibEntry::new("article", format!("ref-{index:05}")))
+            .collect();
+
+        replace_reference_list_entries(&model, entries);
+
+        assert_eq!(model.n_items(), 10_000);
+        assert_eq!(change_count.get(), 1);
+        for (index, expected_key) in [(0, "ref-00000"), (9_999, "ref-09999")] {
+            let item = model
+                .item(index)
+                .and_then(|item| item.downcast::<gtk::glib::BoxedAnyObject>().ok())
+                .unwrap();
+            let row = item.borrow::<ReferenceListItem>();
+            let ReferenceListItem::Entry(entry) = &*row else {
+                panic!("expected a reference model row");
+            };
+            assert_eq!(entry.key, expected_key);
+        }
+    }
+}
+
+#[cfg(test)]
+mod file_dialog_folder_tests {
+    use super::preferred_file_dialog_folder;
+    use gtk::gio::prelude::*;
+    use std::path::PathBuf;
+
+    fn temporary_folder(label: &str) -> PathBuf {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!(
+            "ovenbird-{label}-{}-{nonce}",
+            std::process::id()
+        ));
+        std::fs::create_dir(&path).unwrap();
+        path
+    }
+
+    #[test]
+    fn configured_file_dialog_folder_takes_precedence_when_it_exists() {
+        let configured = temporary_folder("configured-folder");
+        let downloads = temporary_folder("downloads-folder");
+        let configured_uri = gtk::gio::File::for_path(&configured).uri();
+
+        assert_eq!(
+            preferred_file_dialog_folder(Some(configured_uri.as_str()), Some(downloads.clone())),
+            Some(configured.clone())
+        );
+
+        std::fs::remove_dir_all(configured).unwrap();
+        std::fs::remove_dir_all(downloads).unwrap();
+    }
+
+    #[test]
+    fn missing_configured_file_dialog_folder_falls_back_to_downloads() {
+        let downloads = temporary_folder("fallback-downloads");
+        let missing = downloads.join("no-longer-exists");
+        let missing_uri = gtk::gio::File::for_path(&missing).uri();
+
+        assert_eq!(
+            preferred_file_dialog_folder(Some(missing_uri.as_str()), Some(downloads.clone())),
+            Some(downloads.clone())
+        );
+        assert_eq!(preferred_file_dialog_folder(None, None), None);
+
+        std::fs::remove_dir_all(downloads).unwrap();
     }
 }
 
@@ -7340,7 +7983,7 @@ fn choose_pdf_export(state: Rc<State>) {
         Some(&tr("Export")),
         Some(&tr("Cancel")),
     );
-    set_downloads_folder(&dialog);
+    set_default_file_dialog_folder(&dialog);
     dialog.set_current_name("document.pdf");
     let state2 = state.clone();
     dialog.connect_response(move |dialog, response| {
@@ -7756,7 +8399,8 @@ mod sidebar_tests {
 
         let editor = crate::editor::LatexEditor::new();
         let (editor_panel, editor_page, ..) = super::build_editor_page(&editor);
-        let sidebar = super::build_sidebar(super::ThemePreference::System);
+        let sidebar =
+            super::build_sidebar(super::StartupView::Editor);
 
         assert!(
             sidebar.brand.parent().is_some(),
@@ -7815,6 +8459,13 @@ mod sidebar_tests {
         );
         assert!(sidebar.editor_tab.hexpands());
         assert!(sidebar.references_tab.hexpands());
+
+        let references_sidebar = super::build_sidebar(super::StartupView::References);
+        assert!(references_sidebar.references_tab.is_active());
+        assert_eq!(
+            references_sidebar.pages.visible_child_name().as_deref(),
+            Some("references")
+        );
 
         let mode_toolbar = editor_panel
             .first_child()

@@ -192,6 +192,7 @@ impl Default for PdfPreview {
 impl PdfPreview {
     pub fn new() -> Self {
         let root = gtk::Box::new(gtk::Orientation::Vertical, 0);
+        root.add_css_class("ovenbird-pdf-preview");
         let toolbar = gtk::Box::new(gtk::Orientation::Horizontal, 6);
         toolbar.set_margin_start(8);
         toolbar.set_margin_end(8);
@@ -235,6 +236,7 @@ impl PdfPreview {
             .hexpand(true)
             .halign(gtk::Align::Center)
             .build();
+        drawing.add_css_class("ovenbird-pdf-canvas");
         let scroll = gtk::ScrolledWindow::builder()
             .hscrollbar_policy(gtk::PolicyType::Automatic)
             .vscrollbar_policy(gtk::PolicyType::Automatic)
@@ -261,8 +263,6 @@ impl PdfPreview {
             let page_layouts = page_layouts.clone();
             let zoom_factor = zoom_factor.clone();
             drawing.set_draw_func(move |area, context, width, height| {
-                context.set_source_rgb(0.92, 0.93, 0.95);
-                let _ = context.paint();
                 let document = document.borrow();
                 let Some(document) = document.as_ref() else {
                     return;

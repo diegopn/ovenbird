@@ -6,7 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ovenbird 0.1.0\n"
+"Project-Id-Version: ovenbird 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-08 17:03-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -1446,6 +1446,50 @@ msgstr ""
 
 #: rust/src/window.rs
 msgid "Open project"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Open at startup"
+msgstr ""
+
+#: rust/src/window.rs rust/src/application_menu.rs
+msgid "Preferences"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Default folder for file dialogs"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Dialogs start in Downloads unless you choose another folder."
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Choose folder…"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Choose default folder"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Reset"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Restore the system default folder"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "No starting folder available"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "Reopen last project at startup"
+msgstr ""
+
+#: rust/src/window.rs
+msgid "The last project folder could not be restored."
 msgstr ""
 
 #: rust/src/window.rs

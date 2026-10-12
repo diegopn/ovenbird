@@ -168,37 +168,37 @@ dialog headerbar {
 }
 
 .ovenbird-editor-page {
-  background: @view_bg_color;
+  background: @window_bg_color;
   color: @view_fg_color;
 }
 
 .ovenbird-code-panel {
   min-width: 0;
   border-top: 1px solid alpha(@borders, 0.65);
-  background-color: @view_bg_color;
+  background-color: @window_bg_color;
   color: @view_fg_color;
 }
 
 .ovenbird-code-panel sourceview,
 .ovenbird-code-panel textview {
-  background-color: @view_bg_color;
+  background-color: @window_bg_color;
   color: @view_fg_color;
 }
 
 .visual-document {
-  background: @view_bg_color;
+  background: @window_bg_color;
   color: @view_fg_color;
   font-size: 12pt;
   line-height: 1.5;
 }
 
 .source-view {
-  background-color: @view_bg_color;
+  background-color: @window_bg_color;
   color: @view_fg_color;
 }
 
 .source-view text {
-  background-color: @view_bg_color;
+  background-color: @window_bg_color;
   color: @view_fg_color;
   font-family: monospace;
   font-size: 12pt;
@@ -207,7 +207,7 @@ dialog headerbar {
 .latex-diagnostics {
   padding: 6px 12px;
   border-top: 1px solid alpha(@borders, 0.65);
-  background-color: @view_bg_color;
+  background-color: @window_bg_color;
 }
 
 .latex-diagnostics .heading.error {
@@ -220,6 +220,21 @@ dialog headerbar {
 
 .preview-placeholder {
   color: @dim_label;
+}
+
+.ovenbird-pdf-preview,
+.ovenbird-pdf-preview stack,
+.ovenbird-pdf-canvas {
+  background-color: @window_bg_color;
+}
+
+.ovenbird-pdf-preview {
+  border-top: 1px solid alpha(@borders, 0.65);
+}
+
+.ovenbird-reference-list,
+.ovenbird-reference-list > row {
+  background-color: @window_bg_color;
 }
 
 .sidebar-section {
