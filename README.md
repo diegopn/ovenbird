@@ -49,32 +49,19 @@ LaTeX engines are installed separately for native builds. For example, Fedora's 
 sudo dnf install latexmk texlive biber
 ```
 
-## Flatpak packaging
+## Local Flatpak development
 
-The manifest builds the pinned stable Ovenbird release, including Tectonic built from source. It does not build uncommitted changes in this checkout; use the native Meson instructions above when developing Ovenbird.
-
-Install `org.flatpak.Builder`, GNOME Platform/SDK 51, and the Rust SDK extension for Freedesktop 26.08 from Flathub. The commands below use system-installed SDKs. Copy only the packaging files into a separate submission directory:
+The in-repository manifest is intended for local builds while the packaging is being prepared. It is not yet the Flathub submission manifest.
 
 ```sh
-mkdir -p .tooling/flathub-submission
-cp io.github.diegopn.ovenbird.json tectonic-cargo-sources.json metainfo-screenshots.patch LICENSE .tooling/flathub-submission/
-cd .tooling/flathub-submission
-flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest io.github.diegopn.ovenbird.json
-flatpak run --command=flatpak-builder org.flatpak.Builder --sandbox --mirror-screenshots-url=https://dl.flathub.org/media --compose-url-policy=full --repo=repo builddir io.github.diegopn.ovenbird.json
-flatpak run --command=flatpak-builder-lint org.flatpak.Builder repo repo
+flatpak-builder --user --force-clean .flatpak-build io.github.diegopn.ovenbird.json
+flatpak-builder --user --install --force-clean .flatpak-build io.github.diegopn.ovenbird.json
+flatpak run io.github.diegopn.ovenbird
 ```
 
-The submission consists of those four files, not the application source tree. The manifest uses GNOME Platform/SDK 51 and the stable Rust SDK extension. Cargo dependencies are available offline during the build. The first Tectonic document compilation may download LaTeX support files at runtime. Creating a project from a bundled template does not require a network connection.
+The manifest uses GNOME Platform/SDK 51 and the stable Rust SDK extension. The first Tectonic build may download LaTeX support files at runtime. Creating a project from a bundled template does not require a network connection.
 
-`metainfo-screenshots.patch` adds the existing release screenshots to the metadata from Ovenbird `v0.2.0`. The same metadata change is included in this checkout. When packaging a newer release containing that change, update the Ovenbird `tag` and `commit` together and remove the patch source and file.
-
-When updating Tectonic, update its `tag` and `commit` together and regenerate `tectonic-cargo-sources.json` from that exact revision's `Cargo.lock` with the [Flatpak Cargo generator](https://github.com/flatpak/flatpak-builder-tools/tree/master/cargo). From the repository root:
-
-```sh
-python3 /path/to/flatpak-builder-tools/cargo/flatpak-cargo-generator.py /path/to/tectonic/Cargo.lock -o tectonic-cargo-sources.json
-```
-
-Ovenbird's own locked Cargo dependencies remain in the versioned `cargo-cache` used by Meson.
+In GNOME Builder, use `io.github.diegopn.ovenbird.json` as the Flatpak manifest. If the build still reports `org.ovenbird.Ovenbird`, recreate the build configuration from the current manifest; Builder is using the old application ID.
 
 ## Local data
 
