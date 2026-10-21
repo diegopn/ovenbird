@@ -22,20 +22,43 @@
   </developer>
   <content_rating type="oars-1.1" />
   <screenshots>
-    <screenshot type="default">
-      <image width="1480" height="949">https://raw.githubusercontent.com/diegopn/ovenbird/5e74a58c56a2d6d316488b80253e9a90b4bb1257/data/screenshots/processed/ovenbird-editor.png</image>
+    <screenshot type="default" xml:lang="pt_BR">
+      <image type="source" width="1920" height="996">https://raw.githubusercontent.com/diegopn/ovenbird/c5c5b4ebbabc95574c4e4d03d57942aa7ed250a3/data/screenshots/ovenbird-editor-compiled.png</image>
+      <caption>Escreva documentos LaTeX</caption>
+      <caption xml:lang="en">Write LaTeX documents</caption>
+      <caption xml:lang="es">Escribe documentos LaTeX</caption>
+    </screenshot>
+    <screenshot xml:lang="pt_BR">
+      <image type="source" width="1920" height="996">https://raw.githubusercontent.com/diegopn/ovenbird/c5c5b4ebbabc95574c4e4d03d57942aa7ed250a3/data/screenshots/ovenbird-references-list.png</image>
+      <caption>Gerencie uma bibliografia local</caption>
+      <caption xml:lang="en">Manage a local bibliography</caption>
+      <caption xml:lang="es">Gestiona una bibliografía local</caption>
+    </screenshot>
+    <screenshot xml:lang="pt_BR">
+      <image type="source" width="1920" height="996">https://raw.githubusercontent.com/diegopn/ovenbird/c5c5b4ebbabc95574c4e4d03d57942aa7ed250a3/data/screenshots/ovenbird-reference-details.png</image>
+      <caption>Veja os detalhes de uma referência e copie citações</caption>
+      <caption xml:lang="en">View reference details and copy citations</caption>
+      <caption xml:lang="es">Consulta los detalles de una referencia y copia citas</caption>
+    </screenshot>
+    <screenshot xml:lang="pt_BR">
+      <image type="source" width="1920" height="996">https://raw.githubusercontent.com/diegopn/ovenbird/c5c5b4ebbabc95574c4e4d03d57942aa7ed250a3/data/screenshots/ovenbird-authors.png</image>
+      <caption>Gerencie os autores da bibliografia</caption>
+      <caption xml:lang="en">Manage bibliography authors</caption>
+      <caption xml:lang="es">Gestiona los autores de la bibliografía</caption>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <image type="source" width="1480" height="949">https://raw.githubusercontent.com/diegopn/ovenbird/5e74a58c56a2d6d316488b80253e9a90b4bb1257/data/screenshots/processed/ovenbird-editor.png</image>
       <caption>Write LaTeX documents</caption>
       <caption xml:lang="pt_BR">Escreva documentos LaTeX</caption>
       <caption xml:lang="es">Escribe documentos LaTeX</caption>
     </screenshot>
-    <screenshot>
-      <image width="1480" height="949">https://raw.githubusercontent.com/diegopn/ovenbird/5e74a58c56a2d6d316488b80253e9a90b4bb1257/data/screenshots/processed/ovenbird-references.png</image>
-      <caption>Manage a local bibliography</caption>
-      <caption xml:lang="pt_BR">Gerencie uma bibliografia local</caption>
-      <caption xml:lang="es">Gestiona una bibliografía local</caption>
-    </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.0" date="2026-10-21" type="stable">
+      <description>
+        <p>Long reference titles and author names now wrap within the list instead of causing horizontal scrolling. The release also adds updated screenshots for the editor and reference manager.</p>
+      </description>
+    </release>
     <release version="0.2.0" date="2026-10-12" type="stable">
       <description>
         <p>Preferences now let you choose the startup view, reopen the last project, and set the default folder for file dialogs. Large reference, tag, and author lists are now virtualized for smoother navigation, and the editor and reference manager received visual refinements for light and dark themes.</p>
