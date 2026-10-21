@@ -3241,16 +3241,23 @@ fn setup_reference_list_view(state: &Rc<State>) {
             return;
         };
         let row = gtk::Box::new(gtk::Orientation::Horizontal, 8);
+        row.set_hexpand(true);
         row.set_margin_top(4);
         row.set_margin_bottom(4);
 
         let details = gtk::Box::new(gtk::Orientation::Vertical, 3);
         let title = gtk::Label::new(None);
         title.set_xalign(0.0);
+        title.set_hexpand(true);
+        title.set_wrap(true);
+        title.set_wrap_mode(gtk::pango::WrapMode::WordChar);
         title.add_css_class("heading");
         details.append(&title);
         let subtitle = gtk::Label::new(None);
         subtitle.set_xalign(0.0);
+        subtitle.set_hexpand(true);
+        subtitle.set_wrap(true);
+        subtitle.set_wrap_mode(gtk::pango::WrapMode::WordChar);
         subtitle.add_css_class("dim-label");
         details.append(&subtitle);
         details.set_hexpand(true);
