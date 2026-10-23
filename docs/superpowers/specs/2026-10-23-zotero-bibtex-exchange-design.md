@@ -1,38 +1,38 @@
-# Zotero BibTeX exchange design
+# Troca de arquivos BibTeX com a Zotero
 
-## Intent
+## Objetivo
 
-Let people move bibliographic references between Zotero and Ovenbird using `.bib` files, without connecting either account to Ovenbird. This is a manual exchange flow, not automatic account synchronization.
+Permitir que a pessoa transfira referências entre a Zotero e o Ovenbird usando arquivos `.bib`, sem conectar contas ao Ovenbird. A troca será manual; não será uma sincronização automática entre contas.
 
-## Goals
+## O que esta etapa deve fazer
 
-- In the References page, provide a clear shortcut to import a BibTeX file exported from Zotero.
-- Keep Ovenbird's existing BibTeX export available for importing into Zotero.
-- Merge imported entries into the local library, preserving existing data and skipping duplicate citation keys as the current importer does.
-- Keep the local library and exported files in standard, usable BibTeX.
+- Na tela de Referências, oferecer um atalho para importar um arquivo BibTeX exportado da Zotero.
+- Manter a exportação BibTeX do Ovenbird disponível para que a pessoa possa importar o arquivo na Zotero.
+- Incorporar as referências importadas à biblioteca local, preservando os dados existentes e ignorando chaves de citação duplicadas, como o importador atual já faz.
+- Manter a biblioteca local e os arquivos exportados no formato BibTeX padrão.
 
-## Non-goals and limitations
+## O que não faz parte desta etapa
 
-- No Zotero login, API token, network access, account linking, or automatic sync.
-- No transfer of Zotero attachments, notes, collections, or other data outside what BibTeX represents.
-- No promise that repeated exports/imports update matching records in place; an exported BibTeX file is not a complete Zotero backup.
-- Automatic two-way synchronization remains a later project and would need stable remote item identifiers and conflict handling.
+- Login na Zotero, chave de acesso à API, acesso à rede, vínculo de conta ou sincronização automática.
+- Transferência de anexos, notas, coleções ou outros dados da Zotero que o BibTeX não representa.
+- Garantia de que importar o mesmo arquivo novamente atualize os itens existentes. Um arquivo exportado não é uma cópia completa da biblioteca Zotero.
+- Sincronização automática nos dois sentidos. Uma etapa futura precisará guardar identificadores estáveis dos itens remotos e lidar com alterações conflitantes.
 
-## Approaches
+## Caminhos considerados
 
-1. **Manual BibTeX exchange — selected.** Use Zotero's built-in BibTeX export and import, and Ovenbird's existing BibTeX importer and exporter. This avoids account credentials and a service operated by the project, while keeping the data portable. It requires the user to move the file and has the metadata limitations above.
-2. **Zotero Web API.** Browser authorization can support account-based pulls and future writes, but requires application registration, sensitive per-user credentials, and explicit handling of remote identifiers, permissions, and conflicts. It is more than the first manual-transfer step needs.
-3. **GitHub or Google Drive as storage.** These can host or synchronize a file, but add provider authentication and file-conflict behavior without improving BibTeX's bibliographic data model. They are not a better first exchange path.
+1. **Troca manual por BibTeX — escolhido para a primeira etapa.** Usar a exportação e a importação BibTeX da Zotero e os recursos BibTeX que o Ovenbird já tem. Isso evita credenciais de conta e um serviço mantido pelo projeto, além de manter os dados portáteis. A pessoa precisa mover o arquivo manualmente, e o formato tem os limites descritos acima.
+2. **API da Zotero.** A autorização pelo navegador pode permitir buscar referências e, no futuro, enviá-las de volta. Exige registrar o aplicativo, guardar credenciais sensíveis e lidar com identificadores remotos, permissões e conflitos. É mais do que a primeira etapa de transferência manual precisa.
+3. **GitHub ou Google Drive como armazenamento.** Esses serviços podem guardar ou sincronizar um arquivo, mas acrescentam autenticação e possíveis conflitos entre arquivos sem melhorar o formato bibliográfico. Não são uma opção melhor para a primeira etapa.
 
-## Design
+## Proposta
 
-Add a Zotero exchange shortcut to the main header, visible only while References is selected. Place it beside the window's minimize control as requested. Activating it exposes the existing import and export BibTeX actions with Zotero-specific wording. The import continues through the portal-backed file chooser, parses the selected `.bib`, merges it into the local library, and reports the number of newly added references. Export writes the local library as a `.bib` file for the user to import in Zotero.
+Adicionar um atalho de troca com a Zotero à barra superior, visível somente na tela de Referências, ao lado do botão de minimizar. Ao ativá-lo, a pessoa encontrará as ações existentes de importar e exportar BibTeX, com nomes que expliquem o uso com a Zotero. A importação continuará usando a janela segura de seleção de arquivos do sistema: o app lê o `.bib`, incorpora as referências à biblioteca local e informa quantas foram adicionadas. A exportação salva a biblioteca local em `.bib` para a pessoa importar na Zotero.
 
-This keeps the current local `.bib` library as Ovenbird's editable data and makes the two manual directions available. It does not claim continuous synchronization. The Zotero documentation confirms BibTeX import/export support and warns that export/reimport is not a complete library transfer or backup: attachments and collections are not carried by BibTeX, and reimport can alter metadata. See [BibTeX import](https://www.zotero.org/support/kb/importing_standardized_formats), [exporting from Zotero](https://www.zotero.org/support/kb/exporting), and [field mappings](https://www.zotero.org/support/kb/field_mappings).
+Assim, a biblioteca `.bib` local continua sendo editável e exportável, e as duas direções de transferência manual ficam acessíveis. Isso não é sincronização contínua. A documentação da Zotero confirma a importação e a exportação BibTeX e alerta que exportar e importar não transfere uma biblioteca inteira como cópia exata: BibTeX não leva anexos e coleções, e alguns dados podem ser alterados na reimportação. Consulte [importação de BibTeX](https://www.zotero.org/support/kb/importing_standardized_formats), [exportação da Zotero](https://www.zotero.org/support/kb/exporting) e [limites e mapeamento de campos](https://www.zotero.org/support/kb/field_mappings).
 
-## Constraints and implementation calls
+## Restrições e decisões de implementação
 
-- Reuse existing GTK file chooser, import/export actions, local library merge, and BibTeX parser rather than adding a dependency.
-- Keep Flatpak permissions unchanged and use the existing user-selected-file portal flow.
-- Add or update English gettext source strings and keep the Portuguese and Spanish catalogs in sync.
-- The manual exchange itself needs no new persistent metadata or credentials.
+- Reutilizar as janelas de seleção de arquivos, as ações de importação e exportação, a mesclagem da biblioteca local e o leitor BibTeX existentes; não adicionar uma dependência.
+- Manter as permissões do Flatpak como estão e usar o fluxo atual de seleção de arquivos pelo sistema.
+- Atualizar as mensagens em inglês e manter os catálogos de português e espanhol sincronizados.
+- A troca manual não exige novas credenciais nem arquivos de metadados persistentes.
