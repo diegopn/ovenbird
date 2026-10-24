@@ -4,6 +4,10 @@ use crate::commands::*;
 use crate::history::{EditorHistory, EditorMode, EditorState};
 use crate::latex::*;
 use crate::project::*;
+use crate::reference_exchange::{
+    action_for, ReferenceFormat, TransferAction, TransferDirection, AVAILABLE_FORMATS,
+};
+use crate::reference_guides::REFERENCE_MANAGER_GUIDES;
 use crate::search::find_document_match;
 use crate::templates::{safe_archive_listing, valid_project_name};
 use indexmap::IndexMap;
@@ -27,6 +31,41 @@ fn test_build_path(name: &str) -> std::path::PathBuf {
     build_root
         .join("test-tmp")
         .join(format!("{name}-{}", std::process::id()))
+}
+
+#[test]
+fn reference_exchange_offers_only_standard_bibtex() {
+    assert_eq!(AVAILABLE_FORMATS, &[ReferenceFormat::Bibtex]);
+    assert_eq!(ReferenceFormat::Bibtex.label(), "BibTeX (.bib)");
+}
+
+#[test]
+fn reference_exchange_routes_bibtex_by_direction() {
+    assert_eq!(
+        action_for(TransferDirection::Import, ReferenceFormat::Bibtex),
+        TransferAction::ImportBibtex
+    );
+    assert_eq!(
+        action_for(TransferDirection::Export, ReferenceFormat::Bibtex),
+        TransferAction::ExportBibtex
+    );
+}
+
+#[test]
+fn reference_manager_manual_links_use_stable_platform_anchors() {
+    let expected = [
+        ("zotero", "#intercambio-zotero"),
+        ("jabref", "#intercambio-jabref"),
+        ("mendeley", "#intercambio-mendeley"),
+    ];
+    assert_eq!(REFERENCE_MANAGER_GUIDES.len(), expected.len());
+    for ((id, anchor), guide) in expected.iter().zip(REFERENCE_MANAGER_GUIDES) {
+        assert_eq!(guide.id, *id);
+        assert!(guide
+            .uri
+            .starts_with("https://diegopn.github.io/ovenbird-site/manual/"));
+        assert!(guide.uri.ends_with(anchor));
+    }
 }
 
 #[test]

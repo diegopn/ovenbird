@@ -9,6 +9,8 @@ pub mod latex;
 pub mod latex_diagnostics;
 pub mod pdf_preview;
 pub mod project;
+pub mod reference_exchange;
+pub mod reference_guides;
 pub mod search;
 pub mod storage;
 pub mod templates;
