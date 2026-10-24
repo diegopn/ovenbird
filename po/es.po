@@ -515,6 +515,30 @@ msgstr "Importar BibTeX"
 msgid "Export BibTeX"
 msgstr "Exportar BibTeX"
 
+#: rust/src/window.rs:1933 rust/src/window.rs:7901
+msgid "Import references"
+msgstr "Importar referencias"
+
+#: rust/src/window.rs:1934 rust/src/window.rs:7906
+msgid "Export references"
+msgstr "Exportar referencias"
+
+#: rust/src/window.rs:7902
+msgid "Choose a format to import."
+msgstr "Elige un formato para importar."
+
+#: rust/src/window.rs:7907
+msgid "Choose a format to export."
+msgstr "Elige un formato para exportar."
+
+#: rust/src/window.rs:7951
+msgid "Standard format for bibliographic references."
+msgstr "Formato estándar para referencias bibliográficas."
+
+#: rust/src/window.rs:7979
+msgid "Platform guides"
+msgstr "Guías de plataformas"
+
 msgid "No references match the current search and filters."
 msgstr "Ninguna referencia coincide con la búsqueda y los filtros actuales."
 
