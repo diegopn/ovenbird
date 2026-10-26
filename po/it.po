@@ -1,0 +1,1696 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ovenbird 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-08 17:03-0300\n"
+"PO-Revision-Date: 2026-10-26 00:00-0300\n"
+"Last-Translator: Ovenbird contributors\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Syntax problems"
+msgstr "Problemi di sintassi"
+
+msgid "Checking document…"
+msgstr "Controllo del documento…"
+
+msgid "The document appears ready to compile."
+msgstr "Il documento sembra pronto per la compilazione."
+
+msgid "Line"
+msgstr "Riga"
+
+msgid "Unmatched closing brace"
+msgstr "Graffa di chiusura senza corrispondenza"
+
+msgid "Opening brace is not closed"
+msgstr "La graffa di apertura non è chiusa"
+
+msgid "Environment is not closed: "
+msgstr "L’ambiente non è stato chiuso: "
+
+msgid "Environment end has no matching begin: "
+msgstr "La fine dell’ambiente non corrisponde a nessun inizio: "
+
+msgid "Additional syntax problems are not shown."
+msgstr "Gli altri problemi di sintassi non vengono mostrati."
+
+msgid "Math delimiter has no matching opener: "
+msgstr "Questo delimitatore matematico non ha un delimitatore di apertura corrispondente: "
+
+msgid "Math delimiter is not closed: "
+msgstr "Questo delimitatore matematico non è chiuso: "
+
+msgid "Math delimiter opens inside another math expression: "
+msgstr "Questo delimitatore matematico si trova all’interno di un’altra espressione matematica: "
+
+#: rust/src/bibtex.rs:50
+msgid "Journal article"
+msgstr "Articolo di rivista"
+
+#: rust/src/bibtex.rs:51
+msgid "Book"
+msgstr "Libro"
+
+#: rust/src/bibtex.rs:52
+msgid "Book chapter"
+msgstr "Capitolo di libro"
+
+#: rust/src/bibtex.rs:53
+msgid "Conference paper"
+msgstr "Contributo a una conferenza"
+
+#: rust/src/bibtex.rs:54
+msgid "Doctoral thesis"
+msgstr "Tesi di dottorato"
+
+#: rust/src/bibtex.rs:55
+msgid "Master's thesis"
+msgstr "Tesi magistrale"
+
+#: rust/src/bibtex.rs:56
+msgid "Technical report"
+msgstr "Rapporto tecnico"
+
+#: rust/src/bibtex.rs:57
+msgid "Online resource"
+msgstr "Risorsa online"
+
+#: rust/src/bibtex.rs:58
+msgid "Miscellaneous"
+msgstr "Varie"
+
+#: rust/src/bibtex.rs:64
+msgid "Title"
+msgstr "Titolo"
+
+#: rust/src/bibtex.rs:65
+msgid "Author(s)"
+msgstr "Autori"
+
+#: rust/src/bibtex.rs:66
+msgid "Editor(s)"
+msgstr "Curatori"
+
+#: rust/src/bibtex.rs:67
+msgid "Year / date"
+msgstr "Anno / data"
+
+#: rust/src/bibtex.rs
+msgid "Year"
+msgstr "Anno"
+
+#: rust/src/bibtex.rs:68
+msgid "Journal"
+msgstr "Rivista"
+
+#: rust/src/bibtex.rs:69
+msgid "Publisher"
+msgstr "Editore"
+
+#: rust/src/bibtex.rs:70
+msgid "Volume"
+msgstr "Volume"
+
+#: rust/src/bibtex.rs:71
+msgid "Number / issue"
+msgstr "Numero / fascicolo"
+
+#: rust/src/bibtex.rs:72
+msgid "Edition"
+msgstr "Edizione"
+
+#: rust/src/bibtex.rs:73
+msgid "Pages"
+msgstr "Pagine"
+
+#: rust/src/bibtex.rs:74
+msgid "DOI"
+msgstr "DOI"
+
+#: rust/src/bibtex.rs:75 rust/src/window.rs:1959
+msgid "URL"
+msgstr "URL"
+
+#: rust/src/bibtex.rs:76
+msgid "Keywords"
+msgstr "Parole chiave"
+
+#: rust/src/bibtex.rs:106
+msgid "Tags"
+msgstr "Tag"
+
+msgid "Manage tags"
+msgstr "Gestisci i tag"
+
+msgid "Add tag"
+msgstr "Aggiungi tag"
+
+msgid "Edit tag"
+msgstr "Modifica tag"
+
+msgid "Remove tag"
+msgstr "Rimuovi tag"
+
+msgid "Create and organize tags for your references."
+msgstr "Crea e organizza i tag per i tuoi riferimenti."
+
+msgid "No tags yet. Add a tag to organize your references."
+msgstr "Nessun tag per ora. Aggiungi un tag per organizzare i tuoi riferimenti."
+
+msgid "Tag name"
+msgstr "Nome del tag"
+
+msgid "Tag saved"
+msgstr "Tag salvato"
+
+msgid "Tag removed"
+msgstr "Tag rimosso"
+
+msgid "Remove tag ‘%s’ from the list and all references?"
+msgstr "Rimuovere il tag «%s» dall’elenco e da tutti i riferimenti?"
+
+msgid "Find tags…"
+msgstr "Cerca tag…"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "New tag"
+msgstr "Nuovo tag"
+
+msgid "Create and select this tag"
+msgstr "Crea e seleziona questo tag"
+
+msgid "Select or create tags"
+msgstr "Seleziona o crea tag"
+
+msgid "Remove tag from this reference"
+msgstr "Rimuovi il tag da questo riferimento"
+
+msgid "No matching tags"
+msgstr "Nessun tag corrispondente"
+
+msgid "Enter a tag name."
+msgstr "Inserisci un nome per il tag."
+
+msgid "That tag already exists."
+msgstr "Questo tag esiste già."
+
+msgid "The tag no longer exists."
+msgstr "Il tag non esiste più."
+
+msgid "Type: %s"
+msgstr "Tipo: %s"
+
+#: rust/src/bibtex.rs:77
+msgid "Series"
+msgstr "Collana"
+
+#: rust/src/bibtex.rs:78
+msgid "Publication location"
+msgstr "Luogo di pubblicazione"
+
+#: rust/src/bibtex.rs:79
+msgid "ISBN"
+msgstr "ISBN"
+
+#: rust/src/bibtex.rs:80
+msgid "Chapter"
+msgstr "Capitolo"
+
+#: rust/src/bibtex.rs:81
+msgid "Website or organization"
+msgstr "Sito web o organizzazione"
+
+#: rust/src/bibtex.rs:82
+msgid "Organization"
+msgstr "Organizzazione"
+
+#: rust/src/bibtex.rs:83
+msgid "University or academic institution"
+msgstr "Università o istituzione accademica"
+
+#: rust/src/bibtex.rs:84
+msgid "Institution"
+msgstr "Istituzione"
+
+#: rust/src/bibtex.rs:85
+msgid "Report type"
+msgstr "Tipo di rapporto"
+
+#: rust/src/bibtex.rs:86
+msgid "Month"
+msgstr "Mese"
+
+#: rust/src/bibtex.rs:87
+msgid "Note"
+msgstr "Nota"
+
+#: rust/src/bibtex.rs:88
+msgid "Publication method"
+msgstr "Metodo di pubblicazione"
+
+#: rust/src/bibtex.rs:89
+msgid "Access date"
+msgstr "Data di accesso"
+
+#: rust/src/bibtex.rs:90
+msgid "Proceedings title"
+msgstr "Titolo degli atti"
+
+#: rust/src/bibtex.rs:91
+msgid "Book title"
+msgstr "Titolo del libro"
+
+#: rust/src/editor.rs:416
+msgid "New document"
+msgstr "Nuovo documento"
+
+#: rust/src/editor.rs:417
+msgid "Introduction"
+msgstr "Introduzione"
+
+#: rust/src/editor.rs:418
+msgid "Start writing here."
+msgstr "Inizia a scrivere qui."
+
+#: rust/src/pdf_preview.rs:114
+msgid "Previous page"
+msgstr "Pagina precedente"
+
+#: rust/src/pdf_preview.rs:118
+msgid "Next page"
+msgstr "Pagina successiva"
+
+#: rust/src/pdf_preview.rs:207
+msgid "Zoom out"
+msgstr "Riduci zoom"
+
+#: rust/src/pdf_preview.rs:212
+msgid "Zoom in"
+msgstr "Ingrandisci"
+
+#: rust/src/pdf_preview.rs:128
+msgid "The compiled PDF will appear here"
+msgstr "Il PDF compilato apparirà qui"
+
+#: rust/src/pdf_preview.rs:240
+msgid "The PDF has no pages."
+msgstr "Il PDF non contiene pagine."
+
+#: rust/src/pdf_preview.rs:258
+msgid "PDF opened in the default viewer"
+msgstr "PDF aperto nell’applicazione predefinita"
+
+#: rust/src/window.rs:164
+msgid "Compile the document to create the PDF."
+msgstr "Compila il documento per creare il PDF."
+
+#: rust/src/window.rs:165 rust/src/window.rs:1160
+msgid "Not built yet"
+msgstr "Non ancora compilato"
+
+#: rust/src/window.rs:218
+msgid "Find in document"
+msgstr "Cerca nel documento"
+
+#: rust/src/window.rs:227
+msgid "Main menu"
+msgstr "Menu principale"
+
+#: rust/src/window.rs:379
+msgid "About Ovenbird"
+msgstr "Informazioni su Ovenbird"
+
+#: rust/src/window.rs
+msgid "Created by Diego Pereira do Nascimento"
+msgstr "Creato da Diego Pereira do Nascimento"
+
+#: rust/src/window.rs:381
+msgid "Dedicated to my wife, Karina, who always encourages me to go further."
+msgstr "Dedicato a mia moglie, Karina, che mi incoraggia sempre a fare di più."
+
+#: rust/src/window.rs
+msgid "Report an issue"
+msgstr "Segnala un problema"
+
+#: rust/src/window.rs:384
+msgid "Project repository"
+msgstr "Repository del progetto"
+
+#: rust/src/window.rs:385
+msgid "Project website"
+msgstr "Sito del progetto"
+
+#: rust/src/window.rs
+msgid "Project creator's website"
+msgstr "Sito web dell’autore del progetto"
+
+#: rust/src/window.rs:234
+msgid "WORKSPACE"
+msgstr "AREA DI LAVORO"
+
+#: rust/src/window.rs:241
+msgid "Editor"
+msgstr "Editor"
+
+#: rust/src/window.rs:360
+msgid "LaTeX editor"
+msgstr "Editor LaTeX"
+
+#: rust/src/window.rs:247
+msgid "Project files"
+msgstr "File del progetto"
+
+#: rust/src/window.rs:255
+msgid "Create files and folders"
+msgstr "Crea file e cartelle"
+
+#: rust/src/window.rs:271
+msgid "References"
+msgstr "Riferimenti"
+
+#: rust/src/window.rs:284
+msgid "LaTeX · local references"
+msgstr "LaTeX · riferimenti locali"
+
+#: rust/src/window.rs:345 rust/src/window.rs:1657
+msgid "New folder"
+msgstr "Nuova cartella"
+
+#: rust/src/window.rs:363
+msgid "Code"
+msgstr "Codice"
+
+#: rust/src/window.rs:366
+msgid "Visual"
+msgstr "Visuale"
+
+#: rust/src/window.rs:371
+msgid ""
+"Switch modes at any time without creating another version of the document"
+msgstr "Passa da una modalità all’altra in qualsiasi momento senza creare un’altra versione del documento"
+
+#: rust/src/window.rs:384
+msgid "Find in document…"
+msgstr "Cerca nel documento…"
+
+#: rust/src/window.rs:398
+msgid "Close search"
+msgstr "Chiudi la ricerca"
+
+#: rust/src/window.rs:416
+msgid "Normal text"
+msgstr "Testo normale"
+
+#: rust/src/window.rs:433
+msgid "Math"
+msgstr "Matematica"
+
+#: rust/src/window.rs:438
+msgid "Math symbols"
+msgstr "Simboli matematici"
+
+#: rust/src/window.rs:441 rust/src/window.rs:2098
+msgid "Insert citation"
+msgstr "Inserisci citazione"
+
+#: rust/src/window.rs
+msgid "Citation"
+msgstr "Citazione"
+
+#: rust/src/window.rs
+msgid "Bibliographic reference"
+msgstr "Riferimento bibliografico"
+
+#: rust/src/window.rs
+msgid "Bibliographic reference format"
+msgstr "Formato del riferimento bibliografico"
+
+#: rust/src/window.rs
+msgid "Add bibliographic reference"
+msgstr "Aggiungi riferimento bibliografico"
+
+#: rust/src/window.rs:442
+msgid "Find and insert a bibliography reference"
+msgstr "Cerca e inserisci un riferimento bibliografico"
+
+#: rust/src/window.rs:448
+msgid "Lists and indentation"
+msgstr "Elenchi e rientri"
+
+#: rust/src/window.rs:453
+msgid "More"
+msgstr "Altro"
+
+#: rust/src/window.rs:553
+msgid "Local library"
+msgstr "Raccolta locale"
+
+#: rust/src/window.rs:557
+msgid "Your references stay on this computer and remain available offline."
+msgstr "I tuoi riferimenti restano su questo computer e sono disponibili offline."
+
+#: rust/src/window.rs:563 rust/src/window.rs:2103
+msgid "Search references…"
+msgstr "Cerca riferimenti…"
+
+msgid "Search tags…"
+msgstr "Cerca tag…"
+
+msgid "No tags match your search."
+msgstr "Nessun tag corrisponde alla ricerca."
+
+msgid "Tag"
+msgstr "Tag"
+
+msgid "Sort by"
+msgstr "Ordina per"
+
+msgid "Author"
+msgstr "Autore"
+
+msgid "Ascending"
+msgstr "Crescente"
+
+msgid "Descending"
+msgstr "Decrescente"
+
+msgid "All authors"
+msgstr "Tutti gli autori"
+
+msgid "All years"
+msgstr "Tutti gli anni"
+
+msgid "All tags"
+msgstr "Tutti i tag"
+
+msgid "All types"
+msgstr "Tutti i tipi"
+
+#: rust/src/window.rs:566
+msgid "Add reference"
+msgstr "Aggiungi un riferimento"
+
+msgid "View all references"
+msgstr "Visualizza tutti i riferimenti"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "Add a reference to the local library"
+msgstr "Aggiungi un riferimento alla raccolta locale"
+
+#: rust/src/window.rs:569
+msgid "Import BibTeX"
+msgstr "Importa BibTeX"
+
+#: rust/src/window.rs:572
+msgid "Export BibTeX"
+msgstr "Esporta BibTeX"
+
+#: rust/src/window.rs:1933 rust/src/window.rs:7901
+msgid "Import references"
+msgstr "Importa riferimenti"
+
+#: rust/src/window.rs:1934 rust/src/window.rs:7906
+msgid "Export references"
+msgstr "Esporta riferimenti"
+
+#: rust/src/window.rs:7902
+msgid "Choose a format to import."
+msgstr "Scegli un formato da importare."
+
+#: rust/src/window.rs:7907
+msgid "Choose a format to export."
+msgstr "Scegli un formato da esportare."
+
+#: rust/src/window.rs:7951
+msgid "Standard format for bibliographic references."
+msgstr "Formato standard per i riferimenti bibliografici."
+
+#: rust/src/window.rs:7979
+msgid "Platform guides"
+msgstr "Guide delle piattaforme"
+
+msgid "No references match the current search and filters."
+msgstr "Nessun riferimento corrisponde alla ricerca e ai filtri attuali."
+
+#: rust/src/window.rs:601
+msgid "Show or hide the sidebar"
+msgstr "Mostra o nascondi la barra laterale"
+
+#: rust/src/window.rs:604
+msgid "Save document"
+msgstr "Salva documento"
+
+#: rust/src/window.rs:617
+msgid "Compile document"
+msgstr "Compila documento"
+
+#: rust/src/window.rs:621
+msgid "Compile and create PDF"
+msgstr "Compila e crea PDF"
+
+#: rust/src/window.rs:636 rust/src/window.rs:2651
+msgid "Export PDF"
+msgstr "Esporta PDF"
+
+#: rust/src/window.rs:646
+msgid "Document and build details"
+msgstr "Dettagli del documento e della compilazione"
+
+#: rust/src/window.rs:652 rust/src/window.rs:1159 rust/src/window.rs:1168
+#: rust/src/window.rs:1218 rust/src/window.rs:1315 rust/src/window.rs:1899
+#: rust/src/window.rs:2195 rust/src/window.rs:2528 rust/src/window.rs:2529
+#: rust/src/window.rs:2623
+msgid "Ready"
+msgstr "Pronto"
+
+#: rust/src/window.rs:663
+msgid "Current document"
+msgstr "Documento corrente"
+
+#: rust/src/window.rs:667 rust/src/window.rs:751
+msgid "New document not saved yet"
+msgstr "Nuovo documento non ancora salvato"
+
+#: rust/src/window.rs:683
+msgid "Compiler"
+msgstr "Compilatore"
+
+#: rust/src/window.rs:683
+msgid "Status"
+msgstr "Stato"
+
+#: rust/src/window.rs:683
+msgid "Last build"
+msgstr "Ultima compilazione"
+
+#: rust/src/window.rs:743 rust/src/window.rs:767
+msgid "Error"
+msgstr "Errore"
+
+#: rust/src/window.rs:744 rust/src/window.rs:768
+msgid "Modified"
+msgstr "Modificato"
+
+#: rust/src/window.rs:753
+msgid "No project folder selected"
+msgstr "Nessuna cartella di progetto selezionata"
+
+#: rust/src/window.rs:754
+msgid "Save the document to set the project file."
+msgstr "Salva il documento per impostare il file del progetto."
+
+#: rust/src/window.rs:755
+msgid ""
+"File: %s\n"
+"Project: %s"
+msgstr "File: %s\nProgetto: %s"
+
+#: rust/src/window.rs:760
+msgid "Not found"
+msgstr "Non trovato"
+
+#: rust/src/window.rs:762
+msgid "%s · local changes pending"
+msgstr "%s · modifiche locali in sospeso"
+
+#: rust/src/window.rs:783
+msgid "Just now"
+msgstr "Proprio ora"
+
+#: rust/src/window.rs:1000
+msgid "Match found"
+msgstr "Corrispondenza trovata"
+
+#: rust/src/window.rs:1000
+msgid "No results"
+msgstr "Nessun risultato"
+
+#: rust/src/window.rs:1018
+msgid "Keyboard shortcuts"
+msgstr "Scorciatoie da tastiera"
+
+#: rust/src/window.rs:1019 rust/src/window.rs:2099
+msgid "Close"
+msgstr "Chiudi"
+
+#: rust/src/window.rs:1046 rust/src/window.rs:1085 rust/src/window.rs:1243
+#: rust/src/window.rs:1590 rust/src/window.rs:1658 rust/src/window.rs:1707
+#: rust/src/window.rs:1770 rust/src/window.rs:1851 rust/src/window.rs:1947
+#: rust/src/window.rs:2032 rust/src/window.rs:2073 rust/src/window.rs:2314
+#: rust/src/window.rs:2469 rust/src/window.rs:2652
+msgid "Cancel"
+msgstr "Annulla"
+
+#: rust/src/window.rs:1048
+msgid "LaTeX, BibTeX, and style files"
+msgstr "File LaTeX, BibTeX e di stile"
+
+#: rust/src/window.rs:1077 rust/src/window.rs:1302
+msgid "A document save is still in progress."
+msgstr "Il salvataggio del documento è ancora in corso."
+
+#: rust/src/window.rs:1084
+msgid "Unsaved changes"
+msgstr "Modifiche non salvate"
+
+#: rust/src/window.rs:1086
+msgid "Discard"
+msgstr "Scarta"
+
+#: rust/src/window.rs:1087
+msgid "Save"
+msgstr "Salva"
+
+#: rust/src/window.rs:1088
+msgid "Save changes before continuing?"
+msgstr "Salvare le modifiche prima di continuare?"
+
+#: rust/src/window.rs:1127
+msgid "Opening document…"
+msgstr "Apertura del documento…"
+
+#: rust/src/window.rs:1161
+msgid "This document has not been compiled yet."
+msgstr "Questo documento non è ancora stato compilato."
+
+#: rust/src/window.rs:1169
+msgid "Could not open the document"
+msgstr "Impossibile aprire il documento"
+
+#: rust/src/window.rs:1205
+msgid "Loading project…"
+msgstr "Caricamento del progetto…"
+
+#: rust/src/window.rs:1222 rust/src/window.rs:1386 rust/src/window.rs:2698
+msgid "Could not list the project folder"
+msgstr "Impossibile elencare i contenuti della cartella del progetto"
+
+#: rust/src/window.rs:1235
+msgid "This project has no .tex document yet."
+msgstr "Questo progetto non contiene ancora un documento .tex."
+
+#: rust/src/window.rs:1241
+msgid "Choose main document"
+msgstr "Scegli il documento principale"
+
+#: rust/src/window.rs:1244
+msgid "Open"
+msgstr "Apri"
+
+#: rust/src/window.rs
+msgid "Open document"
+msgstr "Apri documento"
+
+#: rust/src/window.rs
+msgid "Open project folder"
+msgstr "Apri la cartella del progetto"
+
+#: rust/src/window.rs:1306
+msgid "Saving…"
+msgstr "Salvataggio…"
+
+#: rust/src/window.rs:1325
+msgid "The document changed while it was being saved. Save again."
+msgstr "Il documento è stato modificato durante il salvataggio. Salvalo di nuovo."
+
+#: rust/src/window.rs:1333
+msgid "Document saved"
+msgstr "Documento salvato"
+
+#: rust/src/window.rs:1346
+msgid "Open a project folder to browse its files."
+msgstr "Apri una cartella di progetto per sfogliare i file."
+
+#: rust/src/window.rs:1353
+msgid "Loading project files…"
+msgstr "Caricamento dei file del progetto…"
+
+#: rust/src/window.rs:1379
+msgid "This project has no files yet. Use + to create one."
+msgstr "Questo progetto non contiene ancora file. Usa + per crearne uno."
+
+#: rust/src/window.rs:1426
+msgid ""
+"This file is listed as a project resource and cannot be edited in Ovenbird "
+"yet."
+msgstr "Questo file è elencato come risorsa del progetto e non può ancora essere modificato in Ovenbird."
+
+#: rust/src/window.rs:1463 rust/src/window.rs:1706 rust/src/window.rs:1708
+msgid "Rename"
+msgstr "Rinomina"
+
+#: rust/src/window.rs:1463
+msgid "Move to Trash"
+msgstr "Sposta nel cestino"
+
+#: rust/src/window.rs
+msgid "Confirm deletion"
+msgstr "Conferma eliminazione"
+
+#: rust/src/window.rs
+msgid "Move ‘%s’ to Trash? You can restore it later."
+msgstr "Spostare «%s» nel cestino? Potrai ripristinarlo in seguito."
+
+#: rust/src/window.rs
+msgid "Move folder ‘%s’ and its contents to Trash?"
+msgstr "Spostare la cartella «%s» e il suo contenuto nel cestino?"
+
+#: rust/src/window.rs:1591 rust/src/window.rs:1659 rust/src/window.rs:1852
+msgid "Create"
+msgstr "Crea"
+
+#: rust/src/window.rs:1599
+msgid "File name in the selected folder"
+msgstr "Nome del file nella cartella selezionata"
+
+#: rust/src/window.rs:1612
+msgid "Enter a valid file name"
+msgstr "Inserisci un nome file valido"
+
+#: rust/src/window.rs:1634
+msgid "File created"
+msgstr "File creato"
+
+#: rust/src/window.rs:1637
+msgid "Could not create the file"
+msgstr "Impossibile creare il file"
+
+#: rust/src/window.rs:1662
+msgid "Folder name"
+msgstr "Nome della cartella"
+
+#: rust/src/window.rs:1675
+msgid "Enter a valid folder name"
+msgstr "Inserisci un nome di cartella valido"
+
+#: rust/src/window.rs:1690
+msgid "Folder created"
+msgstr "Cartella creata"
+
+#: rust/src/window.rs:1693
+msgid "Could not create the folder"
+msgstr "Impossibile creare la cartella"
+
+#: rust/src/window.rs:1761
+msgid "Moved to Trash"
+msgstr "Spostato nel cestino"
+
+#: rust/src/window.rs:1763
+msgid "Could not move to Trash"
+msgstr "Impossibile spostare nel cestino"
+
+#: rust/src/window.rs:1768 rust/src/window.rs:1850
+msgid "New project"
+msgstr "Nuovo progetto"
+
+#: rust/src/window.rs:1771
+msgid "Continue"
+msgstr "Continua"
+
+#: rust/src/window.rs:1779
+msgid ""
+"Choose a starting point. Template files are copied into a local project "
+"folder."
+msgstr "Scegli un punto di partenza. I file modello vengono copiati in una cartella di progetto locale."
+
+#: rust/src/window.rs:1785
+msgid "Blank LaTeX document"
+msgstr "Documento LaTeX vuoto"
+
+#: rust/src/window.rs:1785
+msgid "Start a new document with a simple article structure."
+msgstr "Inizia un nuovo documento con una semplice struttura per un articolo."
+
+#: rust/src/window.rs:1786
+msgid "ABNT · abnTeX2"
+msgstr "ABNT · abnTeX2"
+
+#: rust/src/window.rs:1786
+msgid ""
+"Academic work, articles, reports, and research projects based on ABNT rules."
+msgstr "Lavori accademici, articoli, relazioni e progetti di ricerca basati sulle regole ABNT."
+
+#: rust/src/window.rs:1787
+msgid "IEEE · IEEEtran"
+msgstr "IEEE · IEEEtran"
+
+#: rust/src/window.rs:1787
+msgid "IEEE conference and journal papers using the IEEEtran class."
+msgstr "Articoli IEEE per conferenze e riviste che usano la classe IEEEtran."
+
+#: rust/src/window.rs:1788
+msgid "ACM · acmart"
+msgstr "ACM · acmart"
+
+#: rust/src/window.rs:1788
+msgid "ACM journal and conference papers using the acmart class."
+msgstr "Articoli ACM per riviste e conferenze che usano la classe acmart."
+
+#: rust/src/window.rs:1789
+msgid "Elsevier · elsarticle"
+msgstr "Elsevier · elsarticle"
+
+#: rust/src/window.rs:1789
+msgid "Elsevier manuscripts using the elsarticle package."
+msgstr "Manoscritti Elsevier che usano il pacchetto elsarticle."
+
+#: rust/src/window.rs:1790
+msgid "Springer Nature"
+msgstr "Springer Nature"
+
+#: rust/src/window.rs:1790
+msgid "Springer Nature journal article templates and sample files."
+msgstr "Modelli di articoli per riviste Springer Nature e file di esempio."
+
+#: rust/src/window.rs:1816
+msgid "Source"
+msgstr "Sorgente"
+
+#: rust/src/window.rs:1828
+msgid ""
+"Journal and conference requirements can differ. Check the current author "
+"instructions before submission."
+msgstr "I requisiti di riviste e conferenze possono variare. Controlla le istruzioni aggiornate per gli autori prima di inviare il manoscritto."
+
+#: rust/src/window.rs:1869
+msgid "Enter a valid project name"
+msgstr "Inserisci un nome di progetto valido"
+
+#: rust/src/window.rs:1879
+msgid "Creating project"
+msgstr "Creazione del progetto"
+
+#: rust/src/window.rs:1891
+msgid "Preparing template project…"
+msgstr "Preparazione del progetto modello…"
+
+#: rust/src/window.rs:1895
+msgid "Creating project…"
+msgstr "Creazione del progetto…"
+
+#: rust/src/window.rs:1905 rust/src/window.rs:1932
+msgid "Could not create the project"
+msgstr "Impossibile creare il progetto"
+
+#: rust/src/window.rs:1946 rust/src/window.rs:1948
+msgid "Insert link"
+msgstr "Inserisci link"
+
+#: rust/src/window.rs:1954
+msgid "Link text"
+msgstr "Testo del link"
+
+#: rust/src/window.rs:1957
+msgid "Text"
+msgstr "Testo"
+
+#: rust/src/window.rs:1969
+msgid "Enter a URL"
+msgstr "Inserisci un URL"
+
+#: rust/src/window.rs:1983
+msgid "Open a project folder before inserting an image."
+msgstr "Apri una cartella di progetto prima di inserire un’immagine."
+
+#: rust/src/window.rs:1987
+msgid "The image name is invalid."
+msgstr "Il nome dell’immagine non è valido."
+
+#: rust/src/window.rs:2016
+msgid "Image copied to the project. Reopen the document to insert it."
+msgstr "Immagine copiata nel progetto. Riapri il documento per inserirla."
+
+#: rust/src/window.rs:2025
+msgid "Could not add the image to the project"
+msgstr "Impossibile aggiungere l’immagine al progetto"
+
+#: rust/src/window.rs:2031
+msgid "Insert table"
+msgstr "Inserisci tabella"
+
+#: rust/src/window.rs:2033
+msgid "Insert"
+msgstr "Inserisci"
+
+#: rust/src/window.rs:2040
+msgid "Rows"
+msgstr "Righe"
+
+#: rust/src/window.rs:2042
+msgid "Columns"
+msgstr "Colonne"
+
+#: rust/src/window.rs:2074
+msgid "OK"
+msgstr "OK"
+
+#: rust/src/window.rs:2143
+msgid "No matching references"
+msgstr "Nessun riferimento corrispondente"
+
+#: rust/src/window.rs:2176 rust/src/window.rs:2223
+msgid "Could not load the local library"
+msgstr "Impossibile caricare la raccolta locale"
+
+#: rust/src/window.rs:2184 rust/src/window.rs:2213
+msgid "The local library is busy. Try again in a moment."
+msgstr "La raccolta locale è occupata. Riprova tra poco."
+
+#: rust/src/window.rs:2187
+msgid "Saving references…"
+msgstr "Salvataggio dei riferimenti…"
+
+#: rust/src/window.rs:2202
+msgid "Could not save the local library"
+msgstr "Impossibile salvare la raccolta locale"
+
+#: rust/src/window.rs:2209
+msgid "The local library is still loading."
+msgstr "La raccolta locale è ancora in caricamento."
+
+#: rust/src/window.rs:2229 rust/src/window.rs:2552
+msgid "Retry"
+msgstr "Riprova"
+
+#: rust/src/window.rs:2235
+msgid "Loading local library…"
+msgstr "Caricamento della raccolta locale…"
+
+#: rust/src/window.rs:2253
+msgid "No references match this search."
+msgstr "Nessun riferimento corrisponde a questa ricerca."
+
+#: rust/src/window.rs:2283
+msgid "Edit reference"
+msgstr "Modifica riferimento"
+
+msgid "New reference"
+msgstr "Nuovo riferimento"
+
+#: rust/src/window.rs:2288
+msgid "Delete reference"
+msgstr "Elimina riferimento"
+
+#: rust/src/window.rs
+msgid "Delete reference ‘%s’ from the local library? This cannot be undone."
+msgstr "Eliminare il riferimento «%s» dalla raccolta locale? Questa azione non può essere annullata."
+
+#: rust/src/window.rs:2295 rust/src/window.rs:2388
+msgid "Reference deleted"
+msgstr "Riferimento eliminato"
+
+#: rust/src/window.rs
+msgid "%d local reference · %s"
+msgid_plural "%d local references · %s"
+msgstr[0] "%d riferimento locale · %s"
+msgstr[1] "%d riferimenti locali · %s"
+
+#: rust/src/window.rs:2315
+msgid "Delete"
+msgstr "Elimina"
+
+#: rust/src/window.rs:2328
+msgid "Reference type"
+msgstr "Tipo di riferimento"
+
+#: rust/src/window.rs
+msgid "Reference details"
+msgstr "Dettagli del riferimento"
+
+#: rust/src/window.rs
+msgid "Show reference details"
+msgstr "Mostra i dettagli del riferimento"
+
+#: rust/src/window.rs
+msgid "Cite this reference"
+msgstr "Cita questo riferimento"
+
+#: rust/src/window.rs
+msgid "Citation format"
+msgstr "Formato citazione"
+
+#: rust/src/window.rs
+msgid "ABNT"
+msgstr "ABNT"
+
+#: rust/src/window.rs
+msgid "MLA"
+msgstr "MLA"
+
+#: rust/src/window.rs
+msgid "AMS"
+msgstr "AMS"
+
+#: rust/src/window.rs
+msgid "APA 7"
+msgstr "APA 7"
+
+#: rust/src/window.rs
+msgid "IEEE"
+msgstr "IEEE"
+
+#: rust/src/window.rs
+msgid "Chicago (author-date)"
+msgstr "Chicago (autore-data)"
+
+#: rust/src/window.rs
+msgid "Harvard (author-date)"
+msgstr "Harvard (autore-data)"
+
+#: rust/src/window.rs
+msgid "Vancouver"
+msgstr "Vancouver"
+
+#: rust/src/window.rs
+msgid "Copy value"
+msgstr "Copia valore"
+
+#: rust/src/window.rs
+msgid "Open a BibTeX file before adding a bibliographic reference."
+msgstr "Apri un file BibTeX prima di aggiungere un riferimento bibliografico."
+
+#: rust/src/window.rs
+msgid "This reference is already in the BibTeX file."
+msgstr "Questo riferimento è già presente nel file BibTeX."
+
+#: rust/src/window.rs
+msgid "Could not add the reference to the BibTeX file"
+msgstr "Impossibile aggiungere il riferimento al file BibTeX"
+
+#: rust/src/window.rs
+msgid "Copy formatted reference"
+msgstr "Copia il riferimento formattato"
+
+#: rust/src/window.rs
+msgid "Copied to clipboard"
+msgstr "Copiato negli appunti"
+
+#: rust/src/window.rs:2343
+msgid "Full title of the work"
+msgstr "Titolo completo dell’opera"
+
+#: rust/src/window.rs:2351
+msgid "Citation key"
+msgstr "Chiave di citazione"
+
+#: rust/src/window.rs:2401
+msgid "Enter the reference title"
+msgstr "Inserisci il titolo del riferimento"
+
+#: rust/src/window.rs:2416
+msgid "Reference saved"
+msgstr "Riferimento salvato"
+
+#: rust/src/window.rs:2443
+msgid "Imported %d references"
+msgstr "Importati %d riferimenti"
+
+#: rust/src/window.rs:2445
+msgid "Could not import BibTeX"
+msgstr "Impossibile importare BibTeX"
+
+#: rust/src/window.rs:2460
+msgid "BibTeX exported"
+msgstr "BibTeX esportato"
+
+#: rust/src/window.rs:2461
+msgid "Could not export BibTeX"
+msgstr "Impossibile esportare BibTeX"
+
+#: rust/src/window.rs:2652
+msgid "Export"
+msgstr "Esporta"
+
+#: rust/src/window.rs:2671
+msgid "Save the document before compiling."
+msgstr "Salva il documento prima di compilarlo."
+
+#: rust/src/window.rs:2707
+msgid "Compilation is in progress."
+msgstr "La compilazione è in corso."
+
+#: rust/src/window.rs:2728
+msgid "%d local reference added to the temporary bibliography for this build"
+msgid_plural ""
+"%d local references added to the temporary bibliography for this build"
+msgstr[0] "%d riferimento locale aggiunto alla bibliografia temporanea per questa compilazione"
+msgstr[1] "%d riferimenti locali aggiunti alla bibliografia temporanea per questa compilazione"
+
+#: rust/src/window.rs:2736
+msgid "%d duplicate citation key was left unchanged"
+msgid_plural "%d duplicate citation keys were left unchanged"
+msgstr[0] "%d chiave di citazione duplicata non è stata modificata"
+msgstr[1] "%d chiavi di citazione duplicate non sono state modificate"
+
+#: rust/src/window.rs:2742 rust/src/window.rs:2762
+msgid "Compilation finished"
+msgstr "Compilazione completata"
+
+#: rust/src/window.rs:2748 rust/src/window.rs:2755
+msgid "Could not export PDF"
+msgstr "Impossibile esportare il PDF"
+
+#: rust/src/window.rs:2751
+msgid "PDF exported"
+msgstr "PDF esportato"
+
+#: rust/src/window.rs:2766
+msgid "Could not open the PDF"
+msgstr "Impossibile aprire il PDF"
+
+#: rust/src/window.rs:2767
+msgid "Could not open the compiled PDF"
+msgstr "Impossibile aprire il PDF compilato"
+
+#: rust/src/window.rs:2768
+msgid "Could not open the PDF preview"
+msgstr "Impossibile aprire l’anteprima PDF"
+
+#: rust/src/window.rs:2775 rust/src/window.rs:2776
+msgid "Could not compile the document"
+msgstr "Impossibile compilare il documento"
+
+#: rust/src/window.rs
+msgid "PDF generation failed"
+msgstr "Generazione del PDF non riuscita"
+
+#: rust/src/window.rs
+msgid "PDF generation failed: Image on line %d was not found."
+msgstr "Generazione del PDF non riuscita: immagine alla riga %d non trovata."
+
+#: rust/src/window.rs
+msgid ""
+"PDF generation failed: The document contains errors that prevent compilation."
+msgstr "Generazione del PDF non riuscita: il documento contiene errori che impediscono la compilazione."
+
+#: rust/src/window.rs
+msgid "PDF generation failed: Compilation stopped unexpectedly."
+msgstr "Generazione del PDF non riuscita: la compilazione si è interrotta inaspettatamente."
+
+#: rust/src/window.rs
+msgid "PDF generation failed: Compilation timed out."
+msgstr "Generazione del PDF non riuscita: la compilazione ha superato il tempo limite."
+
+#: rust/src/window.rs
+msgid "%d more lines have missing citations."
+msgstr "%d righe aggiuntive contengono citazioni mancanti."
+
+#: rust/src/window.rs
+msgid "%d additional citation problems are not shown."
+msgstr "%d ulteriori problemi di citazione non vengono mostrati."
+
+#: rust/src/build.rs
+msgid "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live."
+msgstr "Non è stato trovato alcun compilatore LaTeX. Installa latexmk, Tectonic o TeX Live."
+
+#: rust/src/build.rs
+msgid ""
+"This document uses biblatex and needs Biber. Install Biber, latexmk, or "
+"Tectonic."
+msgstr "Questo documento usa biblatex e richiede Biber. Installa Biber, latexmk o Tectonic."
+
+#: rust/src/build.rs
+msgid "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic."
+msgstr "Questo documento richiede BibTeX. Installa BibTeX, latexmk o Tectonic."
+
+#: rust/src/window.rs
+msgid "Citation on line %d has no bibliographic reference in the document."
+msgstr "La citazione alla riga %d non ha un riferimento bibliografico nel documento."
+
+#: rust/src/window.rs
+msgid "Citations on lines %s have no bibliographic references in the document."
+msgstr "Le citazioni alle righe %s non hanno riferimenti bibliografici nel documento."
+
+#: rust/src/window.rs
+msgid "Line %d: %s"
+msgstr "Riga %d: %s"
+
+#: rust/src/window.rs
+msgid "Could not add the reference to the document"
+msgstr "Impossibile aggiungere il riferimento al documento"
+
+#: rust/src/window.rs
+msgid "Save the document before inserting a citation."
+msgstr "Salva il documento prima di inserire una citazione."
+
+#: rust/src/window.rs:2783
+msgid "Open or create a LaTeX project before compiling."
+msgstr "Apri o crea un progetto LaTeX prima di compilarlo."
+
+#: rust/src/window.rs:2789
+msgid "Check the build output"
+msgstr "Controlla l’output della compilazione"
+
+#: rust/src/window.rs
+msgid "Visual mode is available only for LaTeX documents."
+msgstr "La modalità visuale è disponibile solo per i documenti LaTeX."
+
+#: rust/src/window.rs
+msgid "Open a LaTeX document before inserting an image."
+msgstr "Apri un documento LaTeX prima di inserire un’immagine."
+
+#: rust/src/window.rs
+msgid "Image and PDF files"
+msgstr "File immagine e PDF"
+
+#: rust/src/window.rs
+msgid "Choose a main LaTeX document before inserting an image."
+msgstr "Scegli un documento LaTeX principale prima di inserire un’immagine."
+
+#: rust/src/window.rs
+msgid "The image path cannot be represented relative to the main document."
+msgstr "Il percorso dell’immagine non può essere espresso in modo relativo al documento principale."
+
+#: rust/src/window.rs
+msgid "Open a LaTeX document before inserting a citation."
+msgstr "Apri un documento LaTeX prima di inserire una citazione."
+
+#: rust/src/window.rs
+msgid "New LaTeX document"
+msgstr "Nuovo documento LaTeX"
+
+#: rust/src/window.rs
+msgid "New bibliography (.bib)"
+msgstr "Nuova bibliografia (.bib)"
+
+#: rust/src/window.rs
+msgid "New style file (.sty)"
+msgstr "Nuovo file di stile (.sty)"
+
+#: rust/src/window.rs
+msgid "Previous match"
+msgstr "Corrispondenza precedente"
+
+#: rust/src/window.rs
+msgid "Next match"
+msgstr "Corrispondenza successiva"
+
+#: rust/src/window.rs
+msgid "Bold"
+msgstr "Grassetto"
+
+#: rust/src/window.rs
+msgid "Italic"
+msgstr "Corsivo"
+
+#: rust/src/window.rs
+msgid "Underline"
+msgstr "Sottolineato"
+
+#: rust/src/window.rs
+msgid "Monospace"
+msgstr "Monospaziato"
+
+#: rust/src/window.rs
+msgid "Section"
+msgstr "Sezione"
+
+#: rust/src/window.rs
+msgid "Subsection"
+msgstr "Sottosezione"
+
+#: rust/src/window.rs
+msgid "Subsubsection"
+msgstr "Sottosottosezione"
+
+#: rust/src/window.rs
+msgid "Paragraph"
+msgstr "Paragrafo"
+
+#: rust/src/window.rs
+msgid "Subparagraph"
+msgstr "Sottoparagrafo"
+
+#: rust/src/window.rs
+msgid "Inline math"
+msgstr "Matematica in linea"
+
+#: rust/src/window.rs
+msgid "Display math"
+msgstr "Matematica in blocco"
+
+#: rust/src/window.rs
+msgid "α  Alpha"
+msgstr "α  Alfa"
+
+#: rust/src/window.rs
+msgid "β  Beta"
+msgstr "β  Beta"
+
+#: rust/src/window.rs
+msgid "γ  Gamma"
+msgstr "γ  Gamma"
+
+#: rust/src/window.rs
+msgid "π  Pi"
+msgstr "π  Pi"
+
+#: rust/src/window.rs
+msgid "≤  Less than or equal to"
+msgstr "≤  Minore o uguale a"
+
+#: rust/src/window.rs
+msgid "≥  Greater than or equal to"
+msgstr "≥  Maggiore o uguale a"
+
+#: rust/src/window.rs
+msgid "≠  Not equal to"
+msgstr "≠  Diverso da"
+
+#: rust/src/window.rs
+msgid "×  Multiplication"
+msgstr "×  Moltiplicazione"
+
+#: rust/src/window.rs
+msgid "±  Plus or minus"
+msgstr "±  Più o meno"
+
+#: rust/src/window.rs
+msgid "∞  Infinity"
+msgstr "∞  Infinito"
+
+#: rust/src/window.rs
+msgid "∑  Summation"
+msgstr "∑  Sommatoria"
+
+#: rust/src/window.rs
+msgid "∫  Integral"
+msgstr "∫  Integrale"
+
+#: rust/src/window.rs
+msgid "√  Square root"
+msgstr "√  Radice quadrata"
+
+#: rust/src/window.rs
+msgid "Bulleted list"
+msgstr "Elenco puntato"
+
+#: rust/src/window.rs
+msgid "Numbered list"
+msgstr "Elenco numerato"
+
+#: rust/src/window.rs
+msgid "Quotation block"
+msgstr "Blocco citazione"
+
+#: rust/src/window.rs
+msgid "Increase indent"
+msgstr "Aumenta rientro"
+
+#: rust/src/window.rs
+msgid "Decrease indent"
+msgstr "Riduci rientro"
+
+#: rust/src/window.rs
+msgid "Insert image"
+msgstr "Inserisci immagine"
+
+#: rust/src/window.rs
+msgid "LaTeX comment"
+msgstr "Commento LaTeX"
+
+#: rust/src/window.rs
+msgid "Footnote"
+msgstr "Nota a piè di pagina"
+
+#: rust/src/window.rs
+msgid "Review note"
+msgstr "Nota di revisione"
+
+#: rust/src/window.rs
+msgid "Add label"
+msgstr "Aggiungi etichetta"
+
+#: rust/src/window.rs
+msgid "Cross-reference"
+msgstr "Riferimento incrociato"
+
+#: rust/src/window.rs
+msgid "Compile"
+msgstr "Compila"
+
+#: rust/src/window.rs
+msgid "Toggle sidebar"
+msgstr "Mostra/nascondi barra laterale"
+
+#: rust/src/window.rs
+msgid "Undo"
+msgstr "Annulla"
+
+#: rust/src/window.rs
+msgid "Redo"
+msgstr "Ripristina"
+
+#: rust/src/window.rs
+msgid "Choose a project folder"
+msgstr "Scegli cartella di progetto"
+
+#: rust/src/window.rs
+msgid "Choose where to create the project"
+msgstr "Scegli dove creare il progetto"
+
+#: rust/src/window.rs
+msgid "Import"
+msgstr "Importa"
+
+#: rust/src/window.rs
+msgid "Label identifier"
+msgstr "Identificativo dell’etichetta"
+
+#: rust/src/window.rs
+msgid "Open project"
+msgstr "Apri progetto"
+
+#: rust/src/window.rs
+msgid "Open at startup"
+msgstr "Apri all’avvio"
+
+#: rust/src/window.rs rust/src/application_menu.rs
+msgid "Preferences"
+msgstr "Preferenze"
+
+#: rust/src/window.rs
+msgid "Default folder for file dialogs"
+msgstr "Cartella predefinita per le finestre di dialogo dei file"
+
+#: rust/src/window.rs
+msgid "Dialogs start in Downloads unless you choose another folder."
+msgstr "Le finestre di dialogo si aprono in Download, a meno che tu non scelga un’altra cartella."
+
+#: rust/src/window.rs
+msgid "Choose folder…"
+msgstr "Scegli cartella…"
+
+#: rust/src/window.rs
+msgid "Choose default folder"
+msgstr "Scegli cartella predefinita"
+
+#: rust/src/window.rs
+msgid "Reset"
+msgstr "Reimposta"
+
+#: rust/src/window.rs
+msgid "Restore the system default folder"
+msgstr "Ripristina la cartella predefinita di sistema"
+
+#: rust/src/window.rs
+msgid "No starting folder available"
+msgstr "Nessuna cartella iniziale disponibile"
+
+#: rust/src/window.rs
+msgid "Reopen last project at startup"
+msgstr "Riapri l’ultimo progetto all’avvio"
+
+#: rust/src/window.rs
+msgid "The last project folder could not be restored."
+msgstr "Impossibile ripristinare l’ultima cartella di progetto."
+
+#: rust/src/window.rs
+msgid "Close project"
+msgstr "Chiudi progetto"
+
+#: rust/src/window.rs
+msgid "Automatic"
+msgstr "Automatico"
+
+#: rust/src/window.rs
+msgid "Light"
+msgstr "Chiaro"
+
+#: rust/src/window.rs
+msgid "Dark"
+msgstr "Scuro"
+
+#: rust/src/window.rs
+msgid "Quit"
+msgstr "Esci"
+
+#: rust/src/window.rs
+msgid "Project closed"
+msgstr "Progetto chiuso"
+
+#: rust/src/window.rs
+msgid "%d reference"
+msgid_plural "%d references"
+msgstr[0] "%d riferimento"
+msgstr[1] "%d riferimenti"
+
+#: rust/src/window.rs
+msgid "Open with default application"
+msgstr "Apri con l’applicazione predefinita"
+
+#: rust/src/window.rs
+msgid "Copy path"
+msgstr "Copia percorso"
+
+#: rust/src/window.rs
+msgid "Show in Files"
+msgstr "Mostra in File"
+
+#: rust/src/window.rs
+msgid "Could not access the clipboard."
+msgstr "Impossibile accedere agli appunti."
+
+#: rust/src/window.rs
+msgid "Could not find the containing folder."
+msgstr "Impossibile trovare la cartella contenente."
+
+#: rust/src/window.rs
+msgid "Authors"
+msgstr "Autori"
+
+#: rust/src/window.rs
+msgid "Manage references"
+msgstr "Gestisci i riferimenti"
+
+#: rust/src/window.rs
+msgid "Manage authors"
+msgstr "Gestisci autori"
+
+#: rust/src/window.rs
+msgid "Add author"
+msgstr "Aggiungi autore"
+
+#: rust/src/window.rs
+msgid "Edit author"
+msgstr "Modifica autore"
+
+#: rust/src/window.rs
+msgid "Author details"
+msgstr "Dettagli autore"
+
+#: rust/src/window.rs
+msgid "Full name"
+msgstr "Nome completo"
+
+#: rust/src/window.rs
+msgid "Name used in references"
+msgstr "Nome usato nei riferimenti"
+
+#: rust/src/window.rs
+msgid "Generate"
+msgstr "Genera"
+
+#: rust/src/window.rs
+msgid "ORCID"
+msgstr "ORCID"
+
+#: rust/src/window.rs
+msgid "Email"
+msgstr "Email"
+
+#: rust/src/window.rs
+msgid "Delete author"
+msgstr "Elimina autore"
+
+#: rust/src/window.rs
+msgid "No authors yet. Add authors to organize your references."
+msgstr "Nessun autore per ora. Aggiungi autori per organizzare i tuoi riferimenti."
+
+msgid "No authors match this search."
+msgstr "Nessun autore corrisponde alla ricerca."
+
+#: rust/src/window.rs
+msgid "Author name"
+msgstr "Nome autore"
+
+#: rust/src/window.rs
+msgid "Author saved"
+msgstr "Autore salvato"
+
+#: rust/src/window.rs
+msgid "Author deleted"
+msgstr "Autore eliminato"
+
+#: rust/src/window.rs
+msgid "Author has associated references"
+msgstr "Autore con riferimenti associati"
+
+#: rust/src/window.rs
+msgid ""
+"The author ‘%s’ is associated with these references. Delete the author and "
+"all listed references?"
+msgstr "L’autore «%s» è associato a questi riferimenti. Eliminare l’autore e tutti i riferimenti elencati?"
+
+#: rust/src/window.rs
+msgid "Delete author and references"
+msgstr "Elimina autore e riferimenti"
+
+#: rust/src/window.rs
+msgid "Deleted author and %d references"
+msgstr "Autore eliminato e %d riferimenti"
+
+#: rust/src/window.rs
+msgid "Find authors…"
+msgstr "Cerca autori…"
+
+#: rust/src/window.rs
+msgid "New author"
+msgstr "Nuovo autore"
+
+#: rust/src/window.rs
+msgid "Create and select this author"
+msgstr "Crea e seleziona questo autore"
+
+#: rust/src/window.rs
+msgid "Select or create authors"
+msgstr "Seleziona o crea autori"
+
+#: rust/src/window.rs
+msgid "Remove author from this reference"
+msgstr "Rimuovi l’autore da questo riferimento"
+
+#: rust/src/window.rs
+msgid "Move author up"
+msgstr "Sposta autore in alto"
+
+#: rust/src/window.rs
+msgid "Move author down"
+msgstr "Sposta autore in basso"
+
+#: rust/src/window.rs
+msgid "No matching authors"
+msgstr "Nessun autore corrispondente"
+
+#: rust/src/window.rs
+msgid ""
+"PDF generation failed: An error on line %d prevents compilation and PDF "
+"generation."
+msgstr "Generazione del PDF non riuscita: un errore alla riga %d impedisce la compilazione e la generazione del PDF."
+
+#: rust/src/window.rs
+msgid "Your library starts here: add a reference or import BibTeX."
+msgstr "La tua raccolta inizia qui: aggiungi un riferimento o importa BibTeX."
+
+#: rust/src/storage.rs
+msgid "The BibTeX marker “others” cannot be used as an author name."
+msgstr "Il marcatore BibTeX «others» non può essere usato come nome di autore."
