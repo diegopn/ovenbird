@@ -5,6 +5,8 @@
   <summary>LaTeX writing and bibliography management</summary>
   <summary xml:lang="pt_BR">Editor LaTeX e gerenciador de bibliografia</summary>
   <summary xml:lang="es">Editor de LaTeX y gestor de bibliografía</summary>
+  <summary xml:lang="fr">Éditeur LaTeX et gestionnaire de bibliographie</summary>
+  <summary xml:lang="it">Editor LaTeX e gestione bibliografica</summary>
   <url type="homepage">https://github.com/diegopn/ovenbird</url>
   <url type="contact">https://diegopn.github.io/</url>
   <url type="bugtracker">https://github.com/diegopn/ovenbird/issues</url>
@@ -58,6 +60,12 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.4.0" date="2026-10-26" type="stable">
+      <description>
+        <p>References can now be imported from and exported to BibTeX (.bib), with in-app guides for Zotero, JabRef, and Mendeley.</p>
+        <p>The release adds French and Italian translations, project contact and support links, and Linux build instructions for Fedora/RPM, Debian/Ubuntu, Arch, and openSUSE.</p>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-10-21" type="stable">
       <description>
         <p>Long reference titles and author names now wrap within the list instead of causing horizontal scrolling. The release also adds updated screenshots for the editor and reference manager.</p>

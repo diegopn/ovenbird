@@ -1,4 +1,4 @@
-project('ovenbird', 'rust', version: '0.3.0', meson_version: '>= 1.2.0', license: 'GPL-3.0-or-later')
+project('ovenbird', 'rust', version: '0.4.0', meson_version: '>= 1.2.0', license: 'GPL-3.0-or-later')
 
 gnome = import('gnome')
 i18n = import('i18n')

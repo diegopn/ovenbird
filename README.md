@@ -13,7 +13,7 @@ Created by Diego Pereira do Nascimento.
 - Compile with `latexmk`, `pdflatex`, or Tectonic. The local Flatpak manifest includes Tectonic.
 - Preview PDFs and images in the editor. Embedded PDF preview requires Poppler-GLib at build time.
 - Start projects from bundled blank, ABNT, IEEE, ACM, Elsevier, and Springer Nature templates.
-- Use the interface in English, Brazilian Portuguese, or Spanish.
+- Use the interface in English, Brazilian Portuguese, Spanish, French, or Italian.
 
 Visual mode supports a conservative subset of LaTeX. Unknown commands and environments remain source text so the editor does not discard document content.
 
