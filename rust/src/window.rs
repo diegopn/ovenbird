@@ -19,6 +19,8 @@ use crate::editor::LatexEditor;
 use crate::history::EditorMode;
 use crate::i18n::ngettext;
 use crate::project::{self, ProjectEntryKind, ProjectFileKind};
+use crate::reference_exchange::{self, TransferAction, TransferDirection};
+use crate::reference_guides::REFERENCE_MANAGER_GUIDES;
 use crate::storage::{AppSettings, AuthorProfile, LocalLibrary, StartupView};
 
 const MAIN_HEADER_HEIGHT: i32 = 48;
@@ -1928,8 +1930,8 @@ fn update_primary_action(state: &Rc<State>) {
         }
         let actions = if references {
             Some(action_menu(&[
-                ("Import BibTeX", "win.import-bibtex"),
-                ("Export BibTeX", "win.export-bibtex"),
+                ("Import references", "win.import-references"),
+                ("Export references", "win.export-references"),
             ]))
         } else if library_page {
             None
@@ -2354,6 +2356,12 @@ fn connect_actions(state: &Rc<State>) {
     state.compile_action.replace(Some(compile_action));
     install_action(state, "export-pdf", choose_pdf_export);
     install_action(state, "add-reference", |s| edit_reference(&s, None));
+    install_action(state, "import-references", |s| {
+        show_reference_transfer_dialog(s, TransferDirection::Import)
+    });
+    install_action(state, "export-references", |s| {
+        show_reference_transfer_dialog(s, TransferDirection::Export)
+    });
     install_action(state, "import-bibtex", import_bibtex);
     install_action(state, "export-bibtex", export_bibtex);
     install_action(state, "shortcuts", show_shortcuts);
@@ -7884,6 +7892,104 @@ fn edit_reference(state: &Rc<State>, entry: Option<BibEntry>) {
         }
         dialog.close();
     });
+    dialog.present();
+}
+
+fn show_reference_transfer_dialog(state: Rc<State>, direction: TransferDirection) {
+    let (title, description, icon_name) = match direction {
+        TransferDirection::Import => (
+            tr("Import references"),
+            tr("Choose a format to import."),
+            "document-open-symbolic",
+        ),
+        TransferDirection::Export => (
+            tr("Export references"),
+            tr("Choose a format to export."),
+            "document-save-symbolic",
+        ),
+    };
+    let dialog = gtk::Dialog::builder()
+        .title(title)
+        .transient_for(&state.window)
+        .modal(true)
+        .default_width(460)
+        .build();
+    dialog.add_button(&tr("Close"), gtk::ResponseType::Close);
+
+    let content = dialog.content_area();
+    content.set_spacing(12);
+    content.set_margin_top(18);
+    content.set_margin_bottom(18);
+    content.set_margin_start(20);
+    content.set_margin_end(20);
+    let description = gtk::Label::new(Some(&description));
+    description.set_xalign(0.0);
+    description.add_css_class("dim-label");
+    content.append(&description);
+
+    for format in reference_exchange::AVAILABLE_FORMATS {
+        let format = *format;
+        let button = gtk::Button::new();
+        button.add_css_class("card");
+        button.set_hexpand(true);
+        let row = gtk::Box::new(gtk::Orientation::Horizontal, 12);
+        row.set_margin_top(12);
+        row.set_margin_bottom(12);
+        row.set_margin_start(12);
+        row.set_margin_end(12);
+
+        let icon = gtk::Image::from_icon_name(icon_name);
+        icon.set_pixel_size(24);
+        row.append(&icon);
+
+        let text = gtk::Box::new(gtk::Orientation::Vertical, 3);
+        text.set_hexpand(true);
+        let title = gtk::Label::new(Some(format.label()));
+        title.set_xalign(0.0);
+        title.add_css_class("heading");
+        text.append(&title);
+        let detail = gtk::Label::new(Some(&tr("Standard format for bibliographic references.")));
+        detail.set_xalign(0.0);
+        detail.add_css_class("dim-label");
+        text.append(&detail);
+        row.append(&text);
+
+        let next = gtk::Image::from_icon_name("go-next-symbolic");
+        next.add_css_class("dim-label");
+        row.append(&next);
+        button.set_child(Some(&row));
+
+        let weak_dialog = dialog.downgrade();
+        let weak_state = Rc::downgrade(&state);
+        button.connect_clicked(move |_| {
+            if let Some(dialog) = weak_dialog.upgrade() {
+                dialog.close();
+            }
+            if let Some(state) = weak_state.upgrade() {
+                match reference_exchange::action_for(direction, format) {
+                    TransferAction::ImportBibtex => import_bibtex(state),
+                    TransferAction::ExportBibtex => export_bibtex(state),
+                }
+            }
+        });
+        content.append(&button);
+    }
+
+    content.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+    let guides_label = gtk::Label::new(Some(&tr("Platform guides")));
+    guides_label.set_xalign(0.0);
+    guides_label.add_css_class("dim-label");
+    content.append(&guides_label);
+
+    let guides = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    for guide in REFERENCE_MANAGER_GUIDES {
+        let link = gtk::LinkButton::with_label(guide.uri, guide.name);
+        link.set_halign(gtk::Align::Start);
+        guides.append(&link);
+    }
+    content.append(&guides);
+
+    dialog.connect_response(|dialog, _| dialog.close());
     dialog.present();
 }
 

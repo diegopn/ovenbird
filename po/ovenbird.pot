@@ -519,6 +519,30 @@ msgstr ""
 msgid "Export BibTeX"
 msgstr ""
 
+#: rust/src/window.rs:1933 rust/src/window.rs:7901
+msgid "Import references"
+msgstr ""
+
+#: rust/src/window.rs:1934 rust/src/window.rs:7906
+msgid "Export references"
+msgstr ""
+
+#: rust/src/window.rs:7902
+msgid "Choose a format to import."
+msgstr ""
+
+#: rust/src/window.rs:7907
+msgid "Choose a format to export."
+msgstr ""
+
+#: rust/src/window.rs:7951
+msgid "Standard format for bibliographic references."
+msgstr ""
+
+#: rust/src/window.rs:7979
+msgid "Platform guides"
+msgstr ""
+
 msgid "No references match the current search and filters."
 msgstr ""
 
