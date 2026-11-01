@@ -98,12 +98,12 @@ The in-repository manifest is intended for local builds while the packaging is b
 ```sh
 flatpak-builder --user --force-clean .flatpak-build io.github.diegopn.ovenbird.json
 flatpak-builder --user --install --force-clean .flatpak-build io.github.diegopn.ovenbird.json
-flatpak run io.github.diegopn.ovenbird
+flatpak run io.github.diegopn.ovenbird.Devel
 ```
 
-The manifest uses GNOME Platform/SDK 51 and the stable Rust SDK extension. The first Tectonic build may download LaTeX support files at runtime. Creating a project from a bundled template does not require a network connection.
+The local development manifest uses the `.Devel` application ID so GNOME Builder and Glycin can identify an uninstalled development build correctly. The application reads `FLATPAK_ID` at startup, so its `GApplication` ID follows the selected Flatpak manifest; a native launch keeps the stable ID. This manifest uses GNOME Platform/SDK 51 and the stable Rust SDK extension. The first Tectonic build may download LaTeX support files at runtime. Creating a project from a bundled template does not require a network connection.
 
-In GNOME Builder, use `io.github.diegopn.ovenbird.json` as the Flatpak manifest. If the build still reports `org.ovenbird.Ovenbird`, recreate the build configuration from the current manifest; Builder is using the old application ID.
+In GNOME Builder, use `io.github.diegopn.ovenbird.json` as the Flatpak manifest. If the build still reports `org.ovenbird.Ovenbird` or the stable ID `io.github.diegopn.ovenbird`, recreate the build configuration from the current manifest; Builder is using an old application ID.
 
 ## Local data
 

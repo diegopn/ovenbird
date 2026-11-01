@@ -24,6 +24,7 @@ rust_sources = files(
   '../rust/src/history.rs',
   '../rust/src/i18n.rs',
   '../rust/src/libpanel.rs',
+  '../rust/src/runtime.rs',
   '../rust/src/latex.rs',
   '../rust/src/project.rs',
   '../rust/src/pdf_preview.rs',
