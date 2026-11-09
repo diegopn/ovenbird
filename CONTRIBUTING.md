@@ -1,10 +1,10 @@
 # Contributing
 
-Small, focused changes are easiest to review. Use [BUILDING.md](BUILDING.md) for platform dependencies and local build instructions.
+Small, focused changes are easiest to review. By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md). For security vulnerabilities, follow [SECURITY.md](SECURITY.md) and do not report them publicly.
 
 ## Development setup
 
-For a native build, install the packages listed in [BUILDING.md](BUILDING.md), then run:
+For a native build, install the packages listed in the [README build instructions](README.md#building-from-source-on-linux), then run:
 
 ```sh
 meson setup build
@@ -23,7 +23,7 @@ meson test -C build --print-errorlogs
 
 GitHub Actions runs the same quality checks on pushes and pull requests. Meson is the integration build and runs Cargo offline with the repository's dependency cache.
 
-For a local Flatpak build, use the GNOME SDK and Rust extension described in [BUILDING.md](BUILDING.md). Keep native and Flatpak build directories separate.
+For a local Flatpak build, use the GNOME SDK and Rust extension described in the [README build instructions](README.md#building-from-source-on-linux). Keep native and Flatpak build directories separate.
 
 ## Security checks
 
