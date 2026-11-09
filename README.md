@@ -1,10 +1,20 @@
-# Ovenbird
+<p align="center">
+  <a href="https://diegopn.github.io/ovenbird-site/">
+    <img src="data/io.github.diegopn.ovenbird.svg" alt="Ovenbird icon" width="112" />
+  </a>
+</p>
 
-A native GNOME workspace for writing and compiling LaTeX projects, previewing PDFs, and managing a local BibTeX library. Project documents remain ordinary files that you can open with other tools.
+<h1 align="center">Ovenbird</h1>
 
-[Download the latest release](https://github.com/diegopn/ovenbird/releases/latest) · [Project website](https://diegopn.github.io/ovenbird-site/) · [User manual](https://diegopn.github.io/ovenbird-site/manual/)
+<p align="center">A native GNOME workspace for writing and compiling LaTeX projects, previewing PDFs, and managing a local BibTeX library.</p>
 
-Created by Diego Pereira do Nascimento.
+<p align="center">
+  <a href="https://github.com/diegopn/ovenbird/releases/latest">Download</a> ·
+  <a href="https://diegopn.github.io/ovenbird-site/">Website</a> ·
+  <a href="https://diegopn.github.io/ovenbird-site/manual/">User manual</a>
+</p>
+
+Project documents remain ordinary files that you can open with other tools.
 
 ## Features
 
