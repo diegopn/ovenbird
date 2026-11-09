@@ -1,10 +1,10 @@
 # Contributing
 
-Small, focused changes are easiest to review. Before opening an issue or pull request, check the build instructions in the [README](README.md).
+Small, focused changes are easiest to review. Use [BUILDING.md](BUILDING.md) for platform dependencies and local build instructions.
 
 ## Development setup
 
-For a native Fedora build, install the packages listed in the README, then run:
+For a native build, install the packages listed in [BUILDING.md](BUILDING.md), then run:
 
 ```sh
 meson setup build
@@ -23,7 +23,7 @@ meson test -C build --print-errorlogs
 
 GitHub Actions runs the same quality checks on pushes and pull requests. Meson is the integration build and runs Cargo offline with the repository's dependency cache.
 
-For a local Flatpak build, use the GNOME SDK and Rust extension described in the README. Keep native and Flatpak build directories separate.
+For a local Flatpak build, use the GNOME SDK and Rust extension described in [BUILDING.md](BUILDING.md). Keep native and Flatpak build directories separate.
 
 ## Security checks
 
