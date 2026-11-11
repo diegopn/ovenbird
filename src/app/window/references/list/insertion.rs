@@ -5,6 +5,7 @@ pub(in crate::app::window) fn insert_latex_citation(
     entry: &BibEntry,
 ) -> Result<(), String> {
     let current_file = state
+        .project
         .current_file
         .borrow()
         .clone()
@@ -25,11 +26,13 @@ pub(in crate::app::window) fn insert_latex_bibliography_reference(
     style: bibtex::ReferenceStyle,
 ) -> Result<(), String> {
     let current_file = state
+        .project
         .current_file
         .borrow()
         .clone()
         .ok_or_else(|| tr("Save the document before inserting a citation."))?;
     let main_path = state
+        .project
         .main_tex
         .borrow()
         .clone()
@@ -89,6 +92,7 @@ pub(in crate::app::window) fn insert_bibtex_reference(
     entry: &BibEntry,
 ) -> Result<(), String> {
     let current_file = state
+        .project
         .current_file
         .borrow()
         .clone()

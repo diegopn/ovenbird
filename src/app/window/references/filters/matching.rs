@@ -80,7 +80,6 @@ pub(in crate::app::window) fn reference_tags(entry: &BibEntry) -> Vec<String> {
 }
 
 #[cfg(test)]
-
 pub(in crate::app::window) fn reference_matches_filters(
     entry: &BibEntry,
     author: Option<&str>,

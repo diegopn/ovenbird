@@ -99,7 +99,6 @@
             ".tooling",
             "_build",
             "_flatpak-build",
-            "flatpak",
             "build",
             "build-check",
             "docs",

@@ -216,6 +216,7 @@ pub(super) fn choose_image(state: Rc<State>) {
 
 pub(super) fn choose_image_selected(state: Rc<State>, source: PathBuf) {
     let Some(folder) = state
+        .project
         .project_target
         .borrow()
         .clone()
@@ -234,12 +235,14 @@ pub(super) fn choose_image_selected(state: Rc<State>, source: PathBuf) {
     let source = source.to_path_buf();
     let folder_for_worker = folder.clone();
     let root_for_insert = state
+        .project
         .project_root
         .borrow()
         .clone()
         .unwrap_or(folder.clone());
     let current_file = state.project.current_file.borrow().clone();
     let main_file = state
+        .project
         .main_tex
         .borrow()
         .clone()

@@ -125,6 +125,7 @@ pub(in crate::app::window) fn setup_project_file_view(state: &Rc<State>) {
         .file_tree
         .connect_activate(move |_, position| {
             let Some(model) = state_for_activate
+                .project
                 .file_tree_selection
                 .model()
                 .and_then(|model| model.downcast::<gtk::TreeListModel>().ok())
@@ -156,6 +157,7 @@ pub(in crate::app::window) fn setup_project_file_view(state: &Rc<State>) {
 
     let state_for_selection = state.clone();
     state
+        .project
         .file_tree_selection
         .connect_selected_notify(move |selection| {
             let Some(tree_row) = selection

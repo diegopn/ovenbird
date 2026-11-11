@@ -61,13 +61,8 @@ mod search;
 mod utilities;
 mod visual;
 
-use self::construction::*;
 use self::diagnostics::*;
-use self::document::*;
-use self::editing::*;
-use self::history::*;
 use self::history_helpers::*;
-use self::search::*;
 use self::utilities::*;
 use self::visual::*;
 

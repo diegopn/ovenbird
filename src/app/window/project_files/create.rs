@@ -10,6 +10,7 @@ pub(in crate::app::window) fn create_project_file(state: &Rc<State>, extension: 
 pub(in crate::app::window) fn create_project_file_confirmed(state: &Rc<State>, extension: &str) {
     let extension = extension.to_owned();
     if let Some(folder) = state
+        .project
         .project_target
         .borrow()
         .clone()
@@ -113,6 +114,7 @@ pub(in crate::app::window) fn prompt_create_file(
         let state_for_result = state2.clone();
         let extension_for_result = extension.clone();
         let project_root = state2
+            .project
             .project_root
             .borrow()
             .clone()
@@ -138,6 +140,7 @@ pub(in crate::app::window) fn prompt_create_file(
 
 pub(in crate::app::window) fn create_project_folder(state: Rc<State>) {
     let folder = state
+        .project
         .project_target
         .borrow()
         .clone()
@@ -203,6 +206,7 @@ pub(in crate::app::window) fn prompt_create_folder(state: &Rc<State>, parent: &P
         poll_result(receiver, move |result| match result {
             Ok(()) => {
                 state_for_result
+                    .project
                     .expanded_folders
                     .borrow_mut()
                     .insert(parent_for_result.clone());

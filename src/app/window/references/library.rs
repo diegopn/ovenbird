@@ -259,6 +259,7 @@ pub(in crate::app::window) fn refresh_tags(state: &Rc<State>) {
         row.append(&delete);
         state.library_ui.tags_list.append(&row);
         state
+            .library_ui
             .tags_list
             .append(&gtk::Separator::new(gtk::Orientation::Horizontal));
     }
@@ -400,6 +401,7 @@ pub(in crate::app::window) fn refresh_authors(state: &Rc<State>) {
         row.append(&delete);
         state.library_ui.authors_list.append(&row);
         state
+            .library_ui
             .authors_list
             .append(&gtk::Separator::new(gtk::Orientation::Horizontal));
     }

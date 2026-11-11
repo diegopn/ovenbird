@@ -32,6 +32,7 @@ pub(super) fn update_editor_capabilities(state: &Rc<State>) {
         .find_document_button
         .set_visible(supports_search);
     state
+        .editor_ui
         .bibtex_citation_button
         .set_visible(kind == Some(ProjectFileKind::Bibtex));
     state.editor_ui.latex_toolbar.set_visible(supports_latex);
@@ -61,6 +62,7 @@ pub(super) fn supports_latex_document(state: &Rc<State>) -> bool {
 
 pub(super) fn current_file_kind(state: &Rc<State>) -> Option<ProjectFileKind> {
     state
+        .project
         .current_file
         .borrow()
         .as_deref()

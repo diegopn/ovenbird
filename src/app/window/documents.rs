@@ -315,6 +315,7 @@ pub(super) fn open_project(
             .or_else(|| folder_named_main.filter(|path| documents.contains(path)))
             .or_else(|| {
                 state
+                    .project
                     .main_tex
                     .borrow()
                     .clone()

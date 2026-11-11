@@ -42,6 +42,7 @@ pub fn entry_matches_search(entry: &BibEntry, query: &str) -> bool {
         })
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Bibliography {
     pub entries: Vec<BibEntry>,
     pub directives: Vec<String>,

@@ -191,6 +191,7 @@ pub(in crate::app::window) fn refresh_build_status(state: &Rc<State>) {
     state.editor_ui.status.set_label(&display_state);
 
     let filename = state
+        .project
         .current_file
         .borrow()
         .as_ref()
@@ -225,6 +226,7 @@ pub(in crate::app::window) fn update_build_status(
 ) {
     state.build_ui.build_state.replace(status.to_owned());
     state
+        .build_ui
         .build_failure_message
         .replace(failure_message.map(str::to_owned));
     if status == "Ready" {

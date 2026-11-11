@@ -205,6 +205,7 @@ pub(in crate::app::window) fn move_project_file_to(
             let root = state_for_result.project.project_root.borrow().clone();
             if root.as_deref() != Some(destination_for_result.as_path()) {
                 state_for_result
+                    .project
                     .expanded_folders
                     .borrow_mut()
                     .insert(destination_for_result.clone());

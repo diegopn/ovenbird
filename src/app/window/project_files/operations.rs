@@ -70,6 +70,7 @@ pub(in crate::app::window) fn trash_project_file(state: &Rc<State>, path: &Path)
         &tr("Move to Trash"),
         move |state| {
             let active_file_is_being_removed = state
+                .project
                 .current_file
                 .borrow()
                 .as_ref()
@@ -108,11 +109,13 @@ pub(in crate::app::window) fn finish_project_file_removal(
     success_message: &str,
 ) {
     let current_removed = state
+        .project
         .current_file
         .borrow()
         .as_ref()
         .is_some_and(|current| project::path_contains(path, current));
     let main_removed = state
+        .project
         .main_tex
         .borrow()
         .as_ref()
@@ -137,6 +140,7 @@ pub(in crate::app::window) fn finish_project_file_removal(
     }
     if let Some(root) = state.project.project_root.borrow().clone() {
         if state
+            .project
             .project_target
             .borrow()
             .as_ref()
@@ -145,6 +149,7 @@ pub(in crate::app::window) fn finish_project_file_removal(
             *state.project.project_target.borrow_mut() = Some(root.clone());
         }
         state
+            .project
             .expanded_folders
             .borrow_mut()
             .retain(|folder| !project::path_contains(path, folder));

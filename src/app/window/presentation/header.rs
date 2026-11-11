@@ -34,6 +34,7 @@ pub(in crate::app::window) fn build_header(state: &Rc<State>) {
         .reference_summary
         .replace(Some(reference_summary));
     state
+        .build_ui
         .reference_summary_group
         .replace(Some(reference_summary_group));
     state
