@@ -330,7 +330,7 @@ pub(super) fn show_about_dialog(state: &Rc<State>) {
             label.set_xalign(0.0);
             label.set_hexpand(true);
             row.append(&label);
-            row.append(&gtk::Image::from_icon_name("adw-external-link-symbolic"));
+            row.append(&gtk::Image::from_icon_name("web-browser-symbolic"));
             link.set_child(Some(&row));
             links.append(&link);
         }

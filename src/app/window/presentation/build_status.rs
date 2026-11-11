@@ -6,7 +6,7 @@ pub(in crate::app::window) fn build_status_widgets(status: gtk::Label) -> BuildS
     status_row.append(&gtk::Separator::new(gtk::Orientation::Vertical));
     let status_contents = gtk::Box::new(gtk::Orientation::Horizontal, 5);
     status_contents.set_valign(gtk::Align::Center);
-    let icon = gtk::Image::from_icon_name("emblem-ok-symbolic");
+    let icon = gtk::Image::from_icon_name("checkbox-checked-symbolic");
     icon.set_pixel_size(14);
     status_contents.append(&icon);
     status_contents.append(&status);
