@@ -1,7 +1,7 @@
 use super::*;
 
 pub(super) fn with_discard_confirmation(state: &Rc<State>, callback: impl Fn(Rc<State>) + 'static) {
-    if state.save_in_progress.get() {
+    if state.project.save_in_progress.get() {
         show_toast(state, &tr("A document save is still in progress."));
         return;
     }
@@ -30,8 +30,8 @@ pub(super) fn with_discard_confirmation(state: &Rc<State>, callback: impl Fn(Rc<
             callback(state.clone());
             dialog.close();
         } else if response == gtk::ResponseType::Accept {
-            if state.current_file.borrow().is_some() {
-                let path = state.current_file.borrow().clone().unwrap();
+            if state.project.current_file.borrow().is_some() {
+                let path = state.project.current_file.borrow().clone().unwrap();
                 save_document_to_path(state.clone(), path, Some(callback.clone()));
                 dialog.close();
             } else {
@@ -48,7 +48,7 @@ pub(super) fn with_discard_confirmation(state: &Rc<State>, callback: impl Fn(Rc<
                             return;
                         }
                         state.editor.set_file(Some(path.clone()));
-                        *state.current_file.borrow_mut() = Some(path.clone());
+                        *state.project.current_file.borrow_mut() = Some(path.clone());
                         set_project_root(&state, path.parent().map(Path::to_path_buf));
                         update_editor_capabilities(&state);
                         save_document_to_path(state, path, Some(callback.clone()));
@@ -167,11 +167,17 @@ pub(super) fn show_link_dialog(state: Rc<State>) {
 }
 
 pub(super) fn choose_image(state: Rc<State>) {
-    if state.current_file.borrow().as_ref().is_none_or(|path| {
-        !path
-            .extension()
-            .is_some_and(|extension| extension.eq_ignore_ascii_case("tex"))
-    }) {
+    if state
+        .project
+        .current_file
+        .borrow()
+        .as_ref()
+        .is_none_or(|path| {
+            !path
+                .extension()
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("tex"))
+        })
+    {
         show_toast(
             &state,
             &tr("Open a LaTeX document before inserting an image."),
@@ -213,7 +219,7 @@ pub(super) fn choose_image_selected(state: Rc<State>, source: PathBuf) {
         .project_target
         .borrow()
         .clone()
-        .or_else(|| state.project_root.borrow().clone())
+        .or_else(|| state.project.project_root.borrow().clone())
     else {
         show_toast(
             &state,
@@ -232,7 +238,7 @@ pub(super) fn choose_image_selected(state: Rc<State>, source: PathBuf) {
         .borrow()
         .clone()
         .unwrap_or(folder.clone());
-    let current_file = state.current_file.borrow().clone();
+    let current_file = state.project.current_file.borrow().clone();
     let main_file = state
         .main_tex
         .borrow()
@@ -274,10 +280,11 @@ pub(super) fn choose_image_selected(state: Rc<State>, source: PathBuf) {
     });
     poll_result(receiver, move |result| match result {
         Ok(destination) => {
-            if state.project_root.borrow().as_deref() != Some(root_for_insert.as_path())
-                || state.current_file.borrow().as_ref() != current_file.as_ref()
+            if state.project.project_root.borrow().as_deref() != Some(root_for_insert.as_path())
+                || state.project.current_file.borrow().as_ref() != current_file.as_ref()
             {
-                if state.project_root.borrow().as_deref() == Some(root_for_insert.as_path()) {
+                if state.project.project_root.borrow().as_deref() == Some(root_for_insert.as_path())
+                {
                     refresh_project_files(&state);
                 }
                 show_toast(

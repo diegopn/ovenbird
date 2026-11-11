@@ -68,7 +68,7 @@ pub(super) fn choose_project_folder(state: Rc<State>) {
         None,
         |state, path| {
             with_discard_confirmation(&state, move |state| {
-                open_project(&state, &path, false, state.startup_view)
+                open_project(&state, &path, false, state.project.startup_view)
             });
         },
     );
@@ -91,16 +91,16 @@ pub(super) fn open_document_with_page(
         show_toast(state, &tr("This file type is not supported in the editor."));
         return;
     }
-    let request_id = state.open_request_id.get().wrapping_add(1);
-    state.open_request_id.set(request_id);
-    state.status.set_label(&tr("Opening document…"));
+    let request_id = state.project.open_request_id.get().wrapping_add(1);
+    state.project.open_request_id.set(request_id);
+    state.editor_ui.status.set_label(&tr("Opening document…"));
 
     if kind.is_previewable() {
         set_active_project_file_context(state, &path, root, request_id);
         state.editor.set_file(Some(path.clone()));
         state.editor.load_text("");
-        state.search_entry.set_text("");
-        state.search_panel.set_visible(false);
+        state.editor_ui.search_entry.set_text("");
+        state.editor_ui.search_panel.set_visible(false);
         match kind {
             ProjectFileKind::Image => {
                 state
@@ -120,7 +120,7 @@ pub(super) fn open_document_with_page(
             _ => unreachable!(),
         }
         update_editor_capabilities(state);
-        state.status.set_label(&tr("Ready"));
+        state.editor_ui.status.set_label(&tr("Ready"));
         set_build_status(state, "Ready");
         refresh_project_files(state);
         update_title(state, false);
@@ -137,13 +137,13 @@ pub(super) fn open_document_with_page(
     });
     let state = state.clone();
     poll_result(receiver, move |(request_id, path, root, result)| {
-        if state.open_request_id.get() != request_id {
+        if state.project.open_request_id.get() != request_id {
             return;
         }
         match result {
             Ok((text, encoding)) => {
                 set_active_project_file_context(&state, &path, root, request_id);
-                state.file_encoding.set(encoding);
+                state.project.file_encoding.set(encoding);
                 state.image_preview.set_filename(None::<&Path>);
                 state
                     .file_pdf_preview
@@ -151,12 +151,12 @@ pub(super) fn open_document_with_page(
                 state.editor.set_file(Some(path));
                 state.editor.load_text(&text);
                 state.editor.set_mode(EditorMode::Code);
-                state.search_entry.set_text("");
-                state.search_panel.set_visible(false);
-                state.code_mode_button.set_active(true);
-                state.visual_mode_button.set_active(false);
+                state.editor_ui.search_entry.set_text("");
+                state.editor_ui.search_panel.set_visible(false);
+                state.editor_ui.code_mode_button.set_active(true);
+                state.editor_ui.visual_mode_button.set_active(false);
                 update_editor_capabilities(&state);
-                state.status.set_label(&tr("Ready"));
+                state.editor_ui.status.set_label(&tr("Ready"));
                 set_build_status(&state, "Ready");
                 state.editor.focus();
                 refresh_project_files(&state);
@@ -164,7 +164,7 @@ pub(super) fn open_document_with_page(
                 show_page(&state, page_after_open.unwrap_or("editor"));
             }
             Err(error) => {
-                state.status.set_label(&tr("Ready"));
+                state.editor_ui.status.set_label(&tr("Ready"));
                 show_toast(
                     &state,
                     &format!("{}: {error}", tr("Could not open the document")),
@@ -184,7 +184,7 @@ pub(super) fn set_active_project_file_context(
     let is_tex = project::file_kind(path) == ProjectFileKind::Latex;
     set_project_root(state, root.clone());
     if let Some(root) = root.as_deref() {
-        let mut expanded = state.expanded_folders.borrow_mut();
+        let mut expanded = state.project.expanded_folders.borrow_mut();
         let mut parent = path.parent();
         while let Some(folder) = parent {
             if folder == root {
@@ -194,31 +194,36 @@ pub(super) fn set_active_project_file_context(
             parent = folder.parent();
         }
     }
-    *state.current_file.borrow_mut() = Some(path.to_path_buf());
+    *state.project.current_file.borrow_mut() = Some(path.to_path_buf());
     if is_tex {
-        *state.main_tex.borrow_mut() = Some(path.to_path_buf());
+        *state.project.main_tex.borrow_mut() = Some(path.to_path_buf());
     } else {
-        let main_is_available = state.main_tex.borrow().as_deref().is_some_and(|main| {
-            root.as_deref()
-                .is_some_and(|folder| main.starts_with(folder))
-        });
+        let main_is_available = state
+            .project
+            .main_tex
+            .borrow()
+            .as_deref()
+            .is_some_and(|main| {
+                root.as_deref()
+                    .is_some_and(|folder| main.starts_with(folder))
+            });
         if !main_is_available {
-            *state.main_tex.borrow_mut() = None;
+            *state.project.main_tex.borrow_mut() = None;
             if let Some(root) = root.clone() {
                 find_project_main_async(state, root, path.to_path_buf(), request_id);
             }
         }
     }
-    state.project_target.replace(root);
+    state.project.project_target.replace(root);
 }
 
 pub(super) fn set_project_root(state: &Rc<State>, root: Option<PathBuf>) {
-    let root_changed = state.project_root.borrow().as_ref() != root.as_ref();
+    let root_changed = state.project.project_root.borrow().as_ref() != root.as_ref();
     if root_changed {
-        state.expanded_folders.borrow_mut().clear();
-        state.project_files_scroll.set_value(0.0);
+        state.project.expanded_folders.borrow_mut().clear();
+        state.project.project_files_scroll.set_value(0.0);
     }
-    *state.project_root.borrow_mut() = root;
+    *state.project.project_root.borrow_mut() = root;
 }
 
 pub(super) fn find_project_main_async(
@@ -237,13 +242,13 @@ pub(super) fn find_project_main_async(
     });
     let state = state.clone();
     poll_result(receiver, move |main| {
-        if state.open_request_id.get() != request_id
-            || state.current_file.borrow().as_deref() != Some(current_file.as_path())
-            || state.project_root.borrow().as_deref() != Some(root.as_path())
+        if state.project.open_request_id.get() != request_id
+            || state.project.current_file.borrow().as_deref() != Some(current_file.as_path())
+            || state.project.project_root.borrow().as_deref() != Some(root.as_path())
         {
             return;
         }
-        *state.main_tex.borrow_mut() = main;
+        *state.project.main_tex.borrow_mut() = main;
         refresh_build_status(&state);
     });
 }
@@ -256,14 +261,14 @@ pub(super) fn open_project(
 ) {
     let folder = folder.to_path_buf();
     set_project_root(state, Some(folder.clone()));
-    *state.project_target.borrow_mut() = Some(folder.clone());
+    *state.project.project_target.borrow_mut() = Some(folder.clone());
     refresh_build_status(state);
-    state.expanded_folders.borrow_mut().clear();
-    state.project_files_scroll.set_value(0.0);
+    state.project.expanded_folders.borrow_mut().clear();
+    state.project.project_files_scroll.set_value(0.0);
     refresh_project_files(state);
-    let request_id = state.project_open_id.get().wrapping_add(1);
-    state.project_open_id.set(request_id);
-    state.status.set_label(&tr("Loading project…"));
+    let request_id = state.project.project_open_id.get().wrapping_add(1);
+    state.project.project_open_id.set(request_id);
+    state.editor_ui.status.set_label(&tr("Loading project…"));
     let folder_for_worker = folder.clone();
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn(move || {
@@ -273,12 +278,12 @@ pub(super) fn open_project(
     });
     let state = state.clone();
     poll_result(receiver, move |(request_id, folder, result)| {
-        if state.project_open_id.get() != request_id
-            || state.project_root.borrow().as_deref() != Some(folder.as_path())
+        if state.project.project_open_id.get() != request_id
+            || state.project.project_root.borrow().as_deref() != Some(folder.as_path())
         {
             return;
         }
-        state.status.set_label(&tr("Ready"));
+        state.editor_ui.status.set_label(&tr("Ready"));
         let documents = match result {
             Ok(documents) => {
                 remember_last_project_folder(&folder);
@@ -287,8 +292,8 @@ pub(super) fn open_project(
             Err(error) => {
                 if restoring {
                     set_project_root(&state, None);
-                    state.project_target.borrow_mut().take();
-                    state.main_tex.borrow_mut().take();
+                    state.project.project_target.borrow_mut().take();
+                    state.project.main_tex.borrow_mut().take();
                     refresh_project_files(&state);
                 }
                 show_toast(
@@ -316,7 +321,7 @@ pub(super) fn open_project(
                     .filter(|path| documents.contains(path))
             })
             .or_else(|| (documents.len() == 1).then(|| documents[0].clone()));
-        *state.main_tex.borrow_mut() = main.clone();
+        *state.project.main_tex.borrow_mut() = main.clone();
         let page_after_open = restoring.then(|| startup_page_name(startup_view));
         if let Some(main) = main {
             open_document_with_page(&state, &main, Some(folder), page_after_open);
@@ -397,7 +402,7 @@ pub(super) fn choose_main_document(
 }
 
 pub(super) fn save_document(state: Rc<State>) {
-    let current_file = state.current_file.borrow().clone();
+    let current_file = state.project.current_file.borrow().clone();
     if let Some(path) = current_file {
         if project::file_kind(&path).is_previewable() {
             return;
@@ -406,7 +411,7 @@ pub(super) fn save_document(state: Rc<State>) {
             .extension()
             .is_some_and(|ext| ext.eq_ignore_ascii_case("tex"))
         {
-            *state.main_tex.borrow_mut() = Some(path.clone());
+            *state.project.main_tex.borrow_mut() = Some(path.clone());
         }
         save_document_to_path(state, path, None);
         return;
@@ -423,13 +428,13 @@ pub(super) fn save_document(state: Rc<State>) {
                 return;
             }
             state.editor.set_file(Some(path.clone()));
-            *state.current_file.borrow_mut() = Some(path.clone());
+            *state.project.current_file.borrow_mut() = Some(path.clone());
             set_project_root(&state, path.parent().map(Path::to_path_buf));
             if path
                 .extension()
                 .is_some_and(|ext| ext.eq_ignore_ascii_case("tex"))
             {
-                *state.main_tex.borrow_mut() = Some(path.clone());
+                *state.project.main_tex.borrow_mut() = Some(path.clone());
             }
             update_editor_capabilities(&state);
             save_document_to_path(state, path, None);
@@ -445,13 +450,13 @@ pub(super) fn save_document_to_path(state: Rc<State>, path: PathBuf, after: Opti
         );
         return;
     }
-    if state.save_in_progress.replace(true) {
+    if state.project.save_in_progress.replace(true) {
         show_toast(&state, &tr("A document save is still in progress."));
         return;
     }
     let source = state.editor.text();
-    let encoding = state.file_encoding.get();
-    state.status.set_label(&tr("Saving…"));
+    let encoding = state.project.file_encoding.get();
+    state.editor_ui.status.set_label(&tr("Saving…"));
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn(move || {
         let result = project::encode_text(&source, encoding).and_then(|bytes| {
@@ -460,8 +465,8 @@ pub(super) fn save_document_to_path(state: Rc<State>, path: PathBuf, after: Opti
         let _ = sender.send((result, path, source));
     });
     poll_result(receiver, move |(result, path, source)| {
-        state.save_in_progress.set(false);
-        state.status.set_label(&tr("Ready"));
+        state.project.save_in_progress.set(false);
+        state.editor_ui.status.set_label(&tr("Ready"));
         match result {
             Ok(()) => {
                 state.editor.mark_saved(&source);

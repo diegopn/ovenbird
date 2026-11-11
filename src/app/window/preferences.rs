@@ -236,7 +236,7 @@ pub(super) fn schedule_last_project_restore(state: &Rc<State>) {
         let Some(state) = state.upgrade() else {
             return;
         };
-        if state.startup_restore_cancelled.get() {
+        if state.project.startup_restore_cancelled.get() {
             return;
         }
 
@@ -268,7 +268,7 @@ pub(super) fn schedule_last_project_restore(state: &Rc<State>) {
             return;
         }
 
-        open_project(&state, &folder, true, state.startup_view);
+        open_project(&state, &folder, true, state.project.startup_view);
     });
 }
 

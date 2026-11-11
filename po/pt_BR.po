@@ -12,298 +12,333 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: src/ui/editor/diagnostics.rs:89
 msgid "Syntax problems"
 msgstr "Problemas de sintaxe"
 
+#: src/ui/editor/construction.rs:92 src/ui/editor/diagnostics.rs:150
 msgid "Checking document…"
 msgstr "Verificando documento…"
 
+#: src/ui/editor.rs:129 src/ui/editor/diagnostics.rs:83
 msgid "The document appears ready to compile."
 msgstr "Aparentemente, o documento está pronto para ser compilado."
 
+#: src/ui/editor.rs:109 src/ui/editor/diagnostics.rs:65
 msgid "Line"
 msgstr "Linha"
 
+#: src/ui/editor/diagnostics.rs:32
 msgid "Unmatched closing brace"
 msgstr "Chave de fechamento sem par"
 
+#: src/ui/editor/diagnostics.rs:35
 msgid "Opening brace is not closed"
 msgstr "Chave de abertura não foi fechada"
 
+#: src/ui/editor/diagnostics.rs:44
 msgid "Environment is not closed: "
 msgstr "Ambiente não fechado: "
 
+#: src/ui/editor/diagnostics.rs:39
 msgid "Environment end has no matching begin: "
 msgstr "Fim do ambiente sem início correspondente: "
 
+#: src/ui/editor/diagnostics.rs:123
 msgid "Additional syntax problems are not shown."
 msgstr "Os problemas de sintaxe adicionais não são exibidos."
 
+#: src/ui/editor/diagnostics.rs:49
 msgid "Math delimiter has no matching opener: "
 msgstr "Delimitador matemático sem abertura correspondente: "
 
+#: src/ui/editor/diagnostics.rs:54
 msgid "Math delimiter is not closed: "
 msgstr "Delimitador matemático não foi fechado: "
 
+#: src/ui/editor/diagnostics.rs:59
 msgid "Math delimiter opens inside another math expression: "
 msgstr "Delimitador matemático dentro de outra expressão matemática: "
 
-#: src/references/bibtex.rs:50
+#: src/references/bibtex/schema.rs:17
 msgid "Journal article"
 msgstr "Artigo de periódico"
 
-#: src/references/bibtex.rs:51
+#: src/references/bibtex/schema.rs:18
 msgid "Book"
 msgstr "Livro"
 
-#: src/references/bibtex.rs:52
+#: src/references/bibtex/schema.rs:19
 msgid "Book chapter"
 msgstr "Capítulo de livro"
 
-#: src/references/bibtex.rs:53
+#: src/references/bibtex/schema.rs:20
 msgid "Conference paper"
 msgstr "Artigo para conferência"
 
-#: src/references/bibtex.rs:54
+#: src/references/bibtex/schema.rs:21
 msgid "Doctoral thesis"
 msgstr "Tese de doutorado"
 
-#: src/references/bibtex.rs:55
+#: src/references/bibtex/schema.rs:22
 msgid "Master's thesis"
 msgstr "Dissertação de mestrado"
 
-#: src/references/bibtex.rs:56
+#: src/references/bibtex/schema.rs:23
 msgid "Technical report"
 msgstr "Relatório técnico"
 
-#: src/references/bibtex.rs:57
+#: src/references/bibtex/schema.rs:24
 msgid "Online resource"
 msgstr "Recurso on-line"
 
-#: src/references/bibtex.rs:58
+#: src/references/bibtex/schema.rs:25
 msgid "Miscellaneous"
 msgstr "Outros"
 
-#: src/references/bibtex.rs:64
+#: src/references/bibtex/schema.rs:31 src/app/window/presentation/reference_pages.rs:49
 msgid "Title"
 msgstr "Título"
 
-#: src/references/bibtex.rs:65
+#: src/references/bibtex/schema.rs:32
 msgid "Author(s)"
 msgstr "Autor(es)"
 
-#: src/references/bibtex.rs:66
+#: src/references/bibtex/schema.rs:33
 msgid "Editor(s)"
 msgstr "Editor(es)"
 
-#: src/references/bibtex.rs:67
+#: src/references/bibtex/schema.rs:34
 msgid "Year / date"
 msgstr "Ano / data"
 
-#: src/references/bibtex.rs
+#: src/references/bibtex/schema.rs:35 src/app/window/presentation/reference_pages.rs:49
 msgid "Year"
 msgstr "Ano"
 
-#: src/references/bibtex.rs:68
+#: src/references/bibtex/schema.rs:36
 msgid "Journal"
 msgstr "Periódico"
 
-#: src/references/bibtex.rs:69
+#: src/references/bibtex/schema.rs:37
 msgid "Publisher"
 msgstr "Editora"
 
-#: src/references/bibtex.rs:70
+#: src/references/bibtex/schema.rs:38
 msgid "Volume"
 msgstr "Volume"
 
-#: src/references/bibtex.rs:71
+#: src/references/bibtex/schema.rs:39
 msgid "Number / issue"
 msgstr "Número / edição"
 
-#: src/references/bibtex.rs:72
+#: src/references/bibtex/schema.rs:40
 msgid "Edition"
 msgstr "Edição"
 
-#: src/references/bibtex.rs:73
+#: src/references/bibtex/schema.rs:41
 msgid "Pages"
 msgstr "Páginas"
 
-#: src/references/bibtex.rs:74
+#: src/references/bibtex/schema.rs:42
 msgid "DOI"
 msgstr "DOI"
 
-#: src/references/bibtex.rs:75 src/app/window/presentation.rs:1035
+#: src/references/bibtex/schema.rs:43 src/app/window/dialogs.rs:134
 msgid "URL"
 msgstr "URL"
 
-#: src/references/bibtex.rs:76
+#: src/references/bibtex/schema.rs:44
 msgid "Keywords"
 msgstr "Palavras-chave"
 
-#: src/references/bibtex.rs:106
+#: src/references/bibtex/schema.rs:45 src/app/window/references/editor/tag.rs:139
 msgid "Tags"
 msgstr "Tags"
 
+#: src/app/window/presentation/reference_pages.rs:108
 msgid "Manage tags"
 msgstr "Gerenciar tags"
 
+#: src/app/window/presentation/reference_pages.rs:113
+#: src/app/window/presentation/build_status.rs:100 src/app/window/references/editor/tag.rs:118
 msgid "Add tag"
 msgstr "Adicionar tag"
 
+#: src/app/window/references/library.rs:248
 msgid "Edit tag"
 msgstr "Editar tag"
 
+#: src/app/window/references/library.rs:254 src/app/window/references/tags.rs:74
 msgid "Remove tag"
 msgstr "Remover tag"
 
 msgid "Create and organize tags for your references."
 msgstr "Crie e organize tags para suas referências."
 
+#: src/app/window/references/library.rs:212
 msgid "No tags yet. Add a tag to organize your references."
 msgstr "Ainda não há tags. Adicione uma tag para organizar suas referências."
 
+#: src/app/window/references/tags.rs:28
 msgid "Tag name"
 msgstr "Nome da tag"
 
+#: src/app/window/references/tags.rs:49
 msgid "Tag saved"
 msgstr "Tag salva"
 
+#: src/app/window/references/tags.rs:81
 msgid "Tag removed"
 msgstr "Tag removida"
 
+#: src/app/window/references/tags.rs:66
 msgid "Remove tag ‘%s’ from the list and all references?"
 msgstr "Remover a tag ‘%s’ da lista e de todas as referências?"
 
+#: src/app/window/references/editor/tag.rs:47
 msgid "Find tags…"
 msgstr "Buscar tags…"
 
+#: src/app/window/presentation/reference_pages.rs:123
 msgid "Name"
 msgstr "Nome"
 
+#: src/app/window/references/editor/tag.rs:59
 msgid "New tag"
 msgstr "Nova tag"
 
+#: src/app/window/references/editor/tag.rs:112
 msgid "Create and select this tag"
 msgstr "Criar e selecionar esta tag"
 
+#: src/app/window/references/editor/tag.rs:119
 msgid "Select or create tags"
 msgstr "Selecionar ou criar tags"
 
+#: src/app/window/references/filters/tag_selection.rs:63
 msgid "Remove tag from this reference"
 msgstr "Remover tag desta referência"
 
+#: src/app/window/references/filters/tag_selection.rs:95
 msgid "No matching tags"
 msgstr "Nenhuma tag correspondente"
 
+#: src/references/library.rs:334 src/references/library.rs:347
 msgid "Enter a tag name."
 msgstr "Digite um nome para a tag."
 
+#: src/references/library.rs:337 src/references/library.rs:362
 msgid "That tag already exists."
 msgstr "Essa tag já existe."
 
+#: src/references/library.rs:354
 msgid "The tag no longer exists."
 msgstr "Essa tag não existe mais."
 
+#: src/app/window/references/list/picker.rs:180
 msgid "Type: %s"
 msgstr "Tipo: %s"
 
-#: src/references/bibtex.rs:77
+#: src/references/bibtex/schema.rs:46
 msgid "Series"
 msgstr "Série"
 
-#: src/references/bibtex.rs:78
+#: src/references/bibtex/schema.rs:47
 msgid "Publication location"
 msgstr "Local de publicação"
 
-#: src/references/bibtex.rs:79
+#: src/references/bibtex/schema.rs:48
 msgid "ISBN"
 msgstr "ISBN"
 
-#: src/references/bibtex.rs:80
+#: src/references/bibtex/schema.rs:49
 msgid "Chapter"
 msgstr "Capítulo"
 
-#: src/references/bibtex.rs:81
+#: src/references/bibtex/schema.rs:50
 msgid "Website or organization"
 msgstr "Site ou organização"
 
-#: src/references/bibtex.rs:82
+#: src/references/bibtex/schema.rs:51
 msgid "Organization"
 msgstr "Organização"
 
-#: src/references/bibtex.rs:83
+#: src/references/bibtex/schema.rs:52
 msgid "University or academic institution"
 msgstr "Universidade ou instituição acadêmica"
 
-#: src/references/bibtex.rs:84
+#: src/references/bibtex/schema.rs:53 src/app/window/presentation/reference_pages.rs:173
+#: src/app/window/references/authors.rs:101 src/app/window/references/authors.rs:108
+#: src/app/window/references/authors.rs:246
 msgid "Institution"
 msgstr "Instituição"
 
-#: src/references/bibtex.rs:85
+#: src/references/bibtex/schema.rs:54
 msgid "Report type"
 msgstr "Tipo de relatório"
 
-#: src/references/bibtex.rs:86
+#: src/references/bibtex/schema.rs:55
 msgid "Month"
 msgstr "Mês"
 
-#: src/references/bibtex.rs:87
+#: src/references/bibtex/schema.rs:56
 msgid "Note"
 msgstr "Observação"
 
-#: src/references/bibtex.rs:88
+#: src/references/bibtex/schema.rs:57
 msgid "Publication method"
 msgstr "Método de publicação"
 
-#: src/references/bibtex.rs:89
+#: src/references/bibtex/schema.rs:58
 msgid "Access date"
 msgstr "Data de acesso"
 
-#: src/references/bibtex.rs:90
+#: src/references/bibtex/schema.rs:59
 msgid "Proceedings title"
 msgstr "Título dos anais"
 
-#: src/references/bibtex.rs:91
+#: src/references/bibtex/schema.rs:60
 msgid "Book title"
 msgstr "Título do livro"
 
-#: src/ui/editor.rs:416
+#: src/ui/editor/construction.rs:265
 msgid "New document"
 msgstr "Novo documento"
 
-#: src/ui/editor.rs:417
+#: src/ui/editor/construction.rs:266
 msgid "Introduction"
 msgstr "Introdução"
 
-#: src/ui/editor.rs:418
+#: src/ui/editor/construction.rs:267
 msgid "Start writing here."
 msgstr "Comece a escrever aqui."
 
-#: src/ui/pdf_preview.rs:114
+#: src/ui/pdf_preview.rs:202
 msgid "Previous page"
 msgstr "Página anterior"
 
-#: src/ui/pdf_preview.rs:118
+#: src/ui/pdf_preview.rs:206
 msgid "Next page"
 msgstr "Próxima página"
 
-#: src/ui/pdf_preview.rs:207
+#: src/ui/pdf_preview.rs:213
 msgid "Zoom out"
 msgstr "Reduzir zoom"
 
-#: src/ui/pdf_preview.rs:212
+#: src/ui/pdf_preview.rs:218
 msgid "Zoom in"
 msgstr "Ampliar zoom"
 
-#: src/ui/pdf_preview.rs:128
+#: src/ui/pdf_preview.rs:229 src/app/window/actions.rs:370
 msgid "The compiled PDF will appear here"
 msgstr "O PDF compilado aparecerá aqui"
 
-#: src/ui/pdf_preview.rs:240
+#: src/ui/pdf_preview.rs:511
 msgid "The PDF has no pages."
 msgstr "O PDF não contém páginas."
 
-#: src/ui/pdf_preview.rs:258
+#: src/ui/pdf_preview.rs:541
 msgid "PDF opened in the default viewer"
 msgstr "PDF aberto no leitor padrão"
 
@@ -311,43 +346,43 @@ msgstr "PDF aberto no leitor padrão"
 msgid "Compile the document to create the PDF."
 msgstr "Compile o documento para gerar o PDF."
 
-#: src/app/window/mod.rs:165 src/app/window/presentation.rs:250
+#: src/app/window/mod.rs:386 src/app/window/presentation/build_status.rs:231
 msgid "Not built yet"
 msgstr "Ainda não compilado"
 
-#: src/app/window/mod.rs:218
+#: src/app/window/presentation/editor_page.rs:24
 msgid "Find in document"
 msgstr "Buscar no documento"
 
-#: src/app/window/mod.rs:227
+#: src/app/window/presentation/navigation.rs:70
 msgid "Main menu"
 msgstr "Menu do aplicativo"
 
-#: src/app/window/mod.rs:379
+#: src/app/window/mod.rs:462 src/app/window/preferences.rs:277
 msgid "About Ovenbird"
 msgstr "Sobre o Ovenbird"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:301
 msgid "Created by Diego Pereira do Nascimento"
 msgstr "Criado por Diego Pereira do Nascimento"
 
-#: src/app/window/mod.rs:381
+#: src/app/window/mod.rs:464
 msgid "Dedicated to my wife, Karina, who always encourages me to go further."
 msgstr "Dedicado à minha esposa Karina, que sempre me incentiva a ir além."
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:466
 msgid "Report an issue"
 msgstr "Relatar um problema"
 
-#: src/app/window/mod.rs:384
+#: src/app/window/mod.rs:467
 msgid "Project repository"
 msgstr "Repositório do projeto"
 
-#: src/app/window/mod.rs:385
+#: src/app/window/mod.rs:468
 msgid "Project website"
 msgstr "Site do projeto"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:469
 msgid "Project creator's website"
 msgstr "Site do criador do projeto"
 
@@ -355,23 +390,54 @@ msgstr "Site do criador do projeto"
 msgid "WORKSPACE"
 msgstr "ESPAÇO DE TRABALHO"
 
-#: src/app/window/mod.rs:241
+#: src/references/bibtex/schema.rs:33 src/ui/editor.rs:2 src/ui/editor.rs:29
+#: src/ui/editor.rs:30 src/ui/editor.rs:36 src/ui/editor.rs:78 src/ui/editor.rs:80
+#: src/ui/editor.rs:85 src/ui/editor.rs:86 src/ui/editor.rs:168 src/ui/editor.rs:169
+#: src/ui/editor/construction.rs:3 src/ui/editor/construction.rs:9
+#: src/ui/editor/construction.rs:108 src/ui/editor/construction.rs:112
+#: src/ui/editor/construction.rs:122 src/ui/editor/construction.rs:123
+#: src/ui/editor/construction.rs:158 src/ui/editor/construction.rs:159
+#: src/ui/editor/document.rs:3 src/ui/editor/document.rs:16 src/ui/editor/document.rs:69
+#: src/ui/editor/document.rs:79 src/ui/editor/document.rs:82 src/ui/editor/document.rs:108
+#: src/ui/editor/document.rs:109 src/ui/editor/document.rs:118 src/ui/editor/document.rs:210
+#: src/ui/editor/document.rs:211 src/ui/editor/document.rs:219 src/ui/editor/document.rs:220
+#: src/ui/editor/editing.rs:3 src/ui/editor/editing.rs:39 src/ui/editor/editing.rs:64
+#: src/ui/editor/editing.rs:114 src/ui/editor/editing.rs:136 src/ui/editor/editing.rs:201
+#: src/ui/editor/history.rs:3 src/ui/editor/history.rs:16 src/ui/editor/history.rs:102
+#: src/ui/editor/history.rs:104 src/ui/editor/history.rs:105 src/ui/editor/history.rs:114
+#: src/ui/editor/history.rs:115 src/ui/editor/history.rs:116 src/ui/editor/history_helpers.rs:6
+#: src/ui/editor/history_helpers.rs:7 src/ui/editor/history_helpers.rs:8
+#: src/ui/editor/search.rs:3 src/ui/editor/search.rs:42 src/ui/editor/search.rs:46
+#: src/history.rs:4 src/history.rs:8 src/history.rs:12 src/history.rs:19 src/history.rs:25
+#: src/history.rs:32 src/history.rs:33 src/history.rs:53 src/history.rs:81 src/history.rs:89
+#: src/tests.rs:4 src/tests.rs:360 src/tests.rs:364 src/tests.rs:366 src/app/window/mod.rs:18
+#: src/app/window/mod.rs:19 src/app/window/mod.rs:34 src/app/window/mod.rs:42
+#: src/app/window/mod.rs:89 src/app/window/mod.rs:246 src/app/window/mod.rs:304
+#: src/app/window/mod.rs:358 src/app/window/mod.rs:535 src/app/window/mod.rs:542
+#: src/app/window/mod.rs:546 src/app/window/mod.rs:850 src/app/window/mod.rs:852
+#: src/app/window/actions.rs:171 src/app/window/actions.rs:180 src/app/window/actions.rs:361
+#: src/app/window/documents.rs:153 src/app/window/editor.rs:53
+#: src/app/window/preferences.rs:189 src/app/window/preferences.rs:196
+#: src/app/window/preferences.rs:204 src/app/window/presentation/navigation.rs:84
+#: src/app/window/presentation/editor_page.rs:3 src/app/window/project_files/create.rs:44
+#: src/app/window/project_files/operations.rs:124
+#: src/app/window/project_files/operations.rs:129 src/app/window/project_files/templates.rs:231
 msgid "Editor"
 msgstr "Editor"
 
-#: src/app/window/mod.rs:360
+#: src/app/window/preferences.rs:20 src/app/window/presentation/header.rs:11
 msgid "LaTeX editor"
 msgstr "Editor LaTeX"
 
-#: src/app/window/mod.rs:247
+#: src/app/window/presentation/navigation.rs:111
 msgid "Project files"
 msgstr "Arquivos do projeto"
 
-#: src/app/window/mod.rs:255
+#: src/app/window/presentation/navigation.rs:119
 msgid "Create files and folders"
 msgstr "Criar arquivos e pastas"
 
-#: src/app/window/mod.rs:271
+#: src/app/window/preferences.rs:20
 msgid "References"
 msgstr "Referências"
 
@@ -379,226 +445,278 @@ msgstr "Referências"
 msgid "LaTeX · local references"
 msgstr "LaTeX · referências locais"
 
-#: src/app/window/mod.rs:345 src/app/window/presentation.rs:733
+#: src/app/window/presentation/navigation.rs:267 src/app/window/project_files/context.rs:38
+#: src/app/window/project_files/create.rs:165
 msgid "New folder"
 msgstr "Nova pasta"
 
-#: src/app/window/mod.rs:363
+#: src/app/mod.rs:44 src/ui/editor.rs:169 src/ui/editor/construction.rs:112
+#: src/ui/editor/construction.rs:122 src/ui/editor/construction.rs:158
+#: src/ui/editor/document.rs:69 src/ui/editor/document.rs:82 src/ui/editor/document.rs:210
+#: src/ui/editor/document.rs:219 src/ui/editor/history.rs:104 src/ui/editor/history.rs:114
+#: src/ui/editor/search.rs:42 src/ui/editor/visual.rs:114 src/history.rs:13 src/main.rs:5
+#: src/tests.rs:364 src/app/window/actions.rs:171 src/app/window/documents.rs:153
+#: src/app/window/editor.rs:53 src/app/window/presentation/editor_page.rs:13
+#: src/app/window/project_files/operations.rs:129
 msgid "Code"
 msgstr "Código"
 
-#: src/app/window/mod.rs:366
+#: src/ui/editor.rs:168 src/ui/editor/construction.rs:159 src/ui/editor/document.rs:109
+#: src/ui/editor/document.rs:118 src/ui/editor/document.rs:211 src/ui/editor/document.rs:220
+#: src/ui/editor/editing.rs:39 src/ui/editor/editing.rs:64 src/ui/editor/editing.rs:114
+#: src/ui/editor/editing.rs:136 src/ui/editor/editing.rs:201 src/ui/editor/history.rs:16
+#: src/ui/editor/history.rs:102 src/ui/editor/history.rs:105 src/ui/editor/history.rs:115
+#: src/ui/editor/history.rs:116 src/ui/editor/search.rs:46 src/ui/editor/visual.rs:114
+#: src/history.rs:14 src/app/window/actions.rs:180 src/app/window/actions.rs:186
+#: src/app/window/presentation/editor_page.rs:16
 msgid "Visual"
 msgstr "Visual"
 
-#: src/app/window/mod.rs:371
+#: src/app/window/presentation/editor_page.rs:27
 msgid ""
 "Switch modes at any time without creating another version of the document"
 msgstr ""
 "Alterne entre os modos quando quiser sem criar outra versão do documento"
 
-#: src/app/window/mod.rs:384
+#: src/app/window/presentation/editor_page.rs:41
 msgid "Find in document…"
 msgstr "Buscar no documento…"
 
-#: src/app/window/mod.rs:418
+#: src/app/window/presentation/editor_page.rs:56
 msgid "Close search"
 msgstr "Fechar busca"
 
-#: src/app/window/mod.rs:436
+#: src/app/window/presentation/editor_page.rs:76
 msgid "Normal text"
 msgstr "Texto normal"
 
-#: src/app/window/mod.rs:453
+#: src/app/window/presentation/editor_page.rs:102
 msgid "Math"
 msgstr "Matemática"
 
-#: src/app/window/mod.rs:458
+#: src/app/window/presentation/editor_page.rs:107
 msgid "Math symbols"
 msgstr "Símbolos matemáticos"
 
-#: src/app/window/mod.rs:461 src/app/window/actions.rs:39
+#: src/app/window/presentation/editor_page.rs:110
+#: src/app/window/presentation/editor_page.rs:129
 msgid "Insert citation"
 msgstr "Inserir citação"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:67
 msgid "Citation"
 msgstr "Citação"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:69
 msgid "Bibliographic reference"
 msgstr "Referência bibliográfica"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:78
 msgid "Bibliographic reference format"
 msgstr "Formato da referência bibliográfica"
 
-#: src/app/window/mod.rs
+#: src/app/window/presentation/build_status.rs:108
 msgid "Add bibliographic reference"
 msgstr "Adicionar referência bibliográfica"
 
-#: src/app/window/mod.rs:462
+#: src/app/window/presentation/editor_page.rs:111
+#: src/app/window/presentation/editor_page.rs:130
 msgid "Find and insert a bibliography reference"
 msgstr "Buscar e inserir uma referência bibliográfica"
 
-#: src/app/window/mod.rs:468
+#: src/app/window/presentation/editor_page.rs:117
 msgid "Lists and indentation"
 msgstr "Listas e recuos"
 
-#: src/app/window/mod.rs:473
+#: src/app/window/presentation/editor_page.rs:122
 msgid "More"
 msgstr "Mais"
 
-#: src/app/window/presentation.rs:79
+#: src/app/window/presentation/navigation.rs:159
 msgid "Local library"
 msgstr "Biblioteca local"
 
-#: src/app/window/presentation.rs:83
+#: src/app/window/presentation/navigation.rs
 msgid "Your references stay on this computer and remain available offline."
 msgstr ""
 "Suas referências ficam neste computador e continuam disponíveis offline."
 
-#: src/app/window/presentation.rs:89 src/app/window/actions.rs:44
+#: src/app/window/presentation/reference_pages.rs:45
+#: src/app/window/references/list/picker.rs:51
 msgid "Search references…"
 msgstr "Buscar referências…"
 
+#: src/app/window/presentation/reference_pages.rs:120
 msgid "Search tags…"
 msgstr "Pesquisar tags…"
 
+#: src/app/window/references/library.rs:231
 msgid "No tags match your search."
 msgstr "Nenhuma tag corresponde à sua pesquisa."
 
+#: src/app/window/presentation/reference_pages.rs:49
 msgid "Tag"
 msgstr "Tag"
 
+#: src/app/window/presentation/reference_pages.rs:50
+#: src/app/window/presentation/reference_pages.rs:125
+#: src/app/window/presentation/reference_pages.rs:175
 msgid "Sort by"
 msgstr "Ordenar por"
 
+#: src/app/window/presentation/reference_pages.rs:49
 msgid "Author"
 msgstr "Autor"
 
+#: src/app/window/presentation/reference_pages.rs:4
 msgid "Ascending"
 msgstr "Crescente"
 
+#: src/app/window/presentation/reference_pages.rs:5
 msgid "Descending"
 msgstr "Decrescente"
 
+#: src/app/window/references/library.rs:120
 msgid "All authors"
 msgstr "Todos os autores"
 
+#: src/app/window/references/library.rs:125
 msgid "All years"
 msgstr "Todos os anos"
 
+#: src/app/window/references/library.rs:130
 msgid "All tags"
 msgstr "Todas as tags"
 
+#: src/app/window/references/library.rs:135
 msgid "All types"
 msgstr "Todos os tipos"
 
-#: src/app/window/presentation.rs:92
+#: src/app/window/presentation/reference_pages.rs:37
+#: src/app/window/references/list/picker.rs:236
 msgid "Add reference"
 msgstr "Adicionar referência"
 
+#: src/app/window/presentation/navigation.rs:167
 msgid "View all references"
 msgstr "Ver todas as referências"
 
+#: src/app/window/mod.rs:477
 msgid "Add"
 msgstr "Adicionar"
 
+#: src/app/window/mod.rs:478 src/app/window/presentation/build_status.rs:96
 msgid "Add a reference to the local library"
 msgstr "Adicionar uma referência à biblioteca local"
 
-#: src/app/window/presentation.rs:95
+#: src/app/window/references/list/picker.rs:252
 msgid "Import BibTeX"
 msgstr "Importar BibTeX"
 
-#: src/app/window/presentation.rs:98
+#: src/app/window/references/transfer.rs:153
 msgid "Export BibTeX"
 msgstr "Exportar BibTeX"
 
-#: src/app/window/presentation.rs:1009 src/app/window/references.rs:2826
+#: src/app/window/references/transfer.rs:9
 msgid "Import references"
 msgstr "Importar referências"
 
-#: src/app/window/presentation.rs:1010 src/app/window/references.rs:2831
+#: src/app/window/references/transfer.rs:14
 msgid "Export references"
 msgstr "Exportar referências"
 
-#: src/app/window/references.rs:2827
+#: src/app/window/references/transfer.rs:10
 msgid "Choose a format to import."
 msgstr "Escolha um formato para importar."
 
-#: src/app/window/references.rs:2832
+#: src/app/window/references/transfer.rs:15
 msgid "Choose a format to export."
 msgstr "Escolha um formato para exportar."
 
-#: src/app/window/references.rs:2876
+#: src/app/window/references/transfer.rs:59
 msgid "Standard format for bibliographic references."
 msgstr "Formato padrão para referências bibliográficas."
 
-#: src/app/window/references.rs:2904
+#: src/app/window/references/transfer.rs:87
 msgid "Platform guides"
 msgstr "Guias das plataformas"
 
+#: src/app/window/references/library.rs:161
 msgid "No references match the current search and filters."
 msgstr "Nenhuma referência corresponde à pesquisa e aos filtros atuais."
 
-#: src/app/window/presentation.rs:127
+#: src/app/window/presentation/header.rs:45
 msgid "Show or hide the sidebar"
 msgstr "Mostrar ou ocultar a barra lateral"
 
-#: src/app/window/presentation.rs:130
+#: src/app/window/presentation/header.rs:65
 msgid "Save document"
 msgstr "Salvar documento"
 
-#: src/app/window/presentation.rs:143
+#: src/app/window/presentation/navigation.rs
 msgid "Compile document"
 msgstr "Compilar documento"
 
-#: src/app/window/presentation.rs:147
+#: src/app/window/presentation/header.rs:28 src/app/window/presentation/build_status.rs:112
 msgid "Compile and create PDF"
 msgstr "Compilar e gerar PDF"
 
-#: src/app/window/presentation.rs:162 src/app/window/actions.rs:531
+#: src/app/window/mod.rs:460 src/app/window/latex_tools.rs:5
 msgid "Export PDF"
 msgstr "Exportar PDF"
 
-#: src/app/window/presentation.rs:172
+#: src/app/window/presentation/navigation.rs
 msgid "Document and build details"
 msgstr "Detalhes do documento e da compilação"
 
-#: src/app/window/presentation.rs:178 src/app/window/presentation.rs:249 src/app/window/presentation.rs:258
-#: src/app/window/presentation.rs:290 src/app/window/presentation.rs:387 src/app/window/presentation.rs:975
-#: src/app/window/actions.rs:136 src/app/window/actions.rs:408 src/app/window/actions.rs:409
-#: src/app/window/actions.rs:503
+#: src/app/window/mod.rs:308 src/app/window/documents.rs:123 src/app/window/documents.rs:159
+#: src/app/window/documents.rs:167 src/app/window/documents.rs:286
+#: src/app/window/documents.rs:469 src/app/window/project_files/templates.rs:211
+#: src/app/window/references/library.rs:60
 msgid "Ready"
 msgstr "Pronto"
 
-#: src/app/window/presentation.rs:189
+#: src/app/window/presentation/build_status.rs:24
 msgid "Current document"
 msgstr "Documento atual"
 
-#: src/app/window/presentation.rs:193 src/app/window/preferences.rs:40
+#: src/app/window/presentation/build_status.rs:199
 msgid "New document not saved yet"
 msgstr "Novo documento ainda não salvo"
 
-#: src/app/window/presentation.rs:209
+#: src/app/window/presentation/build_status.rs:50
 msgid "Compiler"
 msgstr "Compilador"
 
-#: src/app/window/presentation.rs:209
+#: src/app/window/mod.rs:113 src/app/window/mod.rs:149
+#: src/app/window/presentation/build_status.rs:3 src/app/window/presentation/build_status.rs:76
 msgid "Status"
 msgstr "Estado"
 
-#: src/app/window/presentation.rs:209
+#: src/app/window/presentation/build_status.rs:50
 msgid "Last build"
 msgstr "Última compilação"
 
-#: src/app/window/preferences.rs:32 src/app/window/preferences.rs:56
+#: src/references/bibtex/mod.rs:15 src/references/bibtex/model.rs:51
+#: src/references/bibtex/model.rs:53 src/references/bibtex/model.rs:59
+#: src/references/bibtex/parser.rs:30 src/references/bibtex/parser.rs:56
+#: src/references/bibtex/parser.rs:156 src/references/bibtex/parser.rs:227
+#: src/latex/build.rs:209 src/latex/build.rs:430 src/ui/editor/construction.rs:19
+#: src/ui/pdf_preview.rs:31 src/ui/pdf_preview.rs:65 src/references/library.rs:123
+#: src/references/library.rs:124 src/references/library.rs:132 src/references/library.rs:133
+#: src/references/library.rs:142 src/references/library.rs:143 src/references/library.rs:149
+#: src/references/library.rs:151 src/references/library.rs:170 src/references/library.rs:182
+#: src/references/library.rs:186 src/app/window/mod.rs:778 src/app/window/mod.rs:779
+#: src/app/window/latex_tools.rs:63 src/app/window/latex_tools.rs:122
+#: src/app/window/latex_tools.rs:134 src/app/window/preferences.rs:211
+#: src/app/window/presentation/build_status.rs:175
+#: src/app/window/presentation/build_status.rs:182
+#: src/app/window/presentation/build_status.rs:218
+#: src/app/window/presentation/build_status.rs:232
 msgid "Error"
 msgstr "Erro"
 
-#: src/app/window/preferences.rs:33 src/app/window/preferences.rs:57
+#: src/app/window/presentation/build_status.rs:178
 msgid "Modified"
 msgstr "Modificado"
 
@@ -618,7 +736,7 @@ msgstr ""
 "Arquivo: %s\n"
 "Projeto: %s"
 
-#: src/app/window/preferences.rs:49
+#: src/app/window/presentation/build_status.rs:48
 msgid "Not found"
 msgstr "Não encontrado"
 
@@ -630,27 +748,32 @@ msgstr "%s · alterações locais pendentes"
 msgid "Just now"
 msgstr "Agora"
 
-#: src/app/window/preferences.rs:270
+#: src/app/window/actions.rs:480
 msgid "Match found"
 msgstr "Correspondência encontrada"
 
-#: src/app/window/preferences.rs:270
+#: src/app/window/actions.rs:482
 msgid "No results"
 msgstr "Nenhum resultado"
 
-#: src/app/window/preferences.rs:288
+#: src/app/window/mod.rs:461 src/app/window/actions.rs:508
 msgid "Keyboard shortcuts"
 msgstr "Atalhos de teclado"
 
-#: src/app/window/preferences.rs:289 src/app/window/actions.rs:40
+#: src/app/window/actions.rs:512 src/app/window/latex_tools.rs:220
+#: src/app/window/preferences.rs:10 src/app/window/references/transfer.rs:25
+#: src/app/window/references/list/picker.rs:43
 msgid "Close"
 msgstr "Fechar"
 
-#: src/app/window/preferences.rs:316 src/app/window/preferences.rs:355 src/app/window/presentation.rs:315
-#: src/app/window/presentation.rs:666 src/app/window/presentation.rs:734 src/app/window/presentation.rs:783
-#: src/app/window/presentation.rs:846 src/app/window/presentation.rs:927 src/app/window/presentation.rs:1023
-#: src/app/window/presentation.rs:1108 src/app/window/actions.rs:14 src/app/window/actions.rs:255
-#: src/app/window/editor.rs:37 src/app/window/documents.rs:3
+#: src/app/window/dialogs.rs:17 src/app/window/dialogs.rs:81 src/app/window/dialogs.rs:116
+#: src/app/window/dialogs.rs:192 src/app/window/dialogs.rs:323 src/app/window/dialogs.rs:368
+#: src/app/window/documents.rs:16 src/app/window/documents.rs:350
+#: src/app/window/latex_tools.rs:9 src/app/window/project_files/create.rs:55
+#: src/app/window/project_files/create.rs:169 src/app/window/project_files/operations.rs:9
+#: src/app/window/project_files/templates.rs:11 src/app/window/project_files/templates.rs:146
+#: src/app/window/references/authors.rs:28 src/app/window/references/authors.rs:329
+#: src/app/window/references/tags.rs:17 src/app/window/references/editor.rs:55
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -658,91 +781,94 @@ msgstr "Cancelar"
 msgid "LaTeX, BibTeX, and style files"
 msgstr "Arquivos LaTeX, BibTeX e de estilo"
 
-#: src/app/window/preferences.rs:347 src/app/window/presentation.rs:374
+#: src/app/window/actions.rs:328 src/app/window/dialogs.rs:5 src/app/window/documents.rs:454
 msgid "A document save is still in progress."
 msgstr "Um salvamento de documento ainda está em andamento."
 
-#: src/app/window/preferences.rs:354
+#: src/app/window/dialogs.rs:13
 msgid "Unsaved changes"
 msgstr "Alterações não salvas"
 
-#: src/app/window/preferences.rs:356
+#: src/app/window/dialogs.rs:18
 msgid "Discard"
 msgstr "Descartar"
 
-#: src/app/window/preferences.rs:357
+#: src/app/window/dialogs.rs:19 src/app/window/references/authors.rs:29
+#: src/app/window/references/tags.rs:18
 msgid "Save"
 msgstr "Salvar"
 
-#: src/app/window/preferences.rs:358
+#: src/app/window/dialogs.rs:20
 msgid "Save changes before continuing?"
 msgstr "Salvar as alterações antes de continuar?"
 
-#: src/app/window/preferences.rs:397
+#: src/app/window/documents.rs:96
 msgid "Opening document…"
 msgstr "Abrindo documento…"
 
-#: src/app/window/presentation.rs:251
+#: src/app/window/presentation/navigation.rs
 msgid "This document has not been compiled yet."
 msgstr "Este documento ainda não foi compilado."
 
-#: src/app/window/presentation.rs:259
+#: src/app/window/documents.rs:170
 msgid "Could not open the document"
 msgstr "Não foi possível abrir o documento"
 
-#: src/app/window/presentation.rs:277
+#: src/app/window/documents.rs:271
 msgid "Loading project…"
 msgstr "Carregando projeto…"
 
-#: src/app/window/presentation.rs:294 src/app/window/presentation.rs:458 src/app/window/documents.rs:49
+#: src/app/window/documents.rs:301 src/app/window/latex_tools.rs:66
+#: src/app/window/project_files/tree.rs:415 src/app/window/project_files/tree.rs:423
 msgid "Could not list the project folder"
 msgstr "Não foi possível listar a pasta do projeto"
 
-#: src/app/window/presentation.rs:307
+#: src/app/window/documents.rs:332
 msgid "This project has no .tex document yet."
 msgstr "Este projeto ainda não tem nenhum documento .tex."
 
-#: src/app/window/presentation.rs:313
+#: src/app/window/documents.rs:344
 msgid "Choose main document"
 msgstr "Escolher documento principal"
 
-#: src/app/window/presentation.rs:316
+#: src/app/window/dialogs.rs:191 src/app/window/documents.rs:351
+#: src/app/window/project_files/context.rs:53
 msgid "Open"
 msgstr "Abrir"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:452
 msgid "Open document"
 msgstr "Abrir documento"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:454
 msgid "Open project folder"
 msgstr "Abrir pasta do projeto"
 
-#: src/app/window/presentation.rs:378
+#: src/app/window/documents.rs:459
 msgid "Saving…"
 msgstr "Salvando…"
 
-#: src/app/window/presentation.rs:397
+#: src/app/window/documents.rs:481
 msgid "The document changed while it was being saved. Save again."
 msgstr "O documento mudou durante o salvamento. Salve novamente."
 
-#: src/app/window/presentation.rs:405
+#: src/app/window/documents.rs:490
 msgid "Document saved"
 msgstr "Documento salvo"
 
-#: src/app/window/presentation.rs:418
+#: src/app/window/project_files/tree.rs:333
 msgid "Open a project folder to browse its files."
 msgstr "Abra uma pasta de projeto para navegar pelos arquivos."
 
-#: src/app/window/presentation.rs:425
+#: src/app/window/project_files/tree.rs:343
 msgid "Loading project files…"
 msgstr "Carregando arquivos do projeto…"
 
-#: src/app/window/presentation.rs:451
+#: src/app/window/project_files/tree.rs:370
 msgid "This project has no files yet. Use + to create one."
 msgstr "Este projeto ainda não tem arquivos. Use + para criar um."
 
-#: src/app/window/presentation.rs:498
+#: src/app/window/project_files/tree.rs:84
 msgid ""
 "This file is listed as a project resource and cannot be edited in Ovenbird "
 "yet."
@@ -750,79 +876,84 @@ msgstr ""
 "Este arquivo é um recurso do projeto e ainda não pode ser editado no "
 "Ovenbird."
 
-#: src/app/window/presentation.rs:535 src/app/window/presentation.rs:782 src/app/window/presentation.rs:784
+#: src/app/window/project_files/context.rs:109 src/app/window/project_files/operations.rs:5
+#: src/app/window/project_files/operations.rs:10
 msgid "Rename"
 msgstr "Renomear"
 
-#: src/app/window/presentation.rs:535
+#: src/app/window/project_files/context.rs:118 src/app/window/project_files/operations.rs:70
 msgid "Move to Trash"
 msgstr "Mover para a lixeira"
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/operations.rs:68 src/app/window/references/tags.rs:72
+#: src/app/window/references/details.rs:245
 msgid "Confirm deletion"
 msgstr "Confirmar exclusão"
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/operations.rs:61
 msgid "Move ‘%s’ to Trash? You can restore it later."
 msgstr "Mover ‘%s’ para a lixeira? Você poderá restaurá-lo depois."
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/operations.rs:59
 msgid "Move folder ‘%s’ and its contents to Trash?"
 msgstr "Mover a pasta ‘%s’ e seu conteúdo para a lixeira?"
 
-#: src/app/window/presentation.rs:667 src/app/window/presentation.rs:735 src/app/window/presentation.rs:928
+#: src/app/window/project_files/create.rs:56 src/app/window/project_files/create.rs:170
+#: src/app/window/project_files/templates.rs:147 src/app/window/references/editor/author.rs:64
+#: src/app/window/references/editor/tag.rs:61
 msgid "Create"
 msgstr "Criar"
 
-#: src/app/window/presentation.rs:675
+#: src/app/window/project_files/create.rs:65
 msgid "File name in the selected folder"
 msgstr "Nome do arquivo dentro da pasta selecionada"
 
-#: src/app/window/presentation.rs:688
+#: src/app/window/project_files/create.rs:83
 msgid "Enter a valid file name"
 msgstr "Informe um nome de arquivo válido"
 
-#: src/app/window/presentation.rs:710
+#: src/app/window/project_files/create.rs:126
 msgid "File created"
 msgstr "Arquivo criado"
 
-#: src/app/window/presentation.rs:713
+#: src/app/window/project_files/create.rs:131
 msgid "Could not create the file"
 msgstr "Não foi possível criar o arquivo"
 
-#: src/app/window/presentation.rs:738
+#: src/app/window/project_files/create.rs:173
 msgid "Folder name"
 msgstr "Nome da pasta"
 
-#: src/app/window/presentation.rs:751
+#: src/app/window/project_files/create.rs:190
 msgid "Enter a valid folder name"
 msgstr "Informe um nome de pasta válido"
 
-#: src/app/window/presentation.rs:766
+#: src/app/window/project_files/create.rs:211
 msgid "Folder created"
 msgstr "Pasta criada"
 
-#: src/app/window/presentation.rs:769
+#: src/app/window/project_files/create.rs:216
 msgid "Could not create the folder"
 msgstr "Não foi possível criar a pasta"
 
-#: src/app/window/presentation.rs:837
+#: src/app/window/project_files/operations.rs:96
 msgid "Moved to Trash"
 msgstr "Movido para a lixeira"
 
-#: src/app/window/presentation.rs:839
+#: src/app/window/project_files/operations.rs:99
 msgid "Could not move to Trash"
 msgstr "Não foi possível mover para a lixeira"
 
-#: src/app/window/presentation.rs:844 src/app/window/presentation.rs:926
+#: src/app/window/mod.rs:451 src/app/window/project_files/templates.rs:5
+#: src/app/window/project_files/templates.rs:142
 msgid "New project"
 msgstr "Novo projeto"
 
-#: src/app/window/presentation.rs:847
+#: src/app/window/project_files/templates.rs:12
 msgid "Continue"
 msgstr "Continuar"
 
-#: src/app/window/presentation.rs:855
+#: src/app/window/project_files/templates.rs:21
 msgid ""
 "Choose a starting point. Template files are copied into a local project "
 "folder."
@@ -830,63 +961,63 @@ msgstr ""
 "Escolha um ponto de partida. Os arquivos do modelo serão copiados para uma "
 "pasta de projeto local."
 
-#: src/app/window/presentation.rs:861
+#: src/app/window/project_files/templates.rs:29
 msgid "Blank LaTeX document"
 msgstr "Documento LaTeX em branco"
 
-#: src/app/window/presentation.rs:861
+#: src/app/window/project_files/templates.rs:30
 msgid "Start a new document with a simple article structure."
 msgstr "Comece um documento com uma estrutura simples de artigo."
 
-#: src/app/window/presentation.rs:862
+#: src/app/window/project_files/templates.rs:34
 msgid "ABNT · abnTeX2"
 msgstr "ABNT · abnTeX2"
 
-#: src/app/window/presentation.rs:862
+#: src/app/window/project_files/templates.rs:35
 msgid ""
 "Academic work, articles, reports, and research projects based on ABNT rules."
 msgstr ""
 "Trabalhos acadêmicos, artigos, relatórios e projetos de pesquisa conforme as "
 "regras da ABNT."
 
-#: src/app/window/presentation.rs:863
+#: src/app/window/project_files/templates.rs:39
 msgid "IEEE · IEEEtran"
 msgstr "IEEE · IEEEtran"
 
-#: src/app/window/presentation.rs:863
+#: src/app/window/project_files/templates.rs:40
 msgid "IEEE conference and journal papers using the IEEEtran class."
 msgstr "Artigos para conferências e periódicos IEEE usando a classe IEEEtran."
 
-#: src/app/window/presentation.rs:864
+#: src/app/window/project_files/templates.rs:44
 msgid "ACM · acmart"
 msgstr "ACM · acmart"
 
-#: src/app/window/presentation.rs:864
+#: src/app/window/project_files/templates.rs:45
 msgid "ACM journal and conference papers using the acmart class."
 msgstr "Artigos de periódicos e conferências da ACM usando a classe acmart."
 
-#: src/app/window/presentation.rs:865
+#: src/app/window/project_files/templates.rs:49
 msgid "Elsevier · elsarticle"
 msgstr "Elsevier · elsarticle"
 
-#: src/app/window/presentation.rs:865
+#: src/app/window/project_files/templates.rs:50
 msgid "Elsevier manuscripts using the elsarticle package."
 msgstr "Manuscritos da Elsevier usando o pacote elsarticle."
 
-#: src/app/window/presentation.rs:866
+#: src/app/window/project_files/templates.rs:54
 msgid "Springer Nature"
 msgstr "Springer Nature"
 
-#: src/app/window/presentation.rs:866
+#: src/app/window/project_files/templates.rs:55
 msgid "Springer Nature journal article templates and sample files."
 msgstr ""
 "Modelos de artigos para periódicos e arquivos de exemplo da Springer Nature."
 
-#: src/app/window/presentation.rs:892
+#: src/app/window/project_files/templates.rs:83
 msgid "Source"
 msgstr "Fonte"
 
-#: src/app/window/presentation.rs:904
+#: src/app/window/project_files/templates.rs:99
 msgid ""
 "Journal and conference requirements can differ. Check the current author "
 "instructions before submission."
@@ -894,107 +1025,109 @@ msgstr ""
 "As exigências de periódicos e conferências podem variar. Confira as "
 "instruções atuais para autores antes de enviar."
 
-#: src/app/window/presentation.rs:945
+#: src/app/window/project_files/templates.rs:168
 msgid "Enter a valid project name"
 msgstr "Informe um nome válido para o projeto"
 
-#: src/app/window/presentation.rs:955
+#: src/app/window/project_files/templates.rs:188
 msgid "Creating project"
 msgstr "Criando projeto"
 
-#: src/app/window/presentation.rs:967
+#: src/app/window/project_files/templates.rs:203
 msgid "Preparing template project…"
 msgstr "Preparando o projeto a partir do modelo…"
 
-#: src/app/window/presentation.rs:971
+#: src/app/window/project_files/templates.rs:207
 msgid "Creating project…"
 msgstr "Criando projeto…"
 
-#: src/app/window/presentation.rs:981 src/app/window/presentation.rs:1008
+#: src/app/window/project_files/templates.rs:223 src/app/window/project_files/templates.rs:267
 msgid "Could not create the project"
 msgstr "Não foi possível criar o projeto"
 
-#: src/app/window/presentation.rs:1022 src/app/window/presentation.rs:1024
+#: src/app/window/dialogs.rs:112 src/app/window/dialogs.rs:117
 msgid "Insert link"
 msgstr "Inserir link"
 
-#: src/app/window/presentation.rs:1030
+#: src/app/window/dialogs.rs:129
 msgid "Link text"
 msgstr "Texto do link"
 
-#: src/app/window/presentation.rs:1033
+#: src/app/window/dialogs.rs:132
 msgid "Text"
 msgstr "Texto"
 
-#: src/app/window/presentation.rs:1045
+#: src/app/window/dialogs.rs:145
 msgid "Enter a URL"
 msgstr "Informe uma URL"
 
-#: src/app/window/presentation.rs:1059
+#: src/app/window/dialogs.rs:226
 msgid "Open a project folder before inserting an image."
 msgstr "Abra uma pasta de projeto antes de inserir uma imagem."
 
-#: src/app/window/presentation.rs:1063
+#: src/app/window/dialogs.rs:231
 msgid "The image name is invalid."
 msgstr "O nome da imagem é inválido."
 
-#: src/app/window/presentation.rs:1092
+#: src/app/window/dialogs.rs:292
 msgid "Image copied to the project. Reopen the document to insert it."
 msgstr "Imagem copiada para o projeto. Reabra o documento para inseri-la."
 
-#: src/app/window/presentation.rs:1101
+#: src/app/window/dialogs.rs:312
 msgid "Could not add the image to the project"
 msgstr "Não foi possível adicionar a imagem ao projeto"
 
-#: src/app/window/presentation.rs:1107
+#: src/app/window/mod.rs:509 src/app/window/dialogs.rs:319
 msgid "Insert table"
 msgstr "Inserir tabela"
 
-#: src/app/window/presentation.rs:1109
+#: src/app/window/dialogs.rs:324
 msgid "Insert"
 msgstr "Inserir"
 
-#: src/app/window/presentation.rs:1116
+#: src/app/window/dialogs.rs:337
 msgid "Rows"
 msgstr "Linhas"
 
-#: src/app/window/presentation.rs:1118
+#: src/app/window/dialogs.rs:339
 msgid "Columns"
 msgstr "Colunas"
 
-#: src/app/window/actions.rs:15
+#: src/app/window/dialogs.rs:369
 msgid "OK"
 msgstr "OK"
 
-#: src/app/window/actions.rs:84
+#: src/app/window/references/list/picker.rs:232
 msgid "No matching references"
 msgstr "Nenhuma referência correspondente"
 
-#: src/app/window/actions.rs:117 src/app/window/actions.rs:164
+#: src/app/window/references/library.rs:31 src/app/window/references/library.rs:97
+#: src/app/window/references/library.rs:196 src/app/window/references/library.rs:273
 msgid "Could not load the local library"
 msgstr "Não foi possível carregar a biblioteca local"
 
-#: src/app/window/actions.rs:125 src/app/window/actions.rs:154
+#: src/app/window/references/library.rs:48 src/app/window/references/library.rs:85
 msgid "The local library is busy. Try again in a moment."
 msgstr "A biblioteca local está ocupada. Tente novamente em instantes."
 
-#: src/app/window/actions.rs:128
+#: src/app/window/references/library.rs:52
 msgid "Saving references…"
 msgstr "Salvando referências…"
 
-#: src/app/window/actions.rs:143
+#: src/app/window/references/library.rs:71
 msgid "Could not save the local library"
 msgstr "Não foi possível salvar a biblioteca local"
 
-#: src/app/window/actions.rs:150
+#: src/app/window/references/library.rs:79
 msgid "The local library is still loading."
 msgstr "A biblioteca local ainda está carregando."
 
-#: src/app/window/actions.rs:170 src/app/window/actions.rs:432
+#: src/app/window/references/list/view.rs:105
 msgid "Retry"
 msgstr "Tentar novamente"
 
-#: src/app/window/actions.rs:176
+#: src/app/window/references/library.rs:103 src/app/window/references/library.rs:198
+#: src/app/window/references/library.rs:275
 msgid "Loading local library…"
 msgstr "Carregando biblioteca local…"
 
@@ -1002,22 +1135,24 @@ msgstr "Carregando biblioteca local…"
 msgid "No references match this search."
 msgstr "Nenhuma referência corresponde à pesquisa."
 
-#: src/app/window/actions.rs:224
+#: src/app/window/mod.rs:476 src/app/window/references/details.rs:24
+#: src/app/window/references/list/view.rs:61
 msgid "Edit reference"
 msgstr "Editar referência"
 
+#: src/app/window/mod.rs:475
 msgid "New reference"
 msgstr "Nova referência"
 
-#: src/app/window/actions.rs:229
+#: src/app/window/references/list/view.rs:78
 msgid "Delete reference"
 msgstr "Excluir referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:239
 msgid "Delete reference ‘%s’ from the local library? This cannot be undone."
 msgstr "Excluir a referência ‘%s’ da biblioteca local? Essa ação não pode ser desfeita."
 
-#: src/app/window/actions.rs:236 src/app/window/actions.rs:329
+#: src/app/window/references/details.rs:254
 msgid "Reference deleted"
 msgstr "Referência excluída"
 
@@ -1027,123 +1162,124 @@ msgid_plural "%d local references · %s"
 msgstr[0] "%d referência local · %s"
 msgstr[1] "%d referências locais · %s"
 
-#: src/app/window/actions.rs:256
+#: src/app/window/references/details.rs:247 src/app/window/references/editor.rs:46
 msgid "Delete"
 msgstr "Excluir"
 
-#: src/app/window/actions.rs:269
+#: src/app/window/references/details.rs:49 src/app/window/references/editor.rs:87
 msgid "Reference type"
 msgstr "Tipo de referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:18
 msgid "Reference details"
 msgstr "Detalhes da referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/view.rs:44
 msgid "Show reference details"
 msgstr "Mostrar detalhes da referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:80
 msgid "Cite this reference"
 msgstr "Citar esta referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:86
 msgid "Citation format"
 msgstr "Formato da referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:90 src/app/window/references/list/picker.rs:82
 msgid "ABNT"
 msgstr "ABNT"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:91 src/app/window/references/list/picker.rs:83
 msgid "MLA"
 msgstr "MLA"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:92 src/app/window/references/list/picker.rs:84
 msgid "AMS"
 msgstr "AMS"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:93 src/app/window/references/list/picker.rs:85
 msgid "APA 7"
 msgstr "APA 7"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:97 src/app/window/references/list/picker.rs:89
 msgid "IEEE"
 msgstr "IEEE"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:94 src/app/window/references/list/picker.rs:86
 msgid "Chicago (author-date)"
 msgstr "Chicago (autor-data)"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:95 src/app/window/references/list/picker.rs:87
 msgid "Harvard (author-date)"
 msgstr "Harvard (autor-data)"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:96 src/app/window/references/list/picker.rs:88
 msgid "Vancouver"
 msgstr "Vancouver"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:297 src/app/window/references/details.rs:179
 msgid "Copy value"
 msgstr "Copiar valor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:29 src/app/window/references/list/insertion.rs:95
+#: src/app/window/references/list/insertion.rs:98
 msgid "Open a BibTeX file before adding a bibliographic reference."
 msgstr "Abra um arquivo BibTeX antes de adicionar uma referência bibliográfica."
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/insertion.rs:108
 msgid "This reference is already in the BibTeX file."
 msgstr "Esta referência já está no arquivo BibTeX."
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:219
 msgid "Could not add the reference to the BibTeX file"
 msgstr "Não foi possível adicionar a referência ao arquivo BibTeX"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:123
 msgid "Copy formatted reference"
 msgstr "Copiar referência formatada"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/details.rs:219
 msgid "Copied to clipboard"
 msgstr "Copiado para a área de transferência"
 
-#: src/app/window/actions.rs:284
+#: src/app/window/references/editor.rs:116
 msgid "Full title of the work"
 msgstr "Título completo da obra"
 
-#: src/app/window/actions.rs:292
+#: src/app/window/references/details.rs:54 src/app/window/references/editor.rs:132
 msgid "Citation key"
 msgstr "Chave de citação"
 
-#: src/app/window/actions.rs:342
+#: src/app/window/references/editor/response.rs:45
 msgid "Enter the reference title"
 msgstr "Informe o título da referência"
 
-#: src/app/window/actions.rs:357
+#: src/app/window/references/editor/response.rs:76
 msgid "Reference saved"
 msgstr "Referência salva"
 
-#: src/app/window/editor.rs:11
+#: src/app/window/references/transfer.rs:134
 msgid "Imported %d references"
 msgstr "%d referências importadas"
 
-#: src/app/window/editor.rs:13
+#: src/app/window/references/transfer.rs:139
 msgid "Could not import BibTeX"
 msgstr "Não foi possível importar o BibTeX"
 
-#: src/app/window/editor.rs:28
+#: src/app/window/references/transfer.rs:164
 msgid "BibTeX exported"
 msgstr "BibTeX exportado"
 
-#: src/app/window/editor.rs:29
+#: src/app/window/references/transfer.rs:167
 msgid "Could not export BibTeX"
 msgstr "Não foi possível exportar o BibTeX"
 
-#: src/app/window/documents.rs:3
+#: src/app/window/latex_tools.rs:8
 msgid "Export"
 msgstr "Exportar"
 
-#: src/app/window/documents.rs:22
+#: src/app/window/latex_tools.rs:33
 msgid "Save the document before compiling."
 msgstr "Salve o documento antes de compilar."
 
@@ -1164,23 +1300,23 @@ msgid_plural "%d duplicate citation keys were left unchanged"
 msgstr[0] "%d chave de citação duplicada foi mantida sem alterações"
 msgstr[1] "%d chaves de citação duplicadas foram mantidas sem alterações"
 
-#: src/app/window/dialogs.rs:19 src/app/window/dialogs.rs:39
+#: src/app/window/latex_tools.rs:130
 msgid "Compilation finished"
 msgstr "Compilação concluída"
 
-#: src/app/window/dialogs.rs:25 src/app/window/dialogs.rs:32
+#: src/app/window/latex_tools.rs:116 src/app/window/latex_tools.rs:123
 msgid "Could not export PDF"
 msgstr "Não foi possível exportar o PDF"
 
-#: src/app/window/dialogs.rs:28
+#: src/app/window/latex_tools.rs:119
 msgid "PDF exported"
 msgstr "PDF exportado"
 
-#: src/app/window/dialogs.rs:43
+#: src/app/window/documents.rs:117
 msgid "Could not open the PDF"
 msgstr "Não foi possível abrir o PDF"
 
-#: src/app/window/dialogs.rs:44
+#: src/app/window/latex_tools.rs:133
 msgid "Could not open the compiled PDF"
 msgstr "Não foi possível abrir o PDF compilado"
 
@@ -1192,67 +1328,69 @@ msgstr "Não foi possível abrir a prévia do PDF"
 msgid "Could not compile the document"
 msgstr "Não foi possível compilar o documento"
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:167 src/app/window/latex_tools.rs:214
+#: src/app/window/presentation/build_status.rs:176
 msgid "PDF generation failed"
 msgstr "Falha na geração do PDF"
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:326
 msgid "PDF generation failed: Image on line %d was not found."
 msgstr "Falha na geração do PDF: Imagem da linha %d não foi encontrada."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:365
 msgid "PDF generation failed: The document contains errors that prevent compilation."
 msgstr "Falha na geração do PDF: O documento contém erros que impedem a compilação."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:152
 msgid "PDF generation failed: Compilation stopped unexpectedly."
 msgstr "Falha na geração do PDF: A compilação foi interrompida inesperadamente."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:344
 msgid "PDF generation failed: Compilation timed out."
 msgstr "Falha na geração do PDF: O tempo limite da compilação foi excedido."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:199
 msgid "%d more lines have missing citations."
 msgstr "Há citações sem referência em mais %d linhas."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:254
 msgid "%d additional citation problems are not shown."
 msgstr "%d problemas adicionais de citação não são exibidos."
 
-#: src/latex/build.rs
+#: src/latex/build.rs:685
 msgid "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live."
 msgstr "Nenhum compilador LaTeX foi encontrado. Instale latexmk, Tectonic ou TeX Live."
 
-#: src/latex/build.rs
+#: src/latex/build.rs:778
 msgid "This document uses biblatex and needs Biber. Install Biber, latexmk, or Tectonic."
 msgstr "Este documento usa biblatex e precisa do Biber. Instale Biber, latexmk ou Tectonic."
 
-#: src/latex/build.rs
+#: src/latex/build.rs:807
 msgid "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic."
 msgstr "Este documento precisa do BibTeX. Instale BibTeX, latexmk ou Tectonic."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:181
 msgid "Citation on line %d has no bibliographic reference in the document."
 msgstr "A citação da linha %d não possui referência bibliográfica no documento."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:194
 msgid "Citations on lines %s have no bibliographic references in the document."
 msgstr "As citações das linhas %s não possuem referências bibliográficas no documento."
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:247
 msgid "Line %d: %s"
 msgstr "Linha %d: %s"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:216
 msgid "Could not add the reference to the document"
 msgstr "Não foi possível adicionar a referência ao documento"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/insertion.rs:11
+#: src/app/window/references/list/insertion.rs:31
 msgid "Save the document before inserting a citation."
 msgstr "Salve o documento antes de inserir uma citação."
 
-#: src/app/window/dialogs.rs:60
+#: src/app/window/latex_tools.rs:284
 msgid "Open or create a LaTeX project before compiling."
 msgstr "Abra ou crie um projeto LaTeX antes de compilar."
 
@@ -1260,372 +1398,381 @@ msgstr "Abra ou crie um projeto LaTeX antes de compilar."
 msgid "Check the build output"
 msgstr "Revise a saída da compilação"
 
-#: src/app/window/mod.rs
+#: src/app/window/actions.rs:186
 msgid "Visual mode is available only for LaTeX documents."
 msgstr "O modo visual está disponível somente para documentos LaTeX."
 
-#: src/app/window/mod.rs
+#: src/app/window/dialogs.rs:183
 msgid "Open a LaTeX document before inserting an image."
 msgstr "Abra um documento LaTeX antes de inserir uma imagem."
 
-#: src/app/window/mod.rs
+#: src/app/window/dialogs.rs:195
 msgid "Image and PDF files"
 msgstr "Imagens e arquivos PDF"
 
-#: src/app/window/mod.rs
+#: src/app/window/dialogs.rs:254
 msgid "Choose a main LaTeX document before inserting an image."
 msgstr "Escolha o documento LaTeX principal antes de inserir uma imagem."
 
-#: src/app/window/mod.rs
+#: src/app/window/dialogs.rs:299
 msgid "The image path cannot be represented relative to the main document."
 msgstr "Não foi possível representar o caminho da imagem em relação ao documento principal."
 
-#: src/app/window/mod.rs
+#: src/app/window/references/list/picker.rs:20 src/app/window/references/list/insertion.rs:13
+#: src/app/window/references/list/insertion.rs:46
 msgid "Open a LaTeX document before inserting a citation."
 msgstr "Abra um documento LaTeX antes de inserir uma citação."
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:470
 msgid "New LaTeX document"
 msgstr "Novo documento LaTeX"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:471
 msgid "New bibliography (.bib)"
 msgstr "Nova bibliografia (.bib)"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:472
 msgid "New style file (.sty)"
 msgstr "Novo arquivo de estilo (.sty)"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:473
 msgid "Previous match"
 msgstr "Resultado anterior"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:474
 msgid "Next match"
 msgstr "Próximo resultado"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:479
 msgid "Bold"
 msgstr "Negrito"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:480
 msgid "Italic"
 msgstr "Itálico"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:481
 msgid "Underline"
 msgstr "Sublinhado"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:482
 msgid "Monospace"
 msgstr "Monoespaçado"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:483
 msgid "Section"
 msgstr "Seção"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:484
 msgid "Subsection"
 msgstr "Subseção"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:485
 msgid "Subsubsection"
 msgstr "Subseção terciária"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:486
 msgid "Paragraph"
 msgstr "Parágrafo"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:487
 msgid "Subparagraph"
 msgstr "Subparágrafo"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:488
 msgid "Inline math"
 msgstr "Matemática em linha"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:489
 msgid "Display math"
 msgstr "Matemática em bloco"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:490
 msgid "α  Alpha"
 msgstr "α  Alfa"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:491
 msgid "β  Beta"
 msgstr "β  Beta"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:492
 msgid "γ  Gamma"
 msgstr "γ  Gama"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:493
 msgid "π  Pi"
 msgstr "π  Pi"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:494
 msgid "≤  Less than or equal to"
 msgstr "≤  Menor ou igual a"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:495
 msgid "≥  Greater than or equal to"
 msgstr "≥  Maior ou igual a"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:496
 msgid "≠  Not equal to"
 msgstr "≠  Diferente de"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:497
 msgid "×  Multiplication"
 msgstr "×  Multiplicação"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:498
 msgid "±  Plus or minus"
 msgstr "±  Mais ou menos"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:499
 msgid "∞  Infinity"
 msgstr "∞  Infinito"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:500
 msgid "∑  Summation"
 msgstr "∑  Somatório"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:501
 msgid "∫  Integral"
 msgstr "∫  Integral"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:502
 msgid "√  Square root"
 msgstr "√  Raiz quadrada"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:503
 msgid "Bulleted list"
 msgstr "Lista com marcadores"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:504
 msgid "Numbered list"
 msgstr "Lista numerada"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:505
 msgid "Quotation block"
 msgstr "Bloco de citação"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:506
 msgid "Increase indent"
 msgstr "Aumentar recuo"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:507
 msgid "Decrease indent"
 msgstr "Diminuir recuo"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:508 src/app/window/dialogs.rs:188
 msgid "Insert image"
 msgstr "Inserir imagem"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:510
 msgid "LaTeX comment"
 msgstr "Comentário LaTeX"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:511
 msgid "Footnote"
 msgstr "Nota de rodapé"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:512
 msgid "Review note"
 msgstr "Nota de revisão"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:513
 msgid "Add label"
 msgstr "Adicionar rótulo"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:514
 msgid "Cross-reference"
 msgstr "Referência cruzada"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:515
 msgid "Compile"
 msgstr "Compilar"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:516
 msgid "Toggle sidebar"
 msgstr "Alternar barra lateral"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:517
 msgid "Undo"
 msgstr "Desfazer"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:518
 msgid "Redo"
 msgstr "Refazer"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:519
 msgid "Choose a project folder"
 msgstr "Escolher pasta do projeto"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:520
 msgid "Choose where to create the project"
 msgstr "Escolher onde criar o projeto"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:521
 msgid "Import"
 msgstr "Importar"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:522
 msgid "Label identifier"
 msgstr "Identificador do rótulo"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:453
 msgid "Open project"
 msgstr "Abrir projeto"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:31
 msgid "Open at startup"
 msgstr "Abrir ao iniciar"
 
-#: src/app/window/mod.rs src/app/application_menu.rs
+#: src/app/window/preferences.rs:5
 msgid "Preferences"
 msgstr "Preferências"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:46
 msgid "Default folder for file dialogs"
 msgstr "Pasta padrão dos diálogos de arquivos"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:51
 msgid "Dialogs start in Downloads unless you choose another folder."
 msgstr "Os diálogos começam em Downloads, a menos que você escolha outra pasta."
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:70
 msgid "Choose folder…"
 msgstr "Escolher pasta…"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:80
 msgid "Choose default folder"
 msgstr "Escolha a pasta padrão"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:65
 msgid "Reset"
 msgstr "Redefinir"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:66
 msgid "Restore the system default folder"
 msgstr "Restaurar a pasta padrão do sistema"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:116
 msgid "No starting folder available"
 msgstr "Nenhuma pasta inicial disponível"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:38
 msgid "Reopen last project at startup"
 msgstr "Reabrir o último projeto ao iniciar"
 
-#: src/app/window/mod.rs
+#: src/app/window/preferences.rs:259 src/app/window/preferences.rs:266
 msgid "The last project folder could not be restored."
 msgstr "Não foi possível reabrir a pasta do último projeto."
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:455
 msgid "Close project"
 msgstr "Fechar projeto"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:457
 msgid "Automatic"
 msgstr "Automático"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:458
 msgid "Light"
 msgstr "Claro"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:459
 msgid "Dark"
 msgstr "Escuro"
 
-#: src/app/window/mod.rs
+#: src/app/window/mod.rs:456
 msgid "Quit"
 msgstr "Sair"
 
-#: src/app/window/mod.rs
+#: src/app/window/actions.rs:376
 msgid "Project closed"
 msgstr "Projeto fechado"
 
-#: src/app/window/mod.rs
+#: src/app/window/presentation/build_status.rs:156 src/app/window/references/library.rs:357
+#: src/app/window/references/authors.rs:251
 msgid "%d reference"
 msgid_plural "%d references"
 msgstr[0] "%d referência"
 msgstr[1] "%d referências"
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/context.rs:69
 msgid "Open with default application"
 msgstr "Abrir com o aplicativo padrão"
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/context.rs:81
 msgid "Copy path"
 msgstr "Copiar caminho"
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/context.rs:98
 msgid "Show in Files"
 msgstr "Mostrar no gerenciador de arquivos"
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/context.rs:88 src/app/window/references/details.rs:221
 msgid "Could not access the clipboard."
 msgstr "Não foi possível acessar a área de transferência."
 
-#: src/app/window/mod.rs
+#: src/app/window/project_files/context.rs:161
 msgid "Could not find the containing folder."
 msgstr "Não foi possível localizar a pasta que contém este item."
 
-#: src/app/window/mod.rs
+#: src/app/window/references/editor/author.rs:147
 msgid "Authors"
 msgstr "Autores"
 
-#: src/app/window/mod.rs
+#: src/app/window/presentation/reference_pages.rs:32
 msgid "Manage references"
 msgstr "Gerenciar referências"
 
-#: src/app/window/mod.rs
+#: src/app/window/presentation/reference_pages.rs:158
 msgid "Manage authors"
 msgstr "Gerenciar autores"
 
-#: src/app/window/mod.rs
+#: src/app/window/presentation/reference_pages.rs:163
+#: src/app/window/presentation/build_status.rs:104
+#: src/app/window/references/editor/author.rs:123
 msgid "Add author"
 msgstr "Adicionar autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/library.rs:385 src/app/window/references/authors.rs:225
 msgid "Edit author"
 msgstr "Editar autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/library.rs:377 src/app/window/references/authors.rs:220
 msgid "Author details"
 msgstr "Detalhes do autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/presentation/reference_pages.rs:173 src/app/window/references/authors.rs:51
+#: src/app/window/references/authors.rs:59 src/app/window/references/authors.rs:234
 msgid "Full name"
 msgstr "Nome completo"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:62 src/app/window/references/authors.rs:70
+#: src/app/window/references/authors.rs:239
 msgid "Name used in references"
 msgstr "Nome usado nas referências"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:76
 msgid "Generate"
 msgstr "Gerar"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/library.rs:363 src/app/window/references/authors.rs:81
+#: src/app/window/references/authors.rs:88 src/app/window/references/authors.rs:242
 msgid "ORCID"
 msgstr "ORCID"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:91 src/app/window/references/authors.rs:98
+#: src/app/window/references/authors.rs:243
 msgid "Email"
 msgstr "E-mail"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/library.rs:393
 msgid "Delete author"
 msgstr "Excluir autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/library.rs:330
 msgid "No authors yet. Add authors to organize your references."
 msgstr "Ainda não há autores. Adicione autores para organizar suas referências."
 
+#: src/app/window/references/library.rs:332
 msgid "No authors match this search."
 msgstr "Nenhum autor corresponde à pesquisa."
 
@@ -1633,70 +1780,70 @@ msgstr "Nenhum autor corresponde à pesquisa."
 msgid "Author name"
 msgstr "Nome do autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:187
 msgid "Author saved"
 msgstr "Autor salvo"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:317
 msgid "Author deleted"
 msgstr "Autor excluído"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:323
 msgid "Author has associated references"
 msgstr "Autor associado a referências"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:342
 msgid "The author ‘%s’ is associated with these references. Delete the author and all listed references?"
 msgstr "O autor ‘%s’ está associado a estas referências. Excluir o autor e todas as referências listadas?"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:331
 msgid "Delete author and references"
 msgstr "Excluir autor e referências"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/authors.rs:380
 msgid "Deleted author and %d references"
 msgstr "Autor e %d referências excluídos"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/editor/author.rs:50
 msgid "Find authors…"
 msgstr "Buscar autores…"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/editor/author.rs:62
 msgid "New author"
 msgstr "Novo autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/editor/author.rs:115
 msgid "Create and select this author"
 msgstr "Criar e selecionar este autor"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/editor/author.rs:125
 msgid "Select or create authors"
 msgstr "Selecionar ou criar autores"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/filters/author_selection.rs:97
 msgid "Remove author from this reference"
 msgstr "Remover autor desta referência"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/filters/author_selection.rs:65
 msgid "Move author up"
 msgstr "Mover autor para cima"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/filters/author_selection.rs:80
 msgid "Move author down"
 msgstr "Mover autor para baixo"
 
-#: src/app/window/mod.rs
+#: src/app/window/references/filters/author_selection.rs:137
 msgid "No matching authors"
 msgstr "Nenhum autor correspondente"
 
-#: src/app/window/mod.rs
+#: src/app/window/latex_tools.rs:337
 msgid "PDF generation failed: An error on line %d prevents compilation and PDF generation."
 msgstr "Falha na geração do PDF: Há um erro na linha %d que impede a compilação e a geração do PDF."
 
-#: src/app/window/mod.rs
+#: src/app/window/references/library.rs:159
 msgid "Your library starts here: add a reference or import BibTeX."
 msgstr "Sua biblioteca começa aqui: adicione uma referência ou importe BibTeX."
 
-#: src/references/library.rs
+#: src/references/library.rs:205 src/references/library.rs:243
 msgid "The BibTeX marker “others” cannot be used as an author name."
 msgstr "O marcador BibTeX “others” não pode ser usado como nome de autor."

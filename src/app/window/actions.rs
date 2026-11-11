@@ -36,16 +36,16 @@ pub(super) fn find_search_result(page: &gtk::Box) -> gtk::Label {
 }
 
 pub(super) fn connect_navigation(state: &Rc<State>) {
-    let search_entry = state.search_entry.clone();
+    let search_entry = state.editor_ui.search_entry.clone();
     search_entry.connect_search_changed({
         let state = state.clone();
         move |entry| {
             let query = entry.text();
             if query.trim().is_empty() {
-                state.search_result.set_label("");
+                state.editor_ui.search_result.set_label("");
             } else {
                 let found = state.editor.search_from_start(query.as_str(), true);
-                state.search_result.set_label(&tr(if found {
+                state.editor_ui.search_result.set_label(&tr(if found {
                     "Match found"
                 } else {
                     "No results"
@@ -53,53 +53,53 @@ pub(super) fn connect_navigation(state: &Rc<State>) {
             }
         }
     });
-    state.library_search.connect_search_changed({
+    state.library_ui.library_search.connect_search_changed({
         let state = state.clone();
         move |_| refresh_library(&state)
     });
-    state.tag_search.connect_search_changed({
+    state.library_ui.tag_search.connect_search_changed({
         let state = state.clone();
         move |_| refresh_tags(&state)
     });
-    state.tag_sort.connect_selected_notify({
+    state.library_ui.tag_sort.connect_selected_notify({
         let state = state.clone();
         move |_| refresh_tags(&state)
     });
-    state.tag_sort_descending.connect_toggled({
+    state.library_ui.tag_sort_descending.connect_toggled({
         let state = state.clone();
         move |_| refresh_tags(&state)
     });
-    state.author_search.connect_search_changed({
+    state.library_ui.author_search.connect_search_changed({
         let state = state.clone();
         move |_| refresh_authors(&state)
     });
-    state.reference_sort.connect_selected_notify({
+    state.library_ui.reference_sort.connect_selected_notify({
         let state = state.clone();
         move |_| refresh_library(&state)
     });
-    state.reference_sort_descending.connect_toggled({
+    state.library_ui.reference_sort_descending.connect_toggled({
         let state = state.clone();
         move |_| refresh_library(&state)
     });
-    state.author_sort.connect_selected_notify({
+    state.library_ui.author_sort.connect_selected_notify({
         let state = state.clone();
         move |_| refresh_authors(&state)
     });
-    state.author_sort_descending.connect_toggled({
+    state.library_ui.author_sort_descending.connect_toggled({
         let state = state.clone();
         move |_| refresh_authors(&state)
     });
     let state_weak = Rc::downgrade(state);
     for filter in [
-        state.reference_filters.author.clone(),
-        state.reference_filters.year.clone(),
-        state.reference_filters.tag.clone(),
-        state.reference_filters.kind.clone(),
+        state.library_ui.reference_filters.author.clone(),
+        state.library_ui.reference_filters.year.clone(),
+        state.library_ui.reference_filters.tag.clone(),
+        state.library_ui.reference_filters.kind.clone(),
     ] {
         let state_weak = state_weak.clone();
         filter.connect_selected_notify(move |_| {
             if let Some(state) = state_weak.upgrade() {
-                if !state.library_filters_updating.get() {
+                if !state.library_ui.library_filters_updating.get() {
                     refresh_library(&state);
                 }
             }
@@ -134,10 +134,10 @@ pub(super) fn connect_actions(state: &Rc<State>) {
     install_action(state, "find-document", toggle_search);
     install_action(state, "toggle-sidebar", |s| {
         set_sidebar_visible(
-            &s.layout,
-            &s.sidebar_revealer,
-            &s.sidebar_width,
-            s.layout.start_child().is_none(),
+            &s.window_ui.layout,
+            &s.window_ui.sidebar_revealer,
+            &s.window_ui.sidebar_width,
+            s.window_ui.layout.start_child().is_none(),
         );
     });
     install_action(state, "search-next", |s| search_document(&s, true));
@@ -153,7 +153,7 @@ pub(super) fn connect_actions(state: &Rc<State>) {
         let Some(state) = weak.upgrade() else {
             return;
         };
-        state.startup_restore_cancelled.set(true);
+        state.project.startup_restore_cancelled.set(true);
         let Some(path) = parameter.and_then(|value| value.get::<String>()) else {
             return;
         };
@@ -169,7 +169,7 @@ pub(super) fn connect_actions(state: &Rc<State>) {
     install_action(state, "create-folder", create_project_folder);
     install_action(state, "mode-code", |s| {
         s.editor.set_mode(EditorMode::Code);
-        s.code_mode_button.set_active(true);
+        s.editor_ui.code_mode_button.set_active(true);
     });
     install_action(state, "mode-visual", |s| {
         let supports_visual = s.editor.file().is_none_or(|path| {
@@ -178,9 +178,9 @@ pub(super) fn connect_actions(state: &Rc<State>) {
         });
         if supports_visual {
             s.editor.set_mode(EditorMode::Visual);
-            s.visual_mode_button.set_active(true);
+            s.editor_ui.visual_mode_button.set_active(true);
         } else {
-            s.code_mode_button.set_active(true);
+            s.editor_ui.code_mode_button.set_active(true);
             show_toast(
                 &s,
                 &tr("Visual mode is available only for LaTeX documents."),
@@ -298,7 +298,7 @@ pub(super) fn connect_actions(state: &Rc<State>) {
         }
     });
     state.window.add_action(&compile_action);
-    state.compile_action.replace(Some(compile_action));
+    state.build_ui.compile_action.replace(Some(compile_action));
     install_action(state, "export-pdf", choose_pdf_export);
     install_action(state, "add-reference", |s| edit_reference(&s, None));
     install_action(state, "import-references", |s| {
@@ -321,10 +321,10 @@ pub(super) fn connect_window_close_guard(state: &Rc<State>) {
             let Some(state) = state.upgrade() else {
                 return glib::Propagation::Proceed;
             };
-            if state.close_confirmed.replace(false) {
+            if state.project.close_confirmed.replace(false) {
                 return glib::Propagation::Proceed;
             }
-            if state.save_in_progress.get() {
+            if state.project.save_in_progress.get() {
                 show_toast(&state, &tr("A document save is still in progress."));
                 return glib::Propagation::Stop;
             }
@@ -332,7 +332,7 @@ pub(super) fn connect_window_close_guard(state: &Rc<State>) {
                 return glib::Propagation::Proceed;
             }
             with_discard_confirmation(&state, move |state| {
-                state.close_confirmed.set(true);
+                state.project.close_confirmed.set(true);
                 state.window.close();
             });
             glib::Propagation::Stop
@@ -343,28 +343,31 @@ pub(super) fn connect_window_close_guard(state: &Rc<State>) {
 pub(super) fn close_project(state: Rc<State>) {
     with_discard_confirmation(&state, move |state| {
         state
+            .project
             .open_request_id
-            .set(state.open_request_id.get().wrapping_add(1));
+            .set(state.project.open_request_id.get().wrapping_add(1));
         state
+            .project
             .project_scan_id
-            .set(state.project_scan_id.get().wrapping_add(1));
+            .set(state.project.project_scan_id.get().wrapping_add(1));
         state
+            .project
             .project_open_id
-            .set(state.project_open_id.get().wrapping_add(1));
-        state.project_root.borrow_mut().take();
-        state.project_target.borrow_mut().take();
-        state.current_file.borrow_mut().take();
-        state.file_encoding.set(project::TextEncoding::Utf8);
-        state.main_tex.borrow_mut().take();
-        state.expanded_folders.borrow_mut().clear();
+            .set(state.project.project_open_id.get().wrapping_add(1));
+        state.project.project_root.borrow_mut().take();
+        state.project.project_target.borrow_mut().take();
+        state.project.current_file.borrow_mut().take();
+        state.project.file_encoding.set(project::TextEncoding::Utf8);
+        state.project.main_tex.borrow_mut().take();
+        state.project.expanded_folders.borrow_mut().clear();
         state.editor.set_file(None);
         state.editor.load_text(&LatexEditor::new_document_text());
         state.image_preview.set_filename(None::<&Path>);
         state
             .file_pdf_preview
             .set_message(&tr("Select a PDF file to preview it here."));
-        state.search_entry.set_text("");
-        state.search_panel.set_visible(false);
+        state.editor_ui.search_entry.set_text("");
+        state.editor_ui.search_panel.set_visible(false);
         state
             .pdf_preview
             .set_message(&tr("The compiled PDF will appear here"));
@@ -378,16 +381,25 @@ pub(super) fn close_project(state: Rc<State>) {
 }
 
 pub(super) fn show_page(state: &Rc<State>, page: &str) {
-    state.page_stack.set_visible_child_name(page);
+    state.editor_ui.page_stack.set_visible_child_name(page);
     let sidebar_page = if page == "editor" {
         "editor"
     } else {
         "references"
     };
-    state.sidebar_pages.set_visible_child_name(sidebar_page);
-    state.editor_tab_button.set_active(page == "editor");
-    state.references_tab_button.set_active(page != "editor");
-    state.title.set_label(&tr(match page {
+    state
+        .editor_ui
+        .sidebar_pages
+        .set_visible_child_name(sidebar_page);
+    state
+        .editor_ui
+        .editor_tab_button
+        .set_active(page == "editor");
+    state
+        .editor_ui
+        .references_tab_button
+        .set_active(page != "editor");
+    state.editor_ui.title.set_label(&tr(match page {
         "references" => "References",
         "tags" => "Tags",
         "authors" => "Authors",
@@ -425,13 +437,13 @@ pub(super) fn set_sidebar_visible(
 }
 
 pub(super) fn toggle_search(state: Rc<State>) {
-    if search_is_references_page(&state.page_stack) {
-        match state.page_stack.visible_child_name().as_deref() {
+    if search_is_references_page(&state.editor_ui.page_stack) {
+        match state.editor_ui.page_stack.visible_child_name().as_deref() {
             Some("references") => {
-                state.library_search.grab_focus();
+                state.library_ui.library_search.grab_focus();
             }
             Some("authors") => {
-                state.author_search.grab_focus();
+                state.library_ui.author_search.grab_focus();
             }
             _ => {}
         }
@@ -441,15 +453,15 @@ pub(super) fn toggle_search(state: Rc<State>) {
     if kind.is_some_and(|kind| !kind.is_text_editable()) {
         return;
     }
-    if state.page_stack.visible_child_name().as_deref() != Some("editor") {
+    if state.editor_ui.page_stack.visible_child_name().as_deref() != Some("editor") {
         show_page(&state, "editor");
     }
-    let open = !state.search_panel.is_visible();
-    state.search_panel.set_visible(open);
+    let open = !state.editor_ui.search_panel.is_visible();
+    state.editor_ui.search_panel.set_visible(open);
     if open {
         state.editor.focus();
-        state.search_entry.grab_focus();
-        state.search_entry.select_region(0, -1);
+        state.editor_ui.search_entry.grab_focus();
+        state.editor_ui.search_entry.select_region(0, -1);
     } else {
         state.editor.focus();
     }
@@ -463,7 +475,7 @@ pub(super) fn search_is_references_page(page_stack: &gtk::Stack) -> bool {
 }
 
 pub(super) fn search_document(state: &Rc<State>, forward: bool) {
-    let query = state.search_entry.text();
+    let query = state.editor_ui.search_entry.text();
     let found = state.editor.search(query.as_str(), forward);
     let message = if query.trim().is_empty() {
         String::new()
@@ -472,15 +484,15 @@ pub(super) fn search_document(state: &Rc<State>, forward: bool) {
     } else {
         tr("No results")
     };
-    state.search_result.set_label(&message);
+    state.editor_ui.search_result.set_label(&message);
 }
 
 pub(super) fn show_toast(state: &Rc<State>, message: &str) {
-    state.toast.add_toast(adw::Toast::new(message));
+    state.window_ui.toast.add_toast(adw::Toast::new(message));
 }
 
 pub(super) fn update_title(state: &Rc<State>, dirty: bool) {
-    let path = state.current_file.borrow().clone();
+    let path = state.project.current_file.borrow().clone();
     let name = path
         .as_ref()
         .and_then(|file| file.file_name())

@@ -24,7 +24,7 @@ pub(super) fn choose_pdf_export(state: Rc<State>) {
 
 pub(super) fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
     if state.editor.dirty() {
-        if let Some(path) = state.current_file.borrow().clone() {
+        if let Some(path) = state.project.current_file.borrow().clone() {
             let export_after_save = export_to.clone();
             let after: SaveCallback =
                 Rc::new(move |state| compile(&state, export_after_save.clone()));
@@ -34,14 +34,14 @@ pub(super) fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
         }
         return;
     }
-    let main = state.main_tex.borrow().clone().or_else(|| {
-        state.current_file.borrow().clone().filter(|path| {
+    let main = state.project.main_tex.borrow().clone().or_else(|| {
+        state.project.current_file.borrow().clone().filter(|path| {
             path.extension()
                 .is_some_and(|ext| ext.eq_ignore_ascii_case("tex"))
         })
     });
     let Some(main) = main else {
-        if let Some(root) = state.project_root.borrow().clone() {
+        if let Some(root) = state.project.project_root.borrow().clone() {
             let (sender, receiver) = mpsc::channel();
             let root_for_worker = root.clone();
             std::thread::spawn(move || {
@@ -53,7 +53,7 @@ pub(super) fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
             poll_result(receiver, move |result| match result {
                 Ok(files) => {
                     if let Some(main) = files.first() {
-                        *state_for_result.main_tex.borrow_mut() = Some(main.clone());
+                        *state_for_result.project.main_tex.borrow_mut() = Some(main.clone());
                         compile(&state_for_result, export_to);
                     } else {
                         show_no_main_document(&state_for_result);
@@ -72,9 +72,9 @@ pub(super) fn compile(state: &Rc<State>, export_to: Option<PathBuf>) {
         }
         return;
     };
-    state.main_tex.replace(Some(main.clone()));
+    state.project.main_tex.replace(Some(main.clone()));
     set_build_status(state, "Building…");
-    let active_source = if state.current_file.borrow().as_deref() == Some(main.as_path()) {
+    let active_source = if state.project.current_file.borrow().as_deref() == Some(main.as_path()) {
         Some(state.editor.text())
     } else {
         None

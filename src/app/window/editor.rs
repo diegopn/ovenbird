@@ -8,8 +8,8 @@ pub(super) fn configure_editor_callbacks(state: &Rc<State>) {
     state.editor.set_history_changed({
         let state = state.clone();
         move |undo, redo| {
-            state.undo_button.set_sensitive(undo);
-            state.redo_button.set_sensitive(redo);
+            state.editor_ui.undo_button.set_sensitive(undo);
+            state.editor_ui.redo_button.set_sensitive(redo);
             refresh_build_status(&state);
         }
     });
@@ -21,19 +21,25 @@ pub(super) fn update_editor_capabilities(state: &Rc<State>) {
     let text_editable = kind.is_none_or(ProjectFileKind::is_text_editable);
     let supports_search = text_editable;
 
-    state.mode_toolbar.set_visible(text_editable);
-    state.code_mode_button.set_visible(supports_latex);
-    state.visual_mode_button.set_visible(supports_latex);
-    state.find_document_button.set_visible(supports_search);
+    state.editor_ui.mode_toolbar.set_visible(text_editable);
+    state.editor_ui.code_mode_button.set_visible(supports_latex);
+    state
+        .editor_ui
+        .visual_mode_button
+        .set_visible(supports_latex);
+    state
+        .editor_ui
+        .find_document_button
+        .set_visible(supports_search);
     state
         .bibtex_citation_button
         .set_visible(kind == Some(ProjectFileKind::Bibtex));
-    state.latex_toolbar.set_visible(supports_latex);
-    state.editor_toolbar.set_visible(text_editable);
+    state.editor_ui.latex_toolbar.set_visible(supports_latex);
+    state.editor_ui.editor_toolbar.set_visible(text_editable);
     if !supports_search {
-        state.search_panel.set_visible(false);
+        state.editor_ui.search_panel.set_visible(false);
     }
-    if let Some(button) = state.save_button.borrow().as_ref() {
+    if let Some(button) = state.build_ui.save_button.borrow().as_ref() {
         button.set_visible(text_editable);
     }
 
@@ -45,7 +51,7 @@ pub(super) fn update_editor_capabilities(state: &Rc<State>) {
 
     if !supports_latex {
         state.editor.set_mode(EditorMode::Code);
-        state.code_mode_button.set_active(true);
+        state.editor_ui.code_mode_button.set_active(true);
     }
 }
 

@@ -14,9 +14,10 @@ The application edits ordinary `.tex` files and keeps project documents in folde
 
 ## Repository map
 
-- `src/app/mod.rs`, `src/app/window/`, and `src/app/application_menu.rs` contain application startup, the main window, and application actions.
-- `src/ui/editor.rs`, `src/project.rs`, and `src/history.rs` implement document editing, project file operations, and edit history.
-- `src/references/` handles BibTeX data, import/export, reference guides, and the local reference library; `src/storage.rs` provides XDG paths and atomic writes, while `src/app/settings.rs` stores application preferences.
+- `src/app/mod.rs`, `src/app/window/`, and `src/app/application_menu.rs` contain application startup, the main window, and application actions. Window presentation, project-file management, and reference workflows are split into responsibility-specific modules beneath `src/app/window/`.
+- `src/ui/editor.rs` exposes the editor API; `src/ui/editor/` separates construction, editing, search, visual mode, diagnostics, and history. `src/project.rs` and `src/history.rs` implement project file operations and edit history.
+- `src/references/bibtex/` separates BibTeX models, schema, parsing, display decoding, and citation formatting. The surrounding `src/references/` modules handle import/export, reference guides, and the local reference library; `src/storage.rs` provides XDG paths and atomic writes, while `src/app/settings.rs` stores application preferences.
+- `src/app/window/presentation/`, `project_files/`, and `references/` organize window UI, project-file management, and reference workflows by responsibility.
 - `src/latex/` supports LaTeX parsing, compilation, diagnostics, and bundled templates; PDF preview widgets live in `src/ui/pdf_preview.rs`.
 - `src/tests.rs` contains Rust unit tests. Other Rust modules cover commands, search, internationalization, and UI integration.
 - `data/` contains application metadata, icons, and styles. `po/` contains gettext catalogs. `src/templates/` contains template files and their license notices.
