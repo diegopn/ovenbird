@@ -2,6 +2,10 @@ use adw::prelude::*;
 use gtk::gio;
 use gtk::glib;
 
+mod libpanel;
+mod runtime;
+mod window;
+
 #[link(name = "gtk-4")]
 unsafe extern "C" {
     fn gtk_style_context_add_provider_for_display(
@@ -39,7 +43,7 @@ fn use_existing_window_or_create<W>(
 
 pub fn run() -> glib::ExitCode {
     let flatpak_id = std::env::var("FLATPAK_ID").ok();
-    let application_id = crate::runtime::application_id_for_runtime(flatpak_id.as_deref());
+    let application_id = runtime::application_id_for_runtime(flatpak_id.as_deref());
     let application = adw::Application::builder()
         .application_id(application_id)
         .flags(gio::ApplicationFlags::HANDLES_OPEN)
@@ -48,7 +52,7 @@ pub fn run() -> glib::ExitCode {
         use_existing_window_or_create(
             application.active_window(),
             |window| window.present(),
-            || crate::window::OvenbirdWindow::new(application).present(),
+            || window::OvenbirdWindow::new(application).present(),
         );
     });
     application.connect_open(|application, files, _hint| {
@@ -63,7 +67,7 @@ pub fn run() -> glib::ExitCode {
         }
     });
     application.connect_startup(|application| {
-        crate::libpanel::initialize();
+        libpanel::initialize();
         install_css();
         application.set_accels_for_action("win.new-project", &["<Primary><Alt>n"]);
         application.set_accels_for_action("win.open-document", &["<Primary>o"]);

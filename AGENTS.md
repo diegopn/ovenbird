@@ -14,11 +14,11 @@ The application edits ordinary `.tex` files and keeps project documents in folde
 
 ## Repository map
 
-- `rust/src/app.rs`, `window.rs`, and `application_menu.rs` contain application startup, the main window, and application actions.
-- `rust/src/editor.rs`, `project.rs`, and `history.rs` implement document editing, project file operations, and edit history.
-- `rust/src/bibtex.rs`, `reference_exchange.rs`, `reference_guides.rs`, and `storage.rs` handle reference data, import/export, and local persistence.
-- `rust/src/latex.rs`, `build.rs`, `latex_diagnostics.rs`, `pdf_preview.rs`, and `templates.rs` support LaTeX workflows, previews, and bundled templates.
-- `rust/src/tests.rs` contains Rust unit tests. Other Rust modules cover commands, search, internationalization, and UI integration.
+- `src/app/mod.rs`, `src/app/window/`, and `src/app/application_menu.rs` contain application startup, the main window, and application actions.
+- `src/ui/editor.rs`, `src/project.rs`, and `src/history.rs` implement document editing, project file operations, and edit history.
+- `src/references/` handles BibTeX data, import/export, reference guides, and the local reference library; `src/storage.rs` provides XDG paths and atomic writes, while `src/app/settings.rs` stores application preferences.
+- `src/latex/` supports LaTeX parsing, compilation, diagnostics, and bundled templates; PDF preview widgets live in `src/ui/pdf_preview.rs`.
+- `src/tests.rs` contains Rust unit tests. Other Rust modules cover commands, search, internationalization, and UI integration.
 - `data/` contains application metadata, icons, and styles. `po/` contains gettext catalogs. `src/templates/` contains template files and their license notices.
 - `meson.build` and `src/meson.build` define the integration build. Cargo dependencies are pinned in `Cargo.lock`, and `cargo-cache/` supplies the checked-in registry cache used by Meson for offline builds.
 

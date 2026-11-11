@@ -1,3 +1,7 @@
+pub mod build;
+pub mod diagnostics;
+pub mod templates;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
     Text { text: String, marks: Vec<String> },

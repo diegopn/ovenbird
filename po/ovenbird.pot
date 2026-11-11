@@ -53,99 +53,99 @@ msgstr ""
 msgid "Math delimiter opens inside another math expression: "
 msgstr ""
 
-#: rust/src/bibtex.rs:50
+#: src/references/bibtex.rs:50
 msgid "Journal article"
 msgstr ""
 
-#: rust/src/bibtex.rs:51
+#: src/references/bibtex.rs:51
 msgid "Book"
 msgstr ""
 
-#: rust/src/bibtex.rs:52
+#: src/references/bibtex.rs:52
 msgid "Book chapter"
 msgstr ""
 
-#: rust/src/bibtex.rs:53
+#: src/references/bibtex.rs:53
 msgid "Conference paper"
 msgstr ""
 
-#: rust/src/bibtex.rs:54
+#: src/references/bibtex.rs:54
 msgid "Doctoral thesis"
 msgstr ""
 
-#: rust/src/bibtex.rs:55
+#: src/references/bibtex.rs:55
 msgid "Master's thesis"
 msgstr ""
 
-#: rust/src/bibtex.rs:56
+#: src/references/bibtex.rs:56
 msgid "Technical report"
 msgstr ""
 
-#: rust/src/bibtex.rs:57
+#: src/references/bibtex.rs:57
 msgid "Online resource"
 msgstr ""
 
-#: rust/src/bibtex.rs:58
+#: src/references/bibtex.rs:58
 msgid "Miscellaneous"
 msgstr ""
 
-#: rust/src/bibtex.rs:64
+#: src/references/bibtex.rs:64
 msgid "Title"
 msgstr ""
 
-#: rust/src/bibtex.rs:65
+#: src/references/bibtex.rs:65
 msgid "Author(s)"
 msgstr ""
 
-#: rust/src/bibtex.rs:66
+#: src/references/bibtex.rs:66
 msgid "Editor(s)"
 msgstr ""
 
-#: rust/src/bibtex.rs:67
+#: src/references/bibtex.rs:67
 msgid "Year / date"
 msgstr ""
 
-#: rust/src/bibtex.rs
+#: src/references/bibtex.rs
 msgid "Year"
 msgstr ""
 
-#: rust/src/bibtex.rs:68
+#: src/references/bibtex.rs:68
 msgid "Journal"
 msgstr ""
 
-#: rust/src/bibtex.rs:69
+#: src/references/bibtex.rs:69
 msgid "Publisher"
 msgstr ""
 
-#: rust/src/bibtex.rs:70
+#: src/references/bibtex.rs:70
 msgid "Volume"
 msgstr ""
 
-#: rust/src/bibtex.rs:71
+#: src/references/bibtex.rs:71
 msgid "Number / issue"
 msgstr ""
 
-#: rust/src/bibtex.rs:72
+#: src/references/bibtex.rs:72
 msgid "Edition"
 msgstr ""
 
-#: rust/src/bibtex.rs:73
+#: src/references/bibtex.rs:73
 msgid "Pages"
 msgstr ""
 
-#: rust/src/bibtex.rs:74
+#: src/references/bibtex.rs:74
 msgid "DOI"
 msgstr ""
 
-#: rust/src/bibtex.rs:75 rust/src/window.rs:1959
+#: src/references/bibtex.rs:75 src/app/window/presentation.rs:1035
 msgid "URL"
 msgstr ""
 
-#: rust/src/bibtex.rs:76
+#: src/references/bibtex.rs:76
 msgid "Keywords"
 msgstr ""
 
-#: rust/src/bibtex.rs:106
+#: src/references/bibtex.rs:106
 msgid "Tags"
 msgstr ""
 
@@ -212,256 +212,256 @@ msgstr ""
 msgid "Type: %s"
 msgstr ""
 
-#: rust/src/bibtex.rs:77
+#: src/references/bibtex.rs:77
 msgid "Series"
 msgstr ""
 
-#: rust/src/bibtex.rs:78
+#: src/references/bibtex.rs:78
 msgid "Publication location"
 msgstr ""
 
-#: rust/src/bibtex.rs:79
+#: src/references/bibtex.rs:79
 msgid "ISBN"
 msgstr ""
 
-#: rust/src/bibtex.rs:80
+#: src/references/bibtex.rs:80
 msgid "Chapter"
 msgstr ""
 
-#: rust/src/bibtex.rs:81
+#: src/references/bibtex.rs:81
 msgid "Website or organization"
 msgstr ""
 
-#: rust/src/bibtex.rs:82
+#: src/references/bibtex.rs:82
 msgid "Organization"
 msgstr ""
 
-#: rust/src/bibtex.rs:83
+#: src/references/bibtex.rs:83
 msgid "University or academic institution"
 msgstr ""
 
-#: rust/src/bibtex.rs:84
+#: src/references/bibtex.rs:84
 msgid "Institution"
 msgstr ""
 
-#: rust/src/bibtex.rs:85
+#: src/references/bibtex.rs:85
 msgid "Report type"
 msgstr ""
 
-#: rust/src/bibtex.rs:86
+#: src/references/bibtex.rs:86
 msgid "Month"
 msgstr ""
 
-#: rust/src/bibtex.rs:87
+#: src/references/bibtex.rs:87
 msgid "Note"
 msgstr ""
 
-#: rust/src/bibtex.rs:88
+#: src/references/bibtex.rs:88
 msgid "Publication method"
 msgstr ""
 
-#: rust/src/bibtex.rs:89
+#: src/references/bibtex.rs:89
 msgid "Access date"
 msgstr ""
 
-#: rust/src/bibtex.rs:90
+#: src/references/bibtex.rs:90
 msgid "Proceedings title"
 msgstr ""
 
-#: rust/src/bibtex.rs:91
+#: src/references/bibtex.rs:91
 msgid "Book title"
 msgstr ""
 
-#: rust/src/editor.rs:416
+#: src/ui/editor.rs:416
 msgid "New document"
 msgstr ""
 
-#: rust/src/editor.rs:417
+#: src/ui/editor.rs:417
 msgid "Introduction"
 msgstr ""
 
-#: rust/src/editor.rs:418
+#: src/ui/editor.rs:418
 msgid "Start writing here."
 msgstr ""
 
-#: rust/src/pdf_preview.rs:114
+#: src/ui/pdf_preview.rs:114
 msgid "Previous page"
 msgstr ""
 
-#: rust/src/pdf_preview.rs:118
+#: src/ui/pdf_preview.rs:118
 msgid "Next page"
 msgstr ""
 
-#: rust/src/pdf_preview.rs:207
+#: src/ui/pdf_preview.rs:207
 msgid "Zoom out"
 msgstr ""
 
-#: rust/src/pdf_preview.rs:212
+#: src/ui/pdf_preview.rs:212
 msgid "Zoom in"
 msgstr ""
 
-#: rust/src/pdf_preview.rs:128
+#: src/ui/pdf_preview.rs:128
 msgid "The compiled PDF will appear here"
 msgstr ""
 
-#: rust/src/pdf_preview.rs:240
+#: src/ui/pdf_preview.rs:240
 msgid "The PDF has no pages."
 msgstr ""
 
-#: rust/src/pdf_preview.rs:258
+#: src/ui/pdf_preview.rs:258
 msgid "PDF opened in the default viewer"
 msgstr ""
 
-#: rust/src/window.rs:164
+#: src/app/window/mod.rs:164
 msgid "Compile the document to create the PDF."
 msgstr ""
 
-#: rust/src/window.rs:165 rust/src/window.rs:1160
+#: src/app/window/mod.rs:165 src/app/window/presentation.rs:250
 msgid "Not built yet"
 msgstr ""
 
-#: rust/src/window.rs:218
+#: src/app/window/mod.rs:218
 msgid "Find in document"
 msgstr ""
 
-#: rust/src/window.rs:227
+#: src/app/window/mod.rs:227
 msgid "Main menu"
 msgstr ""
 
-#: rust/src/window.rs:379
+#: src/app/window/mod.rs:379
 msgid "About Ovenbird"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Created by Diego Pereira do Nascimento"
 msgstr ""
 
-#: rust/src/window.rs:381
+#: src/app/window/mod.rs:381
 msgid "Dedicated to my wife, Karina, who always encourages me to go further."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Report an issue"
 msgstr ""
 
-#: rust/src/window.rs:384
+#: src/app/window/mod.rs:384
 msgid "Project repository"
 msgstr ""
 
-#: rust/src/window.rs:385
+#: src/app/window/mod.rs:385
 msgid "Project website"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Project creator's website"
 msgstr ""
 
-#: rust/src/window.rs:234
+#: src/app/window/mod.rs:234
 msgid "WORKSPACE"
 msgstr ""
 
-#: rust/src/window.rs:241
+#: src/app/window/mod.rs:241
 msgid "Editor"
 msgstr ""
 
-#: rust/src/window.rs:360
+#: src/app/window/mod.rs:360
 msgid "LaTeX editor"
 msgstr ""
 
-#: rust/src/window.rs:247
+#: src/app/window/mod.rs:247
 msgid "Project files"
 msgstr ""
 
-#: rust/src/window.rs:255
+#: src/app/window/mod.rs:255
 msgid "Create files and folders"
 msgstr ""
 
-#: rust/src/window.rs:271
+#: src/app/window/mod.rs:271
 msgid "References"
 msgstr ""
 
-#: rust/src/window.rs:284
+#: src/app/window/mod.rs:284
 msgid "LaTeX · local references"
 msgstr ""
 
-#: rust/src/window.rs:345 rust/src/window.rs:1657
+#: src/app/window/mod.rs:345 src/app/window/presentation.rs:733
 msgid "New folder"
 msgstr ""
 
-#: rust/src/window.rs:363
+#: src/app/window/mod.rs:363
 msgid "Code"
 msgstr ""
 
-#: rust/src/window.rs:366
+#: src/app/window/mod.rs:366
 msgid "Visual"
 msgstr ""
 
-#: rust/src/window.rs:371
+#: src/app/window/mod.rs:371
 msgid ""
 "Switch modes at any time without creating another version of the document"
 msgstr ""
 
-#: rust/src/window.rs:384
+#: src/app/window/mod.rs:384
 msgid "Find in document…"
 msgstr ""
 
-#: rust/src/window.rs:398
+#: src/app/window/mod.rs:418
 msgid "Close search"
 msgstr ""
 
-#: rust/src/window.rs:416
+#: src/app/window/mod.rs:436
 msgid "Normal text"
 msgstr ""
 
-#: rust/src/window.rs:433
+#: src/app/window/mod.rs:453
 msgid "Math"
 msgstr ""
 
-#: rust/src/window.rs:438
+#: src/app/window/mod.rs:458
 msgid "Math symbols"
 msgstr ""
 
-#: rust/src/window.rs:441 rust/src/window.rs:2098
+#: src/app/window/mod.rs:461 src/app/window/actions.rs:39
 msgid "Insert citation"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Citation"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Bibliographic reference"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Bibliographic reference format"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Add bibliographic reference"
 msgstr ""
 
-#: rust/src/window.rs:442
+#: src/app/window/mod.rs:462
 msgid "Find and insert a bibliography reference"
 msgstr ""
 
-#: rust/src/window.rs:448
+#: src/app/window/mod.rs:468
 msgid "Lists and indentation"
 msgstr ""
 
-#: rust/src/window.rs:453
+#: src/app/window/mod.rs:473
 msgid "More"
 msgstr ""
 
-#: rust/src/window.rs:553
+#: src/app/window/presentation.rs:79
 msgid "Local library"
 msgstr ""
 
-#: rust/src/window.rs:557
+#: src/app/window/presentation.rs:83
 msgid "Your references stay on this computer and remain available offline."
 msgstr ""
 
-#: rust/src/window.rs:563 rust/src/window.rs:2103
+#: src/app/window/presentation.rs:89 src/app/window/actions.rs:44
 msgid "Search references…"
 msgstr ""
 
@@ -498,7 +498,7 @@ msgstr ""
 msgid "All types"
 msgstr ""
 
-#: rust/src/window.rs:566
+#: src/app/window/presentation.rs:92
 msgid "Add reference"
 msgstr ""
 
@@ -511,1184 +511,1184 @@ msgstr ""
 msgid "Add a reference to the local library"
 msgstr ""
 
-#: rust/src/window.rs:569
+#: src/app/window/presentation.rs:95
 msgid "Import BibTeX"
 msgstr ""
 
-#: rust/src/window.rs:572
+#: src/app/window/presentation.rs:98
 msgid "Export BibTeX"
 msgstr ""
 
-#: rust/src/window.rs:1933 rust/src/window.rs:7901
+#: src/app/window/presentation.rs:1009 src/app/window/references.rs:2826
 msgid "Import references"
 msgstr ""
 
-#: rust/src/window.rs:1934 rust/src/window.rs:7906
+#: src/app/window/presentation.rs:1010 src/app/window/references.rs:2831
 msgid "Export references"
 msgstr ""
 
-#: rust/src/window.rs:7902
+#: src/app/window/references.rs:2827
 msgid "Choose a format to import."
 msgstr ""
 
-#: rust/src/window.rs:7907
+#: src/app/window/references.rs:2832
 msgid "Choose a format to export."
 msgstr ""
 
-#: rust/src/window.rs:7951
+#: src/app/window/references.rs:2876
 msgid "Standard format for bibliographic references."
 msgstr ""
 
-#: rust/src/window.rs:7979
+#: src/app/window/references.rs:2904
 msgid "Platform guides"
 msgstr ""
 
 msgid "No references match the current search and filters."
 msgstr ""
 
-#: rust/src/window.rs:601
+#: src/app/window/presentation.rs:127
 msgid "Show or hide the sidebar"
 msgstr ""
 
-#: rust/src/window.rs:604
+#: src/app/window/presentation.rs:130
 msgid "Save document"
 msgstr ""
 
-#: rust/src/window.rs:617
+#: src/app/window/presentation.rs:143
 msgid "Compile document"
 msgstr ""
 
-#: rust/src/window.rs:621
+#: src/app/window/presentation.rs:147
 msgid "Compile and create PDF"
 msgstr ""
 
-#: rust/src/window.rs:636 rust/src/window.rs:2651
+#: src/app/window/presentation.rs:162 src/app/window/actions.rs:531
 msgid "Export PDF"
 msgstr ""
 
-#: rust/src/window.rs:646
+#: src/app/window/presentation.rs:172
 msgid "Document and build details"
 msgstr ""
 
-#: rust/src/window.rs:652 rust/src/window.rs:1159 rust/src/window.rs:1168
-#: rust/src/window.rs:1218 rust/src/window.rs:1315 rust/src/window.rs:1899
-#: rust/src/window.rs:2195 rust/src/window.rs:2528 rust/src/window.rs:2529
-#: rust/src/window.rs:2623
+#: src/app/window/presentation.rs:178 src/app/window/presentation.rs:249 src/app/window/presentation.rs:258
+#: src/app/window/presentation.rs:290 src/app/window/presentation.rs:387 src/app/window/presentation.rs:975
+#: src/app/window/actions.rs:136 src/app/window/actions.rs:408 src/app/window/actions.rs:409
+#: src/app/window/actions.rs:503
 msgid "Ready"
 msgstr ""
 
-#: rust/src/window.rs:663
+#: src/app/window/presentation.rs:189
 msgid "Current document"
 msgstr ""
 
-#: rust/src/window.rs:667 rust/src/window.rs:751
+#: src/app/window/presentation.rs:193 src/app/window/preferences.rs:40
 msgid "New document not saved yet"
 msgstr ""
 
-#: rust/src/window.rs:683
+#: src/app/window/presentation.rs:209
 msgid "Compiler"
 msgstr ""
 
-#: rust/src/window.rs:683
+#: src/app/window/presentation.rs:209
 msgid "Status"
 msgstr ""
 
-#: rust/src/window.rs:683
+#: src/app/window/presentation.rs:209
 msgid "Last build"
 msgstr ""
 
-#: rust/src/window.rs:743 rust/src/window.rs:767
+#: src/app/window/preferences.rs:32 src/app/window/preferences.rs:56
 msgid "Error"
 msgstr ""
 
-#: rust/src/window.rs:744 rust/src/window.rs:768
+#: src/app/window/preferences.rs:33 src/app/window/preferences.rs:57
 msgid "Modified"
 msgstr ""
 
-#: rust/src/window.rs:753
+#: src/app/window/preferences.rs:42
 msgid "No project folder selected"
 msgstr ""
 
-#: rust/src/window.rs:754
+#: src/app/window/preferences.rs:43
 msgid "Save the document to set the project file."
 msgstr ""
 
-#: rust/src/window.rs:755
+#: src/app/window/preferences.rs:44
 msgid ""
 "File: %s\n"
 "Project: %s"
 msgstr ""
 
-#: rust/src/window.rs:760
+#: src/app/window/preferences.rs:49
 msgid "Not found"
 msgstr ""
 
-#: rust/src/window.rs:762
+#: src/app/window/preferences.rs:51
 msgid "%s · local changes pending"
 msgstr ""
 
-#: rust/src/window.rs:783
+#: src/app/window/preferences.rs:72
 msgid "Just now"
 msgstr ""
 
-#: rust/src/window.rs:1000
+#: src/app/window/preferences.rs:270
 msgid "Match found"
 msgstr ""
 
-#: rust/src/window.rs:1000
+#: src/app/window/preferences.rs:270
 msgid "No results"
 msgstr ""
 
-#: rust/src/window.rs:1018
+#: src/app/window/preferences.rs:288
 msgid "Keyboard shortcuts"
 msgstr ""
 
-#: rust/src/window.rs:1019 rust/src/window.rs:2099
+#: src/app/window/preferences.rs:289 src/app/window/actions.rs:40
 msgid "Close"
 msgstr ""
 
-#: rust/src/window.rs:1046 rust/src/window.rs:1085 rust/src/window.rs:1243
-#: rust/src/window.rs:1590 rust/src/window.rs:1658 rust/src/window.rs:1707
-#: rust/src/window.rs:1770 rust/src/window.rs:1851 rust/src/window.rs:1947
-#: rust/src/window.rs:2032 rust/src/window.rs:2073 rust/src/window.rs:2314
-#: rust/src/window.rs:2469 rust/src/window.rs:2652
+#: src/app/window/preferences.rs:316 src/app/window/preferences.rs:355 src/app/window/presentation.rs:315
+#: src/app/window/presentation.rs:666 src/app/window/presentation.rs:734 src/app/window/presentation.rs:783
+#: src/app/window/presentation.rs:846 src/app/window/presentation.rs:927 src/app/window/presentation.rs:1023
+#: src/app/window/presentation.rs:1108 src/app/window/actions.rs:14 src/app/window/actions.rs:255
+#: src/app/window/editor.rs:37 src/app/window/documents.rs:3
 msgid "Cancel"
 msgstr ""
 
-#: rust/src/window.rs:1048
+#: src/app/window/preferences.rs:318
 msgid "LaTeX, BibTeX, and style files"
 msgstr ""
 
-#: rust/src/window.rs:1077 rust/src/window.rs:1302
+#: src/app/window/preferences.rs:347 src/app/window/presentation.rs:374
 msgid "A document save is still in progress."
 msgstr ""
 
-#: rust/src/window.rs:1084
+#: src/app/window/preferences.rs:354
 msgid "Unsaved changes"
 msgstr ""
 
-#: rust/src/window.rs:1086
+#: src/app/window/preferences.rs:356
 msgid "Discard"
 msgstr ""
 
-#: rust/src/window.rs:1087
+#: src/app/window/preferences.rs:357
 msgid "Save"
 msgstr ""
 
-#: rust/src/window.rs:1088
+#: src/app/window/preferences.rs:358
 msgid "Save changes before continuing?"
 msgstr ""
 
-#: rust/src/window.rs:1127
+#: src/app/window/preferences.rs:397
 msgid "Opening document…"
 msgstr ""
 
-#: rust/src/window.rs:1161
+#: src/app/window/presentation.rs:251
 msgid "This document has not been compiled yet."
 msgstr ""
 
-#: rust/src/window.rs:1169
+#: src/app/window/presentation.rs:259
 msgid "Could not open the document"
 msgstr ""
 
-#: rust/src/window.rs:1205
+#: src/app/window/presentation.rs:277
 msgid "Loading project…"
 msgstr ""
 
-#: rust/src/window.rs:1222 rust/src/window.rs:1386 rust/src/window.rs:2698
+#: src/app/window/presentation.rs:294 src/app/window/presentation.rs:458 src/app/window/documents.rs:49
 msgid "Could not list the project folder"
 msgstr ""
 
-#: rust/src/window.rs:1235
+#: src/app/window/presentation.rs:307
 msgid "This project has no .tex document yet."
 msgstr ""
 
-#: rust/src/window.rs:1241
+#: src/app/window/presentation.rs:313
 msgid "Choose main document"
 msgstr ""
 
-#: rust/src/window.rs:1244
+#: src/app/window/presentation.rs:316
 msgid "Open"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open document"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open project folder"
 msgstr ""
 
-#: rust/src/window.rs:1306
+#: src/app/window/presentation.rs:378
 msgid "Saving…"
 msgstr ""
 
-#: rust/src/window.rs:1325
+#: src/app/window/presentation.rs:397
 msgid "The document changed while it was being saved. Save again."
 msgstr ""
 
-#: rust/src/window.rs:1333
+#: src/app/window/presentation.rs:405
 msgid "Document saved"
 msgstr ""
 
-#: rust/src/window.rs:1346
+#: src/app/window/presentation.rs:418
 msgid "Open a project folder to browse its files."
 msgstr ""
 
-#: rust/src/window.rs:1353
+#: src/app/window/presentation.rs:425
 msgid "Loading project files…"
 msgstr ""
 
-#: rust/src/window.rs:1379
+#: src/app/window/presentation.rs:451
 msgid "This project has no files yet. Use + to create one."
 msgstr ""
 
-#: rust/src/window.rs:1426
+#: src/app/window/presentation.rs:498
 msgid ""
 "This file is listed as a project resource and cannot be edited in Ovenbird "
 "yet."
 msgstr ""
 
-#: rust/src/window.rs:1463 rust/src/window.rs:1706 rust/src/window.rs:1708
+#: src/app/window/presentation.rs:535 src/app/window/presentation.rs:782 src/app/window/presentation.rs:784
 msgid "Rename"
 msgstr ""
 
-#: rust/src/window.rs:1463
+#: src/app/window/presentation.rs:535
 msgid "Move to Trash"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Confirm deletion"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Move ‘%s’ to Trash? You can restore it later."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Move folder ‘%s’ and its contents to Trash?"
 msgstr ""
 
-#: rust/src/window.rs:1591 rust/src/window.rs:1659 rust/src/window.rs:1852
+#: src/app/window/presentation.rs:667 src/app/window/presentation.rs:735 src/app/window/presentation.rs:928
 msgid "Create"
 msgstr ""
 
-#: rust/src/window.rs:1599
+#: src/app/window/presentation.rs:675
 msgid "File name in the selected folder"
 msgstr ""
 
-#: rust/src/window.rs:1612
+#: src/app/window/presentation.rs:688
 msgid "Enter a valid file name"
 msgstr ""
 
-#: rust/src/window.rs:1634
+#: src/app/window/presentation.rs:710
 msgid "File created"
 msgstr ""
 
-#: rust/src/window.rs:1637
+#: src/app/window/presentation.rs:713
 msgid "Could not create the file"
 msgstr ""
 
-#: rust/src/window.rs:1662
+#: src/app/window/presentation.rs:738
 msgid "Folder name"
 msgstr ""
 
-#: rust/src/window.rs:1675
+#: src/app/window/presentation.rs:751
 msgid "Enter a valid folder name"
 msgstr ""
 
-#: rust/src/window.rs:1690
+#: src/app/window/presentation.rs:766
 msgid "Folder created"
 msgstr ""
 
-#: rust/src/window.rs:1693
+#: src/app/window/presentation.rs:769
 msgid "Could not create the folder"
 msgstr ""
 
-#: rust/src/window.rs:1761
+#: src/app/window/presentation.rs:837
 msgid "Moved to Trash"
 msgstr ""
 
-#: rust/src/window.rs:1763
+#: src/app/window/presentation.rs:839
 msgid "Could not move to Trash"
 msgstr ""
 
-#: rust/src/window.rs:1768 rust/src/window.rs:1850
+#: src/app/window/presentation.rs:844 src/app/window/presentation.rs:926
 msgid "New project"
 msgstr ""
 
-#: rust/src/window.rs:1771
+#: src/app/window/presentation.rs:847
 msgid "Continue"
 msgstr ""
 
-#: rust/src/window.rs:1779
+#: src/app/window/presentation.rs:855
 msgid ""
 "Choose a starting point. Template files are copied into a local project "
 "folder."
 msgstr ""
 
-#: rust/src/window.rs:1785
+#: src/app/window/presentation.rs:861
 msgid "Blank LaTeX document"
 msgstr ""
 
-#: rust/src/window.rs:1785
+#: src/app/window/presentation.rs:861
 msgid "Start a new document with a simple article structure."
 msgstr ""
 
-#: rust/src/window.rs:1786
+#: src/app/window/presentation.rs:862
 msgid "ABNT · abnTeX2"
 msgstr ""
 
-#: rust/src/window.rs:1786
+#: src/app/window/presentation.rs:862
 msgid ""
 "Academic work, articles, reports, and research projects based on ABNT rules."
 msgstr ""
 
-#: rust/src/window.rs:1787
+#: src/app/window/presentation.rs:863
 msgid "IEEE · IEEEtran"
 msgstr ""
 
-#: rust/src/window.rs:1787
+#: src/app/window/presentation.rs:863
 msgid "IEEE conference and journal papers using the IEEEtran class."
 msgstr ""
 
-#: rust/src/window.rs:1788
+#: src/app/window/presentation.rs:864
 msgid "ACM · acmart"
 msgstr ""
 
-#: rust/src/window.rs:1788
+#: src/app/window/presentation.rs:864
 msgid "ACM journal and conference papers using the acmart class."
 msgstr ""
 
-#: rust/src/window.rs:1789
+#: src/app/window/presentation.rs:865
 msgid "Elsevier · elsarticle"
 msgstr ""
 
-#: rust/src/window.rs:1789
+#: src/app/window/presentation.rs:865
 msgid "Elsevier manuscripts using the elsarticle package."
 msgstr ""
 
-#: rust/src/window.rs:1790
+#: src/app/window/presentation.rs:866
 msgid "Springer Nature"
 msgstr ""
 
-#: rust/src/window.rs:1790
+#: src/app/window/presentation.rs:866
 msgid "Springer Nature journal article templates and sample files."
 msgstr ""
 
-#: rust/src/window.rs:1816
+#: src/app/window/presentation.rs:892
 msgid "Source"
 msgstr ""
 
-#: rust/src/window.rs:1828
+#: src/app/window/presentation.rs:904
 msgid ""
 "Journal and conference requirements can differ. Check the current author "
 "instructions before submission."
 msgstr ""
 
-#: rust/src/window.rs:1869
+#: src/app/window/presentation.rs:945
 msgid "Enter a valid project name"
 msgstr ""
 
-#: rust/src/window.rs:1879
+#: src/app/window/presentation.rs:955
 msgid "Creating project"
 msgstr ""
 
-#: rust/src/window.rs:1891
+#: src/app/window/presentation.rs:967
 msgid "Preparing template project…"
 msgstr ""
 
-#: rust/src/window.rs:1895
+#: src/app/window/presentation.rs:971
 msgid "Creating project…"
 msgstr ""
 
-#: rust/src/window.rs:1905 rust/src/window.rs:1932
+#: src/app/window/presentation.rs:981 src/app/window/presentation.rs:1008
 msgid "Could not create the project"
 msgstr ""
 
-#: rust/src/window.rs:1946 rust/src/window.rs:1948
+#: src/app/window/presentation.rs:1022 src/app/window/presentation.rs:1024
 msgid "Insert link"
 msgstr ""
 
-#: rust/src/window.rs:1954
+#: src/app/window/presentation.rs:1030
 msgid "Link text"
 msgstr ""
 
-#: rust/src/window.rs:1957
+#: src/app/window/presentation.rs:1033
 msgid "Text"
 msgstr ""
 
-#: rust/src/window.rs:1969
+#: src/app/window/presentation.rs:1045
 msgid "Enter a URL"
 msgstr ""
 
-#: rust/src/window.rs:1983
+#: src/app/window/presentation.rs:1059
 msgid "Open a project folder before inserting an image."
 msgstr ""
 
-#: rust/src/window.rs:1987
+#: src/app/window/presentation.rs:1063
 msgid "The image name is invalid."
 msgstr ""
 
-#: rust/src/window.rs:2016
+#: src/app/window/presentation.rs:1092
 msgid "Image copied to the project. Reopen the document to insert it."
 msgstr ""
 
-#: rust/src/window.rs:2025
+#: src/app/window/presentation.rs:1101
 msgid "Could not add the image to the project"
 msgstr ""
 
-#: rust/src/window.rs:2031
+#: src/app/window/presentation.rs:1107
 msgid "Insert table"
 msgstr ""
 
-#: rust/src/window.rs:2033
+#: src/app/window/presentation.rs:1109
 msgid "Insert"
 msgstr ""
 
-#: rust/src/window.rs:2040
+#: src/app/window/presentation.rs:1116
 msgid "Rows"
 msgstr ""
 
-#: rust/src/window.rs:2042
+#: src/app/window/presentation.rs:1118
 msgid "Columns"
 msgstr ""
 
-#: rust/src/window.rs:2074
+#: src/app/window/actions.rs:15
 msgid "OK"
 msgstr ""
 
-#: rust/src/window.rs:2143
+#: src/app/window/actions.rs:84
 msgid "No matching references"
 msgstr ""
 
-#: rust/src/window.rs:2176 rust/src/window.rs:2223
+#: src/app/window/actions.rs:117 src/app/window/actions.rs:164
 msgid "Could not load the local library"
 msgstr ""
 
-#: rust/src/window.rs:2184 rust/src/window.rs:2213
+#: src/app/window/actions.rs:125 src/app/window/actions.rs:154
 msgid "The local library is busy. Try again in a moment."
 msgstr ""
 
-#: rust/src/window.rs:2187
+#: src/app/window/actions.rs:128
 msgid "Saving references…"
 msgstr ""
 
-#: rust/src/window.rs:2202
+#: src/app/window/actions.rs:143
 msgid "Could not save the local library"
 msgstr ""
 
-#: rust/src/window.rs:2209
+#: src/app/window/actions.rs:150
 msgid "The local library is still loading."
 msgstr ""
 
-#: rust/src/window.rs:2229 rust/src/window.rs:2552
+#: src/app/window/actions.rs:170 src/app/window/actions.rs:432
 msgid "Retry"
 msgstr ""
 
-#: rust/src/window.rs:2235
+#: src/app/window/actions.rs:176
 msgid "Loading local library…"
 msgstr ""
 
-#: rust/src/window.rs:2253
+#: src/app/window/actions.rs:194
 msgid "No references match this search."
 msgstr ""
 
-#: rust/src/window.rs:2283
+#: src/app/window/actions.rs:224
 msgid "Edit reference"
 msgstr ""
 
 msgid "New reference"
 msgstr ""
 
-#: rust/src/window.rs:2288
+#: src/app/window/actions.rs:229
 msgid "Delete reference"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Delete reference ‘%s’ from the local library? This cannot be undone."
 msgstr ""
 
-#: rust/src/window.rs:2295 rust/src/window.rs:2388
+#: src/app/window/actions.rs:236 src/app/window/actions.rs:329
 msgid "Reference deleted"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "%d local reference · %s"
 msgid_plural "%d local references · %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rust/src/window.rs:2315
+#: src/app/window/actions.rs:256
 msgid "Delete"
 msgstr ""
 
-#: rust/src/window.rs:2328
+#: src/app/window/actions.rs:269
 msgid "Reference type"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Reference details"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Show reference details"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Cite this reference"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Citation format"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "ABNT"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "MLA"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "AMS"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "APA 7"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "IEEE"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Chicago (author-date)"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Harvard (author-date)"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Vancouver"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Copy value"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open a BibTeX file before adding a bibliographic reference."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "This reference is already in the BibTeX file."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Could not add the reference to the BibTeX file"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Copy formatted reference"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Copied to clipboard"
 msgstr ""
 
-#: rust/src/window.rs:2343
+#: src/app/window/actions.rs:284
 msgid "Full title of the work"
 msgstr ""
 
-#: rust/src/window.rs:2351
+#: src/app/window/actions.rs:292
 msgid "Citation key"
 msgstr ""
 
-#: rust/src/window.rs:2401
+#: src/app/window/actions.rs:342
 msgid "Enter the reference title"
 msgstr ""
 
-#: rust/src/window.rs:2416
+#: src/app/window/actions.rs:357
 msgid "Reference saved"
 msgstr ""
 
-#: rust/src/window.rs:2443
+#: src/app/window/editor.rs:11
 msgid "Imported %d references"
 msgstr ""
 
-#: rust/src/window.rs:2445
+#: src/app/window/editor.rs:13
 msgid "Could not import BibTeX"
 msgstr ""
 
-#: rust/src/window.rs:2460
+#: src/app/window/editor.rs:28
 msgid "BibTeX exported"
 msgstr ""
 
-#: rust/src/window.rs:2461
+#: src/app/window/editor.rs:29
 msgid "Could not export BibTeX"
 msgstr ""
 
-#: rust/src/window.rs:2652
+#: src/app/window/documents.rs:3
 msgid "Export"
 msgstr ""
 
-#: rust/src/window.rs:2671
+#: src/app/window/documents.rs:22
 msgid "Save the document before compiling."
 msgstr ""
 
-#: rust/src/window.rs:2707
+#: src/app/window/documents.rs:58
 msgid "Compilation is in progress."
 msgstr ""
 
-#: rust/src/window.rs:2728
+#: src/app/window/dialogs.rs:5
 msgid "%d local reference added to the temporary bibliography for this build"
 msgid_plural ""
 "%d local references added to the temporary bibliography for this build"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rust/src/window.rs:2736
+#: src/app/window/dialogs.rs:13
 msgid "%d duplicate citation key was left unchanged"
 msgid_plural "%d duplicate citation keys were left unchanged"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rust/src/window.rs:2742 rust/src/window.rs:2762
+#: src/app/window/dialogs.rs:19 src/app/window/dialogs.rs:39
 msgid "Compilation finished"
 msgstr ""
 
-#: rust/src/window.rs:2748 rust/src/window.rs:2755
+#: src/app/window/dialogs.rs:25 src/app/window/dialogs.rs:32
 msgid "Could not export PDF"
 msgstr ""
 
-#: rust/src/window.rs:2751
+#: src/app/window/dialogs.rs:28
 msgid "PDF exported"
 msgstr ""
 
-#: rust/src/window.rs:2766
+#: src/app/window/dialogs.rs:43
 msgid "Could not open the PDF"
 msgstr ""
 
-#: rust/src/window.rs:2767
+#: src/app/window/dialogs.rs:44
 msgid "Could not open the compiled PDF"
 msgstr ""
 
-#: rust/src/window.rs:2768
+#: src/app/window/dialogs.rs:45
 msgid "Could not open the PDF preview"
 msgstr ""
 
-#: rust/src/window.rs:2775 rust/src/window.rs:2776
+#: src/app/window/dialogs.rs:52 src/app/window/dialogs.rs:53
 msgid "Could not compile the document"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "PDF generation failed"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "PDF generation failed: Image on line %d was not found."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "PDF generation failed: The document contains errors that prevent compilation."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "PDF generation failed: Compilation stopped unexpectedly."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "PDF generation failed: Compilation timed out."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "%d more lines have missing citations."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "%d additional citation problems are not shown."
 msgstr ""
 
-#: rust/src/build.rs
+#: src/latex/build.rs
 msgid "No LaTeX compiler was found. Install latexmk, Tectonic, or TeX Live."
 msgstr ""
 
-#: rust/src/build.rs
+#: src/latex/build.rs
 msgid "This document uses biblatex and needs Biber. Install Biber, latexmk, or Tectonic."
 msgstr ""
 
-#: rust/src/build.rs
+#: src/latex/build.rs
 msgid "This document needs BibTeX. Install BibTeX, latexmk, or Tectonic."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Citation on line %d has no bibliographic reference in the document."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Citations on lines %s have no bibliographic references in the document."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Line %d: %s"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Could not add the reference to the document"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Save the document before inserting a citation."
 msgstr ""
 
-#: rust/src/window.rs:2783
+#: src/app/window/dialogs.rs:60
 msgid "Open or create a LaTeX project before compiling."
 msgstr ""
 
-#: rust/src/window.rs:2789
+#: src/app/window/dialogs.rs:66
 msgid "Check the build output"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Visual mode is available only for LaTeX documents."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open a LaTeX document before inserting an image."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Image and PDF files"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Choose a main LaTeX document before inserting an image."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "The image path cannot be represented relative to the main document."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open a LaTeX document before inserting a citation."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "New LaTeX document"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "New bibliography (.bib)"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "New style file (.sty)"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Previous match"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Next match"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Bold"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Italic"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Underline"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Monospace"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Section"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Subsection"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Subsubsection"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Paragraph"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Subparagraph"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Inline math"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Display math"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "α  Alpha"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "β  Beta"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "γ  Gamma"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "π  Pi"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "≤  Less than or equal to"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "≥  Greater than or equal to"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "≠  Not equal to"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "×  Multiplication"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "±  Plus or minus"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "∞  Infinity"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "∑  Summation"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "∫  Integral"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "√  Square root"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Bulleted list"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Numbered list"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Quotation block"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Increase indent"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Decrease indent"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Insert image"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "LaTeX comment"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Footnote"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Review note"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Add label"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Cross-reference"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Compile"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Toggle sidebar"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Undo"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Redo"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Choose a project folder"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Choose where to create the project"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Import"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Label identifier"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open project"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open at startup"
 msgstr ""
 
-#: rust/src/window.rs rust/src/application_menu.rs
+#: src/app/window/mod.rs src/app/application_menu.rs
 msgid "Preferences"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Default folder for file dialogs"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Dialogs start in Downloads unless you choose another folder."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Choose folder…"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Choose default folder"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Reset"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Restore the system default folder"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "No starting folder available"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Reopen last project at startup"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "The last project folder could not be restored."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Close project"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Automatic"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Light"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Dark"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Quit"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Project closed"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "%d reference"
 msgid_plural "%d references"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Open with default application"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Copy path"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Show in Files"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Could not access the clipboard."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Could not find the containing folder."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Authors"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Manage references"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Manage authors"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Add author"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Edit author"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Author details"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Full name"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Name used in references"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Generate"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "ORCID"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Email"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Delete author"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "No authors yet. Add authors to organize your references."
 msgstr ""
 
 msgid "No authors match this search."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Author name"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Author saved"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Author deleted"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Author has associated references"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "The author ‘%s’ is associated with these references. Delete the author and all listed references?"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Delete author and references"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Deleted author and %d references"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Find authors…"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "New author"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Create and select this author"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Select or create authors"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Remove author from this reference"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Move author up"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Move author down"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "No matching authors"
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "PDF generation failed: An error on line %d prevents compilation and PDF generation."
 msgstr ""
 
-#: rust/src/window.rs
+#: src/app/window/mod.rs
 msgid "Your library starts here: add a reference or import BibTeX."
 msgstr ""
 
-#: rust/src/storage.rs
+#: src/references/library.rs
 msgid "The BibTeX marker “others” cannot be used as an author name."
 msgstr ""
