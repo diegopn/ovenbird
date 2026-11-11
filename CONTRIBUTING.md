@@ -1,10 +1,10 @@
 # Contributing
 
-Small, focused changes are easiest to review. Before opening an issue or pull request, check the build instructions in the [README](README.md).
+Small, focused changes are easiest to review. By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md). For security vulnerabilities, follow [SECURITY.md](SECURITY.md) and do not report them publicly.
 
 ## Development setup
 
-For a native Fedora build, install the packages listed in the README, then run:
+For a native build, install the packages listed in the [README build instructions](README.md#building-from-source-on-linux), then run:
 
 ```sh
 meson setup build
@@ -23,14 +23,12 @@ meson test -C build --print-errorlogs
 
 GitHub Actions runs the same quality checks on pushes and pull requests. Meson is the integration build and runs Cargo offline with the repository's dependency cache.
 
-For a local Flatpak build, use the GNOME SDK and Rust extension described in the README. Keep native and Flatpak build directories separate.
+For a local Flatpak build, use the GNOME SDK and Rust extension described in the [README build instructions](README.md#building-from-source-on-linux). Keep native and Flatpak build directories separate.
 
 ## Security checks
 
 The `Ovenbird checks` workflow runs build, test, and security checks on every
-push and pull request. Dependabot checks Cargo dependencies and GitHub Actions
-every two months and proposes updates as pull requests; security updates remain
-separate from this version update schedule. Updates are not merged automatically.
+push and pull request.
 
 - `cargo-audit` checks `Cargo.lock` against the RustSec advisory database.
 - Gitleaks scans Git history for exposed credentials, with secret values redacted.
@@ -46,8 +44,8 @@ personally owned repository. Actions are pinned to commit hashes.
 
 When a dependency update changes `Cargo.lock`, refresh the checked-in
 `cargo-cache/registry/index` and `cargo-cache/registry/cache` for the new locked
-dependencies before merging. Dependabot does not refresh this cache. Keep the
-Meson build offline and run the usual quality checks against the updated cache.
+dependencies before merging. Keep the Meson build offline and run the usual
+quality checks against the updated cache.
 Do not ignore advisories or secret findings just to make a check pass. A leaked
 credential must be revoked or rotated, even if it has been removed from the code.
 

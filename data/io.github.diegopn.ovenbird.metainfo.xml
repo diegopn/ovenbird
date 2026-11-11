@@ -7,12 +7,13 @@
   <summary xml:lang="es">Editor de LaTeX y gestor de bibliografía</summary>
   <summary xml:lang="fr">Éditeur LaTeX et gestionnaire de bibliographie</summary>
   <summary xml:lang="it">Editor LaTeX e gestione bibliografica</summary>
-  <url type="homepage">https://github.com/diegopn/ovenbird</url>
-  <url type="contact">https://diegopn.github.io/</url>
+  <url type="homepage">https://diegopn.github.io/ovenbird-site/</url>
   <url type="bugtracker">https://github.com/diegopn/ovenbird/issues</url>
+  <url type="help">https://diegopn.github.io/ovenbird-site/manual/</url>
+  <url type="contact">https://diegopn.github.io/#contato</url>
+  <url type="donation">https://github.com/sponsors/diegopn</url>
   <url type="vcs-browser">https://github.com/diegopn/ovenbird</url>
-  <url type="contribute">https://github.com/diegopn/ovenbird/blob/main/CONTRIBUTING.md</url>
-  <url type="donation">https://github.com/sponsors/diegopn/</url>
+  <url type="contribute">https://github.com/diegopn/ovenbird/blob/develop/CONTRIBUTING.md</url>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <description>
@@ -60,6 +61,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.5.0" date="2026-11-10" type="stable">
+      <description>
+        <p>Flatpak development builds now use a separate application ID from stable releases. The stable release manifest is documented alongside the local development setup.</p>
+      </description>
+    </release>
     <release version="0.4.0" date="2026-10-26" type="stable">
       <description>
         <p>References can now be imported from and exported to BibTeX (.bib), with in-app guides for Zotero, JabRef, and Mendeley.</p>
