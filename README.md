@@ -126,17 +126,17 @@ Meson invokes Cargo with `Cargo.lock` and network access disabled. Build artifac
 
 ### Local Flatpak development
 
-Use `io.github.diegopn.ovenbird.json` for local development builds. It uses the `.Devel` application ID. Use `io.github.diegopn.ovenbird.release.json` when preparing a stable release package; it uses the stable application ID.
+Use `flatpak/io.github.diegopn.ovenbird.json` for local development builds. It uses the `.Devel` application ID. Use `flatpak/io.github.diegopn.ovenbird.release.json` when preparing a stable release package; it uses the stable application ID.
 
 ```sh
-flatpak-builder --user --force-clean .flatpak-build io.github.diegopn.ovenbird.json
-flatpak-builder --user --install --force-clean .flatpak-build io.github.diegopn.ovenbird.json
+flatpak-builder --user --force-clean .flatpak-build flatpak/io.github.diegopn.ovenbird.json
+flatpak-builder --user --install --force-clean .flatpak-build flatpak/io.github.diegopn.ovenbird.json
 flatpak run io.github.diegopn.ovenbird.Devel
 ```
 
 The local development manifest uses the `.Devel` application ID so GNOME Builder and Glycin can identify an uninstalled development build correctly. The application reads `FLATPAK_ID` at startup, so its `GApplication` ID follows the selected Flatpak manifest; a native launch keeps the stable ID. Both manifests use GNOME Platform/SDK 51 and the stable Rust SDK extension. The first Tectonic build may download LaTeX support files at runtime. Creating a project from a bundled template does not require a network connection.
 
-In GNOME Builder, use `io.github.diegopn.ovenbird.json` as the Flatpak manifest. If the build still reports `org.ovenbird.Ovenbird` or the stable ID `io.github.diegopn.ovenbird`, recreate the build configuration from the current manifest; Builder is using an old application ID.
+In GNOME Builder, use `flatpak/io.github.diegopn.ovenbird.json` as the Flatpak manifest. If the build still reports `org.ovenbird.Ovenbird` or the stable ID `io.github.diegopn.ovenbird`, recreate the build configuration from the current manifest; Builder is using an old application ID.
 
 ## Data and documents
 

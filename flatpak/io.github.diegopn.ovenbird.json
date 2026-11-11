@@ -1,5 +1,5 @@
 {
-  "app-id": "io.github.diegopn.ovenbird",
+  "app-id": "io.github.diegopn.ovenbird.Devel",
   "runtime": "org.gnome.Platform",
   "runtime-version": "51",
   "sdk": "org.gnome.Sdk",
@@ -86,7 +86,7 @@
       "sources": [
         {
           "type": "dir",
-          "path": ".",
+          "path": "..",
           "skip": [
             ".agents",
             ".aws",
@@ -99,6 +99,7 @@
             ".tooling",
             "_build",
             "_flatpak-build",
+            "flatpak",
             "build",
             "build-check",
             "docs",

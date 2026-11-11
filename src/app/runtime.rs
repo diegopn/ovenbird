@@ -8,7 +8,8 @@ pub fn application_id_for_runtime(flatpak_id: Option<&str>) -> &str {
 
 #[cfg(test)]
 mod tests {
-    const DEVELOPMENT_MANIFEST: &str = include_str!("../../io.github.diegopn.ovenbird.json");
+    const DEVELOPMENT_MANIFEST: &str =
+        include_str!("../../flatpak/io.github.diegopn.ovenbird.json");
 
     #[test]
     fn flatpak_builder_manifest_uses_development_application_id() {
