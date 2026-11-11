@@ -28,9 +28,7 @@ For a local Flatpak build, use the GNOME SDK and Rust extension described in the
 ## Security checks
 
 The `Ovenbird checks` workflow runs build, test, and security checks on every
-push and pull request. Dependabot checks Cargo dependencies and GitHub Actions
-every two months and proposes updates as pull requests; security updates remain
-separate from this version update schedule. Updates are not merged automatically.
+push and pull request.
 
 - `cargo-audit` checks `Cargo.lock` against the RustSec advisory database.
 - Gitleaks scans Git history for exposed credentials, with secret values redacted.
@@ -46,8 +44,8 @@ personally owned repository. Actions are pinned to commit hashes.
 
 When a dependency update changes `Cargo.lock`, refresh the checked-in
 `cargo-cache/registry/index` and `cargo-cache/registry/cache` for the new locked
-dependencies before merging. Dependabot does not refresh this cache. Keep the
-Meson build offline and run the usual quality checks against the updated cache.
+dependencies before merging. Keep the Meson build offline and run the usual
+quality checks against the updated cache.
 Do not ignore advisories or secret findings just to make a check pass. A leaked
 credential must be revoked or rotated, even if it has been removed from the code.
 
