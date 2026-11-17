@@ -1,0 +1,111 @@
+name: Flatpak release bundles
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - .github/workflows/release-flatpak.yml
+      - Cargo.lock
+      - Cargo.toml
+      - build.rs
+      - cargo-cache/**
+      - data/**
+      - flatpak/**
+      - meson.build
+      - po/**
+      - rust-toolchain.toml
+      - src/**
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }} bundle
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Flatpak builder
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes flatpak flatpak-builder
+
+      - name: Add Flathub remote
+        run: flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Build architecture-specific bundle
+        env:
+          PACKAGE_ARCH: ${{ matrix.arch }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          case "$(uname -m)" in
+            x86_64) actual_arch=x86_64 ;;
+            aarch64) actual_arch=aarch64 ;;
+            *) echo "Unsupported runner architecture: $(uname -m)" >&2; exit 1 ;;
+          esac
+          test "$actual_arch" = "$PACKAGE_ARCH"
+
+          safe_tag="${RELEASE_TAG//\//-}"
+          bundle="Ovenbird-${safe_tag}-${PACKAGE_ARCH}.flatpak"
+
+          flatpak-builder \
+            --arch="$PACKAGE_ARCH" \
+            --default-branch=stable \
+            --disable-rofiles-fuse \
+            --force-clean \
+            --install-deps-from=flathub \
+            --repo=flatpak-repo \
+            --user \
+            .flatpak-build \
+            flatpak/io.github.diegopn.ovenbird.release.json
+
+          flatpak build-bundle \
+            --arch="$PACKAGE_ARCH" \
+            --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+            flatpak-repo \
+            "$bundle" \
+            io.github.diegopn.ovenbird \
+            stable
+          sha256sum "$bundle" > "$bundle.sha256"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ovenbird-flatpak-${{ matrix.arch }}
+          path: |
+            Ovenbird-*.flatpak
+            Ovenbird-*.flatpak.sha256
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Attach bundles to release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download architecture bundles
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ovenbird-flatpak-*
+          merge-multiple: true
+          path: dist
+
+      - name: Upload bundles and checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"

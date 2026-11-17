@@ -9,14 +9,33 @@ permissions:
 
 jobs:
   quality:
-    name: Build and test
+    name: Build and test (${{ matrix.arch }})
     if: github.event_name == 'push' || github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     container: registry.fedoraproject.org/fedora:44
     defaults:
       run:
         shell: bash
     steps:
+      - name: Check runner architecture
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: |
+          case "$(uname -m)" in
+            x86_64) actual_arch=x86_64 ;;
+            aarch64) actual_arch=aarch64 ;;
+            *) echo "Unsupported runner architecture: $(uname -m)" >&2; exit 1 ;;
+          esac
+          test "$actual_arch" = "$EXPECTED_ARCH"
+
       - name: Install native build dependencies
         run: |
           dnf install --assumeyes --setopt=install_weak_deps=False \

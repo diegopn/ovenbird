@@ -124,6 +124,18 @@ The repository pins Rust 1.92.0, including `rustfmt` and Clippy, in `rust-toolch
 
 Meson invokes Cargo with `Cargo.lock` and network access disabled. Build artifacts and the Cargo home stay inside the build directory. If you already have a build directory from another Meson version, configure a new directory instead of deleting existing project files. See [CONTRIBUTING.md](CONTRIBUTING.md) for the checks to run before submitting Rust changes; GitHub Actions runs them on pushes and pull requests.
 
+### Stable release downloads
+
+New stable releases provide Flatpak installers for both `x86_64` (64-bit Intel/AMD) and `aarch64` (64-bit ARM). Download the `.flatpak` file matching your machine; the adjacent `.sha256` file contains its checksum. Install the downloaded file with:
+
+```sh
+flatpak install --user --bundle ./Ovenbird-vX.Y.Z-aarch64.flatpak
+```
+
+Replace the example filename with the downloaded asset; use `x86_64` or `aarch64` to match your processor.
+
+Flatpak may download GNOME Platform 51 from Flathub during installation, so an internet connection is required unless that runtime is already installed.
+
 ### Local Flatpak development
 
 Use `flatpak/io.github.diegopn.ovenbird.json` for local development builds. It uses the `.Devel` application ID. Use `flatpak/io.github.diegopn.ovenbird.release.json` when preparing a stable release package; it uses the stable application ID.
