@@ -7,7 +7,8 @@
   "sdk-extensions": ["org.freedesktop.Sdk.Extension.rust-stable"],
   "command": "ovenbird",
   "build-options": {
-    "append-path": "/usr/lib/sdk/rust-stable/bin"
+    "append-path": "/usr/lib/sdk/rust-stable/bin",
+    "libdir": "/app/lib"
   },
   "finish-args": [
     "--share=ipc",
