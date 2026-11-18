@@ -95,7 +95,6 @@ pub struct Template {
     pub id: &'static str,
     pub archive: &'static str,
     pub main_tex: &'static str,
-    pub overlay: &'static str,
 }
 
 pub const TEMPLATES: &[Template] = &[
@@ -103,31 +102,26 @@ pub const TEMPLATES: &[Template] = &[
         id: "abntex2",
         archive: "abntex2.zip",
         main_tex: "main.tex",
-        overlay: "abntex2",
     },
     Template {
         id: "ieeetran",
         archive: "ieeetran.zip",
         main_tex: "main.tex",
-        overlay: "ieeetran",
     },
     Template {
         id: "acmart",
         archive: "acmart.zip",
         main_tex: "main.tex",
-        overlay: "acmart",
     },
     Template {
         id: "elsarticle",
         archive: "elsarticle.zip",
         main_tex: "main.tex",
-        overlay: "elsarticle",
     },
     Template {
         id: "springer-nature",
         archive: "springer-nature.zip",
         main_tex: "main.tex",
-        overlay: "springer-nature",
     },
 ];
 
@@ -246,10 +240,6 @@ fn create_project_with_tool(
         if children.len() == 1 && children[0].path().is_dir() {
             content = children.remove(0).path();
         }
-        copy_overlay(
-            &resource_root.join("overlays").join(template.overlay),
-            &content,
-        )?;
         let main = content.join(template.main_tex);
         if !main.is_file() {
             return Err("The bundled template does not contain its entry document.".to_owned());
@@ -261,25 +251,12 @@ fn create_project_with_tool(
     result
 }
 
-fn copy_overlay(overlay: &Path, destination: &Path) -> Result<(), String> {
-    for entry in std::fs::read_dir(overlay).map_err(|error| error.to_string())? {
-        let entry = entry.map_err(|error| error.to_string())?;
-        if entry
-            .file_type()
-            .map_err(|error| error.to_string())?
-            .is_file()
-        {
-            std::fs::copy(entry.path(), destination.join(entry.file_name()))
-                .map_err(|error| error.to_string())?;
-        }
-    }
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::{create_project_async, resource_root, TEMPLATES};
+    use std::collections::HashMap;
     use std::path::{Path, PathBuf};
+    use std::process::Command;
     use std::time::Duration;
 
     fn test_root(name: &str) -> PathBuf {
@@ -404,5 +381,93 @@ mod tests {
         }
 
         std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn creates_projects_using_only_bundled_archives() {
+        let root = test_root("archive-only-template-test");
+        let parent = root.join("projects");
+        let templates = root.join("templates");
+        let vendor = templates.join("vendor");
+        let source_vendor = std::env::current_dir()
+            .unwrap()
+            .join("src/templates/vendor");
+        std::fs::create_dir_all(&parent).unwrap();
+        std::fs::create_dir_all(&vendor).unwrap();
+        for entry in std::fs::read_dir(source_vendor).unwrap() {
+            let entry = entry.unwrap();
+            std::fs::copy(entry.path(), vendor.join(entry.file_name())).unwrap();
+        }
+
+        for template in TEMPLATES {
+            let name = format!("{}-project", template.id);
+            let (project, main_tex) =
+                create_project_async(*template, parent.clone(), name, templates.clone())
+                    .recv_timeout(Duration::from_secs(45))
+                    .unwrap()
+                    .unwrap();
+            let (class_file, bibliography_style, bibliography_file) = match template.id {
+                "abntex2" => ("abntex2.cls", "abntex2-alf.bst", "references.bib"),
+                "ieeetran" => ("IEEEtran.cls", "IEEEtran.bst", "references.bib"),
+                "acmart" => ("acmart.cls", "ACM-Reference-Format.bst", "references.bib"),
+                "elsarticle" => ("elsarticle.cls", "elsarticle-num.bst", "references.bib"),
+                "springer-nature" => ("sn-jnl.cls", "sn-mathphys-num.bst", "sn-bibliography.bib"),
+                _ => panic!("unexpected bundled template: {}", template.id),
+            };
+            assert!(main_tex.is_file(), "{} must include main.tex", template.id);
+            assert!(
+                project.join(class_file).is_file(),
+                "{} must include its document class",
+                template.id
+            );
+            assert!(
+                project.join(bibliography_style).is_file(),
+                "{} must include its bibliography style",
+                template.id
+            );
+            assert!(
+                project.join(bibliography_file).is_file(),
+                "{} must include its example bibliography",
+                template.id
+            );
+            if template.id == "springer-nature" {
+                assert!(
+                    project.join("fig.pdf").is_file(),
+                    "Springer Nature must include its sample figure"
+                );
+            }
+        }
+
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn bundled_archive_checksums_match_readme() {
+        let templates = std::env::current_dir().unwrap().join("src/templates");
+        let readme = std::fs::read_to_string(templates.join("README.md")).unwrap();
+        let checksums = readme
+            .lines()
+            .filter_map(|line| {
+                let mut fields = line.split_whitespace();
+                let archive = fields.next()?;
+                let checksum = fields.next()?;
+                (archive.ends_with(".zip") && checksum.len() == 64)
+                    .then(|| (archive.to_owned(), checksum.to_owned()))
+            })
+            .collect::<HashMap<_, _>>();
+
+        assert_eq!(checksums.len(), TEMPLATES.len());
+        for template in TEMPLATES {
+            let expected = checksums
+                .get(template.archive)
+                .unwrap_or_else(|| panic!("README must document {}", template.archive));
+            let output = Command::new("sha256sum")
+                .arg(templates.join("vendor").join(template.archive))
+                .output()
+                .expect("sha256sum must be available to verify bundled archives");
+            assert!(output.status.success(), "sha256sum must succeed");
+            let actual = String::from_utf8_lossy(&output.stdout);
+            assert_eq!(actual.split_whitespace().next(), Some(expected.as_str()));
+        }
     }
 }

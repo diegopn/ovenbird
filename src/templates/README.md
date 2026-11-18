@@ -1,8 +1,9 @@
 # Bundled LaTeX templates
 
-The ZIP files in `vendor/` are the complete, unmodified packages distributed by
-their upstream projects. Ovenbird copies and extracts these local archives when
-creating a template project; project creation does not contact the network.
+Each ZIP in `vendor/` contains the complete upstream template package together
+with the files Ovenbird uses to start a project. The upstream package contents,
+documentation, and license notices are retained. Project creation extracts the
+local ZIP and does not contact the network.
 
 | Archive | Upstream package | License/source |
 | --- | --- | --- |
@@ -10,23 +11,21 @@ creating a template project; project creation does not contact the network.
 | `ieeetran.zip` | IEEEtran 1.8b | LPPL 1.3, [CTAN](https://ctan.org/pkg/ieeetran) |
 | `acmart.zip` | acmart 2.20 | LPPL 1.3, [CTAN](https://ctan.org/pkg/acmart) |
 | `elsarticle.zip` | elsarticle 3.4 | LPPL 1.3, [CTAN](https://ctan.org/pkg/elsarticle) |
-| `springer-nature.zip` | Springer Nature journal template, December 2024 | [Official package](https://www.springernature.com/gp/authors/campaigns/latex-author-support); original archive retained |
+| `springer-nature.zip` | Springer Nature journal template, December 2024 | [Official package](https://www.springernature.com/gp/authors/campaigns/latex-author-support) |
 
-The archives retain their original notices and documentation. `overlays/`
-provides class/style files at the project root when their upstream archive keeps
-them in a nested directory or supplies only the documented source (`.dtx`). It
-also supplies Ovenbird starter documents for ABNT, IEEE, ACM, and Elsevier, with
-an active bibliography and a local `references.bib` file. The Springer Nature
-entry document is copied unchanged to the project root with its required class
-and bibliography styles. Generated class files keep their upstream copyright
-and LPPL notices.
+The ZIPs include the Ovenbird starter documents and example bibliographies at
+the project root. Class and bibliography-style files supplied in nested package
+directories are also present at the root so the starter document can use them
+without extra path configuration. The ACM and Elsevier bundles include their
+generated class files. The Springer Nature bundle includes its sample figure.
+Generated class files retain their upstream copyright and LPPL notices.
 
-SHA-256 checksums for the bundled upstream archives:
+SHA-256 checksums of the bundled ZIP files:
 
 ```text
-abntex2.zip       2e4931c7336456083e10748bfb9b5cba855f81899ec84ea92d35a9aa04fc7f85
-acmart.zip        93933ce58fbeffa13e23398bb523fcb68275ecc73369c6bc73b421eeef2c10de
-elsarticle.zip    0b093093e84db49f99bcc9a7c3f69ed1fb61b0147c6d296427aff7963e7f50f6
-ieeetran.zip      e0cd4f5afbd42c8076092280e72b3e0a5111efe501d35de9f715cfb8da313cb4
-springer-nature.zip 812e76dcaa9c28dc1bff1fb6065d51729b67d4ea140552a05088317414a3ecae
+abntex2.zip       247ab346ceefa489a77e0f82e800ba6fa8e0149bcf88ad530bd17f6db202f2ab
+acmart.zip        3fcd3161b57ff0c54088a92902e5b2ce6100023e3c9f60a2618e2c53fa9a252a
+elsarticle.zip    2254e9b2f208e3fb5c643b00a8895ab973585fa1e22190f000eec9c2d49d427f
+ieeetran.zip      142d24e29348275f7a2e8efd1bf448eebafca91d1bcbc682657a95e0e2d318c8
+springer-nature.zip ee6c213e7240ee757a85e1a07adc305dd0b16d116566397d275570aaa91d0ff5
 ```
