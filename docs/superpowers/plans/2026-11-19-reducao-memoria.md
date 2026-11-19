@@ -47,7 +47,7 @@
 **Interfaces:**
 
 - `generate-memory-fixtures.py --output DIR` gera `main-long.tex`, `library-300.bib`, `library-1000.bib`, `pdf-100-pages.pdf` e `SHA256SUMS`.
-- `sample-process-memory.py PID --scenario NAME --interval-ms 250 --duration-sec N --output CSV` registra timestamp, RSS, PSS, memória privada limpa/suja, pico RSS do processo (`VmHWM`, quando disponível) e pico RSS amostrado.
+- `sample-process-memory.py PID --scenario NAME --interval-ms 250 --duration-sec N --output CSV` registra timestamp monotônico e RSS, PSS, memória privada limpa/suja e `VmHWM` em KiB; também registra o pico RSS amostrado como fallback.
 
 - [ ] **Passo 1: Escrever testes para os fixtures.** Verificar 5.000 linhas no TeX, aproximadamente 2,5 MiB, 300 e 1.000 entradas BibTeX com os mesmos campos e resumos de 1 KiB, 100 páginas PDF com uma imagem RGB de 512×512 compartilhada, e hashes que correspondem aos arquivos gerados.
 - [ ] **Passo 2: Rodar os testes e confirmar a falha.** Executar `python3 -m unittest discover -s tests -p 'test_memory_fixtures.py'`.
@@ -76,7 +76,7 @@
 - [ ] **Passo 3: Atualizar o cache Cargo offline.** Incluir o pacote mimalloc e todos os transitivos requeridos pelo build; confirmar que a compilação funciona com `CARGO_NET_OFFLINE=true`.
 - [ ] **Passo 4: Preparar três builds release isolados.** Configurar `build-memory-system`, `build-memory-rust` e `build-memory-override` com `meson setup DIR --buildtype=release -Dmemory-allocator=VALUE`; não reutilizar nem remover `build/`.
 - [ ] **Passo 5: Compilar as três variantes.** Executar `meson compile -C DIR` para cada diretório e registrar tamanho do binário e falhas de ligação.
-- [ ] **Passo 6: Confirmar a interposição no Flatpak experimental.** Antes de considerar o modo `override`, construir uma variante temporária do Flatpak release e usar `LD_DEBUG=bindings` para confirmar que chamadas `malloc` de GLib/GTK resolvem para mimalloc. Se não resolverem, marcar a variante como não funcional para memória nativa; não inferir cobertura pelo uso de `#[global_allocator]`.
+- [ ] **Passo 6: Confirmar a interposição no Flatpak experimental.** Criar uma cópia temporária do manifesto release ao lado do original, adicionar `-Dmemory-allocator=mimalloc-override` em `config-opts` do módulo Ovenbird e manter `path: ..`; não alterar o manifesto acompanhado pelo Git. Construir em `build-memory-flatpak` e executar com `flatpak-builder --run build-memory-flatpak MANIFESTO_TEMPORARIO env LD_DEBUG=bindings /app/bin/ovenbird`. Confirmar nos bindings que chamadas `malloc` de GLib/GTK resolvem para mimalloc. Se não resolverem, marcar a variante como não funcional para memória nativa; não inferir cobertura pelo uso de `#[global_allocator]`.
 - [ ] **Passo 7: Comparar os alocadores.** Baseline: três repetições por cenário. Depois comparar cada variante pelo menos três vezes em todos os cenários para verificar regressões; fazer cinco repetições em repouso e nos dois cenários de maior consumo. Guardar CSVs e medianas em `docs/performance/memory-baseline.md`.
 - [ ] **Passo 8: Revisar o resultado antes de escolher padrão.** Um modo só é candidato se reduzir PSS mediano em pelo menos 5% em dois cenários e não elevar PSS em mais de 5% nos demais, sem regressão observável em abertura, digitação, busca ou prévia.
 
@@ -95,7 +95,7 @@
 - A implementação deve usar memória auxiliar proporcional ao tamanho da consulta, sem vetores que armazenem o documento inteiro ou todas as posições encontradas.
 
 - [ ] **Passo 1: Escrever testes para as regras atuais.** Manter `search_uses_unicode_character_offsets_and_wraps`; acrescentar casos de busca para trás com retorno circular, consulta vazia, ausência de resultado, sobreposição e `İ` minúsculo expandido em `i` mais ponto combinante.
-- [ ] **Passo 2: Rodar os testes e confirmar a falha de qualquer caso novo.** Executar os testes de busca usando o `CARGO_HOME` e `CARGO_TARGET_DIR` do `build-memory-system`, criado pela Tarefa 2.
+- [ ] **Passo 2: Rodar os testes e confirmar a falha de qualquer caso novo.** Executar `CARGO_HOME=build-memory-system/cargo-home CARGO_TARGET_DIR=build-memory-system/cargo-target CARGO_NET_OFFLINE=true cargo test --manifest-path Cargo.toml --locked --offline --lib search_`.
 - [ ] **Passo 3: Implementar a busca incremental.** Aplicar KMP sobre os caracteres minúsculos da consulta; percorrer o texto uma vez, mapear a janela de caracteres transformados para offsets de caracteres originais e guardar somente o primeiro/último resultado necessário para direção e retorno circular.
 - [ ] **Passo 4: Reexecutar os testes de busca.** Confirmar ranges em offsets Unicode do GtkTextBuffer e paridade de comportamento com a busca anterior.
 - [ ] **Passo 5: Medir o pico da busca.** Repetir buscas `a` e `citação` no fixture de 2,5 MiB; comparar pico RSS e PSS com o baseline, além do tempo de resposta.
@@ -116,7 +116,7 @@
 - Representar cada alteração por offset de byte UTF-8 válido, texto removido e texto inserido; nunca cortar uma string dentro de um caractere.
 
 - [ ] **Passo 1: Escrever testes para desfazer/refazer por alteração.** Manter `history_coalesces_typing_but_keeps_separate_actions`; acrescentar edição Unicode, substituição de documento inteiro, truncamento do redo após novo ramo e limite de 200 estados.
-- [ ] **Passo 2: Rodar os testes e confirmar as falhas.** Executar os testes de histórico com o ambiente Cargo offline do `build-memory-system`, criado pela Tarefa 2.
+- [ ] **Passo 2: Rodar os testes e confirmar as falhas.** Executar `CARGO_HOME=build-memory-system/cargo-home CARGO_TARGET_DIR=build-memory-system/cargo-target CARGO_NET_OFFLINE=true cargo test --manifest-path Cargo.toml --locked --offline --lib history_`.
 - [ ] **Passo 3: Implementar diferenças entre estados.** Calcular prefixo e sufixo comuns apenas em limites UTF-8 e guardar apenas o segmento substituído e o novo segmento. Coalescer digitação recalculando a alteração em relação ao estado anterior ao grupo; depois de desfazer e gravar novo estado, eliminar o ramo de redo.
 - [ ] **Passo 4: Implementar undo/redo sobre o estado corrente.** Aplicar o segmento inverso ou direto, restaurar cursor e modo, e avançar o estado-base quando o limite de 200 estados remover a alteração mais antiga.
 - [ ] **Passo 5: Rodar os testes de histórico.** Confirmar texto, cursor, modo, coalescência, limite e ramo após undo/redo.
@@ -173,7 +173,7 @@
 - Atualizar: `docs/performance/memory-baseline.md`
 - Condicional: `flatpak/io.github.diegopn.ovenbird.release.json`
 
-- [ ] **Passo 1: Executar as verificações Rust exigidas pelo projeto.** `cargo fmt --all -- --check` e `cargo clippy --locked --all-targets -- -D warnings`.
+- [ ] **Passo 1: Executar as verificações Rust exigidas pelo projeto.** Rodar `cargo fmt --all -- --check` e `CARGO_HOME=build-memory-system/cargo-home CARGO_TARGET_DIR=build-memory-system/cargo-target CARGO_NET_OFFLINE=true cargo clippy --locked --all-targets -- -D warnings`.
 - [ ] **Passo 2: Compilar e testar cada configuração aceita.** Executar `meson compile -C DIR` e `meson test -C DIR --print-errorlogs` em builds separados, sem substituir `build/` existente.
 - [ ] **Passo 3: Repetir a medição release Flatpak.** Comparar sistema e o melhor modo mimalloc em três processos novos para todos os cenários e em cinco processos para repouso e os dois cenários de maior consumo; confirmar também abertura, busca, desfazer/refazer, prévia PDF e fechamento do projeto.
 - [ ] **Passo 4: Aplicar o critério de sucesso.** A melhoria total exige queda de pelo menos 10% no pico ou PSS estabilizada do cenário mais pesado. Ativar mimalloc no manifest release somente se o próprio Flatpak cumprir também o critério de alocador da Tarefa 2; caso contrário, manter `system`.
