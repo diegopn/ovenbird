@@ -84,6 +84,9 @@
     {
       "name": "ovenbird",
       "buildsystem": "meson",
+      "config-opts": [
+        "--buildtype=release"
+      ],
       "sources": [
         {
           "type": "dir",
